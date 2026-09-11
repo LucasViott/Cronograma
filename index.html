@@ -189,6 +189,24 @@ select{cursor:pointer;appearance:none;
 }
 .date-nav .spacer{margin-left:auto;}
 
+/* ---------- DIÁRIO: LAYOUT EM DUAS COLUNAS ---------- */
+.daily-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:18px;
+  align-items:start;
+}
+.daily-main{min-width:0;}
+.daily-side{
+  position:sticky;
+  top:78px;              /* altura do header + folga */
+  align-self:start;
+}
+@media(max-width:1020px){
+  .daily-layout{grid-template-columns:1fr;}
+  .daily-side{position:static;top:auto;}
+}
+
 /* ---------- PROGRESS ---------- */
 .progress-wrap{margin-bottom:18px;}
 .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12.5px;}
@@ -364,11 +382,62 @@ select{cursor:pointer;appearance:none;
   border-color:#33333a;
 }
 
-@media(max-width:640px){
-  .cal-cell{min-height:58px;padding:6px;border-radius:9px;}
-  .cal-num{font-size:12px;}
-  .cal-badge{font-size:9px;padding:1px 6px;}
-  .cal-dots i{width:5px;height:5px;}
+/* ====== Calendário compacto (coluna lateral do Diário) ====== */
+.cal-panel{padding:14px;}
+.cal-panel .cal-head{
+  margin-bottom:12px;
+  gap:8px;
+}
+.cal-panel .cal-title{
+  font-size:14.5px;
+  flex:1;
+  min-width:0;
+}
+.cal-panel .cal-nav{gap:4px;}
+.cal-panel .cal-nav .nav-btn{
+  width:28px;height:28px;border-radius:8px;font-size:15px;
+}
+.cal-panel .cal-nav .btn.ghost{
+  padding:6px 10px;
+  font-size:12px;
+  border-radius:8px;
+}
+.cal-panel .cal-weekdays{gap:2px;margin-bottom:6px;}
+.cal-panel .cal-weekdays span{
+  font-size:9.5px;letter-spacing:.4px;padding:2px 0;
+}
+.cal-panel .cal-grid{gap:3px;}
+.cal-panel .cal-cell{
+  min-height:46px;
+  padding:5px;
+  border-radius:7px;
+  gap:2px;
+}
+.cal-panel .cal-num{font-size:12px;letter-spacing:-.1px;}
+.cal-panel .cal-badge{
+  font-size:9px;
+  padding:1px 5px;
+  border-radius:8px;
+}
+.cal-panel .cal-dots{gap:2px;}
+.cal-panel .cal-dots i{width:4px;height:4px;}
+
+/* Rodapé de legenda dentro do painel compacto */
+.cal-hint{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--border-soft);
+  font-size:11px;
+  color:var(--muted);
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.cal-hint .chip{
+  font-size:10.5px;font-weight:600;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--border);
+  padding:3px 9px;border-radius:20px;
 }
 
 /* ---------- WEEKLY GRID ---------- */
@@ -572,7 +641,6 @@ select{cursor:pointer;appearance:none;
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="daily">☀️ Diário</button>
-      <button class="tab" data-tab="calendar">📅 Calendário</button>
       <button class="tab" data-tab="weekly">🗓️ Semanal</button>
       <button class="tab" data-tab="dashboard">📊 Dashboard</button>
     </nav>
@@ -583,61 +651,64 @@ select{cursor:pointer;appearance:none;
 
   <!-- ============ VIEW: DIÁRIO ============ -->
   <section class="view active" id="view-daily">
-    <div class="section-head">
-      <div>
-        <h2>Rotina Diária</h2>
-        <p>Planeje seu dia por data. Cada dia tem sua própria lista.</p>
-      </div>
-    </div>
+    <div class="daily-layout">
 
-    <div class="date-nav">
-      <button class="nav-btn" id="prevDay" title="Dia anterior">‹</button>
-      <input type="date" id="dailyDate">
-      <button class="nav-btn" id="nextDay" title="Próximo dia">›</button>
-      <div class="label" id="dailyDateLabel"></div>
-      <div class="spacer"></div>
-      <button class="btn ghost" id="todayBtn">Hoje</button>
-      <button class="btn ghost" id="openCalendarBtn">📅 Calendário</button>
-      <button class="btn ghost" id="openWeeklyBtn">🗓️ Semana</button>
-    </div>
-
-    <form class="quick-add" id="dailyForm">
-      <input type="time" id="qTime" title="Horário de início" required>
-      <input type="text" id="qTitle" placeholder="O que você vai fazer?" maxlength="90" required>
-      <select id="qCat"></select>
-      <button class="btn primary" type="submit">+ Adicionar</button>
-    </form>
-
-    <div class="progress-wrap" id="dailyProgress"></div>
-
-    <ul class="task-list" id="dailyList"></ul>
-  </section>
-
-  <!-- ============ VIEW: CALENDÁRIO ============ -->
-  <section class="view" id="view-calendar">
-    <div class="section-head">
-      <div>
-        <h2>Calendário</h2>
-        <p>Datas com planos ficam destacadas. Clique em um dia para abrir no Diário.</p>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="cal-head">
-        <div class="cal-title" id="calTitle">—</div>
-        <div class="cal-nav">
-          <button class="nav-btn" id="calPrev" title="Mês anterior">‹</button>
-          <button class="btn ghost" id="calToday">Hoje</button>
-          <button class="nav-btn" id="calNext" title="Próximo mês">›</button>
+      <!-- Coluna principal: rotina diária -->
+      <div class="daily-main">
+        <div class="section-head">
+          <div>
+            <h2>Rotina Diária</h2>
+            <p>Planeje seu dia por data. Cada dia tem sua própria lista.</p>
+          </div>
         </div>
+
+        <div class="date-nav">
+          <button class="nav-btn" id="prevDay" title="Dia anterior">‹</button>
+          <input type="date" id="dailyDate">
+          <button class="nav-btn" id="nextDay" title="Próximo dia">›</button>
+          <div class="label" id="dailyDateLabel"></div>
+          <div class="spacer"></div>
+          <button class="btn ghost" id="todayBtn">Hoje</button>
+          <button class="btn ghost" id="openWeeklyBtn">🗓️ Semana</button>
+        </div>
+
+        <form class="quick-add" id="dailyForm">
+          <input type="time" id="qTime" title="Horário de início" required>
+          <input type="text" id="qTitle" placeholder="O que você vai fazer?" maxlength="90" required>
+          <select id="qCat"></select>
+          <button class="btn primary" type="submit">+ Adicionar</button>
+        </form>
+
+        <div class="progress-wrap" id="dailyProgress"></div>
+
+        <ul class="task-list" id="dailyList"></ul>
       </div>
 
-      <div class="cal-weekdays">
-        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span>
-        <span>Qui</span><span>Sex</span><span>Sáb</span>
-      </div>
+      <!-- Coluna lateral: calendário compacto de consulta -->
+      <aside class="daily-side">
+        <div class="panel cal-panel" id="calPanel">
+          <div class="cal-head">
+            <div class="cal-title" id="calTitle">—</div>
+            <div class="cal-nav">
+              <button class="nav-btn" id="calPrev" title="Mês anterior">‹</button>
+              <button class="nav-btn" id="calNext" title="Próximo mês">›</button>
+            </div>
+          </div>
 
-      <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-weekdays">
+            <span>D</span><span>S</span><span>T</span><span>Q</span>
+            <span>Q</span><span>S</span><span>S</span>
+          </div>
+
+          <div class="cal-grid" id="calGrid"></div>
+
+          <div class="cal-hint">
+            <button class="chip" id="calToday" type="button" style="cursor:pointer;font:inherit;">Ir para hoje</button>
+            <span class="chip" id="calMonthTotal">0 no mês</span>
+          </div>
+        </div>
+      </aside>
+
     </div>
   </section>
 
@@ -733,6 +804,7 @@ select{cursor:pointer;appearance:none;
    CONSTANTES
    ============================================================ */
 const STORAGE_KEY = 'cronoplano.v3';
+const VALID_TABS = ['daily','weekly','dashboard'];
 
 const CATEGORIES = {
   'formacao-inicial':           { label:'Formação Inicial',           color:'#60a5fa' },
@@ -750,9 +822,6 @@ const PRIO = {
 
 /* ============================================================
    ESTADO
-   Tudo é armazenado em data.daily[YYYY-MM-DD] = [tasks]
-   As 3 visões (Diário, Calendário, Semanal) leem e escrevem no
-   mesmo lugar — por isso ficam automaticamente sincronizadas.
    ============================================================ */
 function todayISO(){
   return new Date().toLocaleDateString('sv-SE');
@@ -785,14 +854,14 @@ function load(){
     if(raw){
       const parsed = JSON.parse(raw);
       data.daily = parsed.daily || {};
-      // migração antiga: descarta weekly se existir
       if(parsed.ui){
-        ui.tab = parsed.ui.tab || ui.tab;
+        ui.tab  = parsed.ui.tab  || ui.tab;
         ui.date = parsed.ui.date || ui.date;
         if(parsed.ui.calMonth) ui.calMonth = parsed.ui.calMonth;
       }
     }
   }catch(err){ console.warn('Falha ao carregar dados:', err); }
+  if(!VALID_TABS.includes(ui.tab)) ui.tab = 'daily';
 }
 
 function save(){
@@ -845,13 +914,11 @@ function sortByTime(arr){
 function isoOf(dt){
   return dt.toLocaleDateString('sv-SE');
 }
-
-/* retorna o objeto Date da segunda-feira da semana que contém a data ISO */
 function mondayOf(iso){
   const [y,m,d] = iso.split('-').map(Number);
   const dt = new Date(y, m-1, d);
-  const dow = dt.getDay();                 // 0=dom
-  const offset = dow === 0 ? -6 : 1 - dow; // move para segunda
+  const dow = dt.getDay();
+  const offset = dow === 0 ? -6 : 1 - dow;
   dt.setDate(dt.getDate() + offset);
   return dt;
 }
@@ -860,6 +927,7 @@ function mondayOf(iso){
    NAVEGAÇÃO DE ABAS
    ============================================================ */
 function switchTab(tab){
+  if(!VALID_TABS.includes(tab)) tab = 'daily';
   ui.tab = tab;
   $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + tab));
@@ -898,37 +966,38 @@ function renderDaily(){
         Nenhuma atividade para este dia.<br>
         <span>Use o campo acima para adicionar sua primeira tarefa.</span>
       </div>`;
-    return;
+  } else {
+    list.innerHTML = tasks.map(t => {
+      const cat = catOf(t.cat);
+      const prio = PRIO[t.prio] || PRIO.media;
+      return `
+        <li class="task ${t.done?'done':''}" data-id="${t.id}" style="--c:${cat.color}">
+          <button class="check" data-act="toggle" title="Marcar como concluída">${t.done?'✓':''}</button>
+          <div class="t-time">
+            <strong>${t.start ? esc(t.start) : '--:--'}</strong>
+            ${t.end ? `<span>${esc(t.end)}</span>` : ''}
+          </div>
+          <div class="t-main">
+            <div class="t-title">${esc(t.title)}</div>
+            <div class="t-meta">
+              <span class="pill" style="--c:${cat.color}">${cat.label}</span>
+              ${t.prio && t.prio !== 'media' ? `<span class="pill prio-${t.prio}">${prio.label}</span>` : ''}
+              ${t.notes ? `<span class="note">${esc(t.notes)}</span>` : ''}
+            </div>
+          </div>
+          <div class="t-actions">
+            <button data-act="edit" title="Editar">✎</button>
+            <button data-act="del"  title="Excluir">🗑</button>
+          </div>
+        </li>`;
+    }).join('');
   }
 
-  list.innerHTML = tasks.map(t => {
-    const cat = catOf(t.cat);
-    const prio = PRIO[t.prio] || PRIO.media;
-    return `
-      <li class="task ${t.done?'done':''}" data-id="${t.id}" style="--c:${cat.color}">
-        <button class="check" data-act="toggle" title="Marcar como concluída">${t.done?'✓':''}</button>
-        <div class="t-time">
-          <strong>${t.start ? esc(t.start) : '--:--'}</strong>
-          ${t.end ? `<span>${esc(t.end)}</span>` : ''}
-        </div>
-        <div class="t-main">
-          <div class="t-title">${esc(t.title)}</div>
-          <div class="t-meta">
-            <span class="pill" style="--c:${cat.color}">${cat.label}</span>
-            ${t.prio && t.prio !== 'media' ? `<span class="pill prio-${t.prio}">${prio.label}</span>` : ''}
-            ${t.notes ? `<span class="note">${esc(t.notes)}</span>` : ''}
-          </div>
-        </div>
-        <div class="t-actions">
-          <button data-act="edit" title="Editar">✎</button>
-          <button data-act="del"  title="Excluir">🗑</button>
-        </div>
-      </li>`;
-  }).join('');
+  renderCalendar();
 }
 
 /* ============================================================
-   RENDER: CALENDÁRIO
+   RENDER: CALENDÁRIO (compacto, na lateral)
    ============================================================ */
 function renderCalendar(){
   const { year, month } = ui.calMonth;
@@ -950,9 +1019,10 @@ function renderCalendar(){
   }
 
   const todayIso = todayISO();
+  let monthTotal = 0;
 
   $('#calTitle').textContent =
-    first.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+    first.toLocaleDateString('pt-BR', { month:'short', year:'numeric' });
 
   $('#calGrid').innerHTML = cells.map(c => {
     const iso   = isoOf(c.date);
@@ -962,6 +1032,8 @@ function renderCalendar(){
     const allDone   = count > 0 && doneCount === count;
     const isToday   = iso === todayIso;
     const isSelected = iso === ui.date;
+
+    if(!c.other) monthTotal += count;
 
     const dotColors = [];
     const seen = new Set();
@@ -981,16 +1053,17 @@ function renderCalendar(){
           </span>` : ''}
       </button>`;
   }).join('');
+
+  $('#calMonthTotal').textContent = `${monthTotal} no mês`;
 }
 
 /* ============================================================
-   RENDER: SEMANAL (mesmos dados do diário)
+   RENDER: SEMANAL
    ============================================================ */
 function renderWeekly(){
   const monday = mondayOf(ui.date);
   const todayIso = todayISO();
 
-  // monta as 7 datas da semana
   const weekDates = [];
   for(let i = 0; i < 7; i++){
     const dt = new Date(monday);
@@ -998,7 +1071,6 @@ function renderWeekly(){
     weekDates.push(dt);
   }
 
-  // rótulo: "08/09 – 14/09"
   const sun = weekDates[6];
   const fmt = dt => `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
   $('#wkLabel').textContent = `${fmt(monday)} – ${fmt(sun)}`;
@@ -1119,7 +1191,6 @@ function renderDashboard(){
   const S = collectStats();
   const pct = S.total ? Math.round((S.done / S.total) * 100) : 0;
 
-  // últimos 7 dias (diário)
   const last7 = [];
   const now = new Date();
   for(let i = 6; i >= 0; i--){
@@ -1134,7 +1205,6 @@ function renderDashboard(){
     });
   }
 
-  // semana atual (seg-dom)
   const monday = mondayOf(todayISO());
   const weekDates = [];
   for(let i = 0; i < 7; i++){
@@ -1224,10 +1294,9 @@ function renderDashboard(){
    RENDER PRINCIPAL
    ============================================================ */
 function render(){
-  if(ui.tab === 'daily')           renderDaily();
-  else if(ui.tab === 'calendar')   renderCalendar();
-  else if(ui.tab === 'weekly')     renderWeekly();
-  else                              renderDashboard();
+  if(ui.tab === 'daily')        renderDaily();
+  else if(ui.tab === 'weekly')  renderWeekly();
+  else                          renderDashboard();
 }
 
 /* ============================================================
@@ -1241,7 +1310,7 @@ function fillCategorySelects(){
 }
 
 /* ============================================================
-   MODAL (apenas tarefas diárias — que alimentam as 3 visões)
+   MODAL
    ============================================================ */
 let modalCtx = null;
 
@@ -1268,7 +1337,7 @@ function closeModal(){
 }
 
 /* ============================================================
-   AÇÕES (todas gravam em data.daily → sincronizadas nas 3 views)
+   AÇÕES
    ============================================================ */
 function toggleTask(date, id){
   const arr = data.daily[date] || [];
@@ -1317,10 +1386,9 @@ $('#todayBtn').addEventListener('click', () => { setDate(todayISO()); render(); 
 $('#dailyDate').addEventListener('change', e => {
   if(e.target.value){ setDate(e.target.value); render(); }
 });
-$('#openCalendarBtn').addEventListener('click', () => switchTab('calendar'));
 $('#openWeeklyBtn').addEventListener('click', () => switchTab('weekly'));
 
-/* --- Calendário: navegação de mês --- */
+/* --- Calendário lateral: navegação de mês --- */
 $('#calPrev').addEventListener('click', () => {
   const { year, month } = ui.calMonth;
   const d = new Date(year, month - 1, 1);
@@ -1337,15 +1405,15 @@ $('#calToday').addEventListener('click', () => {
   const now = new Date();
   ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
   setDate(todayISO());
-  renderCalendar();
+  render();
 });
 
-/* --- Calendário: clique em um dia leva ao Diário --- */
+/* --- Calendário lateral: clicar num dia só muda a data --- */
 $('#calGrid').addEventListener('click', e => {
   const cell = e.target.closest('.cal-cell');
   if(!cell) return;
   setDate(cell.dataset.date);
-  switchTab('daily');
+  render();          // já estamos no Diário; atualiza lista + calendário
 });
 
 /* --- Semanal: navegação de semana --- */
@@ -1355,7 +1423,6 @@ $('#wkToday').addEventListener('click', () => { setDate(todayISO()); render(); }
 
 /* --- Semanal: interações na grade --- */
 $('#weekGrid').addEventListener('click', e => {
-  // botão + de cada coluna
   const addBtn = e.target.closest('[data-add-date]');
   if(addBtn){
     const iso = addBtn.dataset.addDate;
@@ -1364,7 +1431,6 @@ $('#weekGrid').addEventListener('click', e => {
     return;
   }
 
-  // clicar no nome do dia (abre no Diário)
   const gotoEl = e.target.closest('[data-goto]');
   if(gotoEl){
     setDate(gotoEl.dataset.goto);
@@ -1372,7 +1438,6 @@ $('#weekGrid').addEventListener('click', e => {
     return;
   }
 
-  // item da tarefa
   const wk = e.target.closest('.wk-item');
   if(!wk) return;
   const id  = wk.dataset.id;
@@ -1490,6 +1555,7 @@ function init(){
     const now = new Date();
     ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
   }
+  if(!VALID_TABS.includes(ui.tab)) ui.tab = 'daily';
 
   $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + ui.tab));
