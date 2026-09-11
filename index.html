@@ -7,7 +7,6 @@
 <style>
 :root{
   color-scheme: dark;
-  /* TEMA CINZA MAIS ESCURO E NEUTRO */
   --bg:#0a0a0b;
   --bg-2:#111113;
   --surface:#17171a;
@@ -80,15 +79,6 @@ body::before{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;box-shadow:0 4px 16px rgba(124,139,255,.28);
 }
-#btnExport, #btnImport{
-  border:1px dashed var(--border);
-  background:transparent;
-}
-#btnExport:hover, #btnImport:hover{
-  border-style:solid;
-  border-color:var(--accent);
-  color:var(--accent);
-}
 
 /* ---------- MAIN ---------- */
 main{max-width:1280px;margin:0 auto;padding:26px 22px 90px;}
@@ -121,7 +111,7 @@ main{max-width:1280px;margin:0 auto;padding:26px 22px 90px;}
   padding:4px 11px;border-radius:20px;
 }
 
-/* ---------- FORM ELEMENTS ---------- */
+/* ---------- FORM ---------- */
 input,select,textarea{
   width:100%;
   background:var(--bg-2);
@@ -394,18 +384,30 @@ select{cursor:pointer;appearance:none;
   border-radius:13px;padding:13px;
   display:flex;flex-direction:column;gap:9px;
   min-height:190px;
+  transition:.16s;
 }
 .day-col.is-today{
   border-color:rgba(124,139,255,.5);
   box-shadow:0 0 0 1px rgba(124,139,255,.15), 0 8px 30px rgba(124,139,255,.06);
 }
+.day-col.is-selected{
+  background:linear-gradient(180deg,rgba(124,139,255,.08),transparent),var(--surface);
+  border-color:var(--accent);
+}
 .day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.day-head .name{font-size:12.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);}
+.day-head .name{
+  font-size:12.5px;font-weight:700;letter-spacing:.3px;
+  text-transform:uppercase;color:var(--muted);
+  cursor:pointer;
+  transition:.15s;
+}
+.day-head .name:hover{color:var(--text);}
 .day-col.is-today .day-head .name{color:var(--accent);}
 .day-head .add{
   width:24px;height:24px;border-radius:7px;border:1px solid var(--border);
   background:var(--surface-2);color:var(--muted);cursor:pointer;font-size:14px;
   line-height:1;display:grid;place-items:center;transition:.16s;
+  flex:0 0 auto;
 }
 .day-head .add:hover{background:var(--accent);color:#fff;border-color:transparent;}
 .day-count{font-size:10.5px;color:var(--muted);font-weight:600;}
@@ -417,10 +419,25 @@ select{cursor:pointer;appearance:none;
   border-radius:9px;padding:9px 10px;
   cursor:pointer;transition:.16s;position:relative;
   animation:fade .2s ease;
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
 }
 .wk-item:hover{background:#17171a;border-color:#35353c;border-left-color:var(--c);}
 .wk-item.done{opacity:.45;}
 .wk-item.done .wk-title{text-decoration:line-through;}
+.wk-check{
+  width:16px;height:16px;border-radius:50%;flex:0 0 auto;
+  border:2px solid #3b3b42;background:transparent;color:#fff;
+  cursor:pointer;transition:.15s;display:grid;place-items:center;
+  font-size:9px;font-weight:900;line-height:1;margin-top:1px;
+}
+.wk-check:hover{border-color:var(--accent);}
+.wk-item.done .wk-check{
+  background:var(--ok);
+  border-color:var(--ok);
+}
+.wk-body{flex:1;min-width:0;}
 .wk-time{
   font-size:10.5px;font-weight:700;color:var(--c,var(--accent));
   font-variant-numeric:tabular-nums;letter-spacing:.2px;margin-bottom:3px;
@@ -558,9 +575,6 @@ select{cursor:pointer;appearance:none;
       <button class="tab" data-tab="calendar">📅 Calendário</button>
       <button class="tab" data-tab="weekly">🗓️ Semanal</button>
       <button class="tab" data-tab="dashboard">📊 Dashboard</button>
-      <button class="tab" id="btnExport" title="Baixar arquivo com seus dados">⬇️ Exportar</button>
-      <button class="tab" id="btnImport" title="Carregar arquivo de dados">⬆️ Importar</button>
-      <input type="file" id="fileInput" accept=".json,application/json" hidden>
     </nav>
   </div>
 </header>
@@ -583,7 +597,8 @@ select{cursor:pointer;appearance:none;
       <div class="label" id="dailyDateLabel"></div>
       <div class="spacer"></div>
       <button class="btn ghost" id="todayBtn">Hoje</button>
-      <button class="btn ghost" id="openCalendarBtn">📅 Ver calendário</button>
+      <button class="btn ghost" id="openCalendarBtn">📅 Calendário</button>
+      <button class="btn ghost" id="openWeeklyBtn">🗓️ Semana</button>
     </div>
 
     <form class="quick-add" id="dailyForm">
@@ -630,10 +645,17 @@ select{cursor:pointer;appearance:none;
   <section class="view" id="view-weekly">
     <div class="section-head">
       <div>
-        <h2>Cronograma Semanal</h2>
-        <p>Sua grade fixa da semana. Clique em uma coluna para adicionar blocos.</p>
+        <h2>Visão Semanal</h2>
+        <p>Os mesmos planos do Diário, agrupados por dia da semana.</p>
       </div>
-      <button class="btn primary" id="addWeeklyBtn">+ Novo bloco</button>
+    </div>
+
+    <div class="date-nav">
+      <button class="nav-btn" id="wkPrev" title="Semana anterior">‹</button>
+      <div class="label" id="wkLabel"></div>
+      <button class="nav-btn" id="wkNext" title="Próxima semana">›</button>
+      <div class="spacer"></div>
+      <button class="btn ghost" id="wkToday">Esta semana</button>
     </div>
 
     <div class="panel" style="padding:14px;">
@@ -648,7 +670,7 @@ select{cursor:pointer;appearance:none;
     <div class="section-head">
       <div>
         <h2>Dashboard</h2>
-        <p>Visão geral separada do seu diário e do seu semanal.</p>
+        <p>Visão geral do seu planejamento.</p>
       </div>
     </div>
     <div id="dashContent"></div>
@@ -668,17 +690,9 @@ select{cursor:pointer;appearance:none;
         <input type="text" id="fTitle" placeholder="Ex: Reunião de equipe" maxlength="90" required>
       </label>
 
-      <div id="rowDate">
-        <label class="field"><span>Data</span>
-          <input type="date" id="fDate">
-        </label>
-      </div>
-
-      <div id="rowDay">
-        <label class="field"><span>Dia da semana</span>
-          <select id="fDay"></select>
-        </label>
-      </div>
+      <label class="field"><span>Data</span>
+        <input type="date" id="fDate">
+      </label>
 
       <div class="row">
         <label class="field"><span>Início</span>
@@ -718,9 +732,8 @@ select{cursor:pointer;appearance:none;
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v2';
+const STORAGE_KEY = 'cronoplano.v3';
 
-/* NOVAS CATEGORIAS */
 const CATEGORIES = {
   'formacao-inicial':           { label:'Formação Inicial',           color:'#60a5fa' },
   'formacao-continuada':        { label:'Formação Continuada',        color:'#a78bfa' },
@@ -735,24 +748,17 @@ const PRIO = {
   baixa: { label:'Baixa' }
 };
 
-const DAYS = [
-  { key:'seg', label:'Segunda', short:'Seg' },
-  { key:'ter', label:'Terça',   short:'Ter' },
-  { key:'qua', label:'Quarta',  short:'Qua' },
-  { key:'qui', label:'Quinta',  short:'Qui' },
-  { key:'sex', label:'Sexta',   short:'Sex' },
-  { key:'sab', label:'Sábado',  short:'Sáb' },
-  { key:'dom', label:'Domingo', short:'Dom' }
-];
-
 /* ============================================================
-   ESTADO + PERSISTÊNCIA
+   ESTADO
+   Tudo é armazenado em data.daily[YYYY-MM-DD] = [tasks]
+   As 3 visões (Diário, Calendário, Semanal) leem e escrevem no
+   mesmo lugar — por isso ficam automaticamente sincronizadas.
    ============================================================ */
 function todayISO(){
   return new Date().toLocaleDateString('sv-SE');
 }
 
-let data = { daily:{}, weekly:{} };
+let data = { daily: {} };
 let ui = {
   tab: 'daily',
   date: todayISO(),
@@ -774,11 +780,12 @@ function esc(s){
 function load(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY)
-              || localStorage.getItem('cronoplano.v1'); // migração suave
+              || localStorage.getItem('cronoplano.v2')
+              || localStorage.getItem('cronoplano.v1');
     if(raw){
       const parsed = JSON.parse(raw);
-      data.daily  = parsed.daily  || {};
-      data.weekly = parsed.weekly || {};
+      data.daily = parsed.daily || {};
+      // migração antiga: descarta weekly se existir
       if(parsed.ui){
         ui.tab = parsed.ui.tab || ui.tab;
         ui.date = parsed.ui.date || ui.date;
@@ -786,17 +793,12 @@ function load(){
       }
     }
   }catch(err){ console.warn('Falha ao carregar dados:', err); }
-
-  DAYS.forEach(d => {
-    if(!Array.isArray(data.weekly[d.key])) data.weekly[d.key] = [];
-  });
 }
 
 function save(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       daily: data.daily,
-      weekly: data.weekly,
       ui: {
         tab: ui.tab,
         date: ui.date,
@@ -840,9 +842,18 @@ function sortByTime(arr){
     (a.start || '99:99').localeCompare(b.start || '99:99')
   );
 }
-function dayIndexOfToday(){
-  const jsDay = new Date().getDay();
-  return jsDay === 0 ? 6 : jsDay - 1;
+function isoOf(dt){
+  return dt.toLocaleDateString('sv-SE');
+}
+
+/* retorna o objeto Date da segunda-feira da semana que contém a data ISO */
+function mondayOf(iso){
+  const [y,m,d] = iso.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  const dow = dt.getDay();                 // 0=dom
+  const offset = dow === 0 ? -6 : 1 - dow; // move para segunda
+  dt.setDate(dt.getDate() + offset);
+  return dt;
 }
 
 /* ============================================================
@@ -850,7 +861,7 @@ function dayIndexOfToday(){
    ============================================================ */
 function switchTab(tab){
   ui.tab = tab;
-  $$('.tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + tab));
   save();
   render();
@@ -922,28 +933,23 @@ function renderDaily(){
 function renderCalendar(){
   const { year, month } = ui.calMonth;
   const first = new Date(year, month, 1);
-  const startDay = first.getDay();           // 0 = domingo
+  const startDay = first.getDay();
   const daysInMonth = new Date(year, month+1, 0).getDate();
   const prevDays    = new Date(year, month, 0).getDate();
 
   const cells = [];
-  // Dias do mês anterior para preencher a primeira semana
   for(let i = startDay - 1; i >= 0; i--){
-    const d = prevDays - i;
-    cells.push({ date: new Date(year, month-1, d), other: true });
+    cells.push({ date: new Date(year, month-1, prevDays - i), other: true });
   }
-  // Dias do mês atual
   for(let d = 1; d <= daysInMonth; d++){
     cells.push({ date: new Date(year, month, d), other: false });
   }
-  // Completa até 42 células (6 semanas)
   let nextD = 1;
   while(cells.length < 42){
     cells.push({ date: new Date(year, month+1, nextD++), other: true });
   }
 
   const todayIso = todayISO();
-  const isoOf = dt => dt.toLocaleDateString('sv-SE');
 
   $('#calTitle').textContent =
     first.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
@@ -957,12 +963,11 @@ function renderCalendar(){
     const isToday   = iso === todayIso;
     const isSelected = iso === ui.date;
 
-    // pega até 4 cores de categoria para mostrar como pontinhos
     const dotColors = [];
     const seen = new Set();
     for(const t of tasks){
-      const c = catOf(t.cat).color;
-      if(!seen.has(c)){ seen.add(c); dotColors.push(c); }
+      const c2 = catOf(t.cat).color;
+      if(!seen.has(c2)){ seen.add(c2); dotColors.push(c2); }
       if(dotColors.length >= 4) break;
     }
 
@@ -979,33 +984,55 @@ function renderCalendar(){
 }
 
 /* ============================================================
-   RENDER: SEMANAL
+   RENDER: SEMANAL (mesmos dados do diário)
    ============================================================ */
 function renderWeekly(){
-  const todayIdx = dayIndexOfToday();
-  const grid = $('#weekGrid');
+  const monday = mondayOf(ui.date);
+  const todayIso = todayISO();
 
-  grid.innerHTML = DAYS.map((d, i) => {
-    const items = sortByTime(data.weekly[d.key] || []);
-    const isToday = i === todayIdx;
+  // monta as 7 datas da semana
+  const weekDates = [];
+  for(let i = 0; i < 7; i++){
+    const dt = new Date(monday);
+    dt.setDate(monday.getDate() + i);
+    weekDates.push(dt);
+  }
+
+  // rótulo: "08/09 – 14/09"
+  const sun = weekDates[6];
+  const fmt = dt => `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
+  $('#wkLabel').textContent = `${fmt(monday)} – ${fmt(sun)}`;
+
+  const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  $('#weekGrid').innerHTML = weekDates.map(dt => {
+    const iso = isoOf(dt);
+    const tasks = sortByTime(data.daily[iso] || []);
+    const isToday = iso === todayIso;
+    const isSelected = iso === ui.date;
+    const label = dayNames[dt.getDay()];
+
     return `
-      <div class="day-col ${isToday?'is-today':''}">
+      <div class="day-col ${isToday?'is-today':''} ${isSelected?'is-selected':''}">
         <div class="day-head">
           <div>
-            <div class="name">${d.short}</div>
-            <div class="day-count">${items.length} bloco${items.length===1?'':'s'}</div>
+            <div class="name" data-goto="${iso}" title="Abrir no Diário">
+              ${label} · ${String(dt.getDate()).padStart(2,'0')}
+            </div>
+            <div class="day-count">${tasks.length} ${tasks.length===1?'item':'itens'}</div>
           </div>
-          <button class="add" data-day="${d.key}" title="Adicionar em ${d.label}">+</button>
+          <button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>
         </div>
-        ${items.length ? items.map(it => {
-          const cat = catOf(it.cat);
+        ${tasks.length ? tasks.map(t => {
+          const cat = catOf(t.cat);
           return `
-            <div class="wk-item ${it.done?'done':''}" data-id="${it.id}" data-day="${d.key}" style="--c:${cat.color}">
+            <div class="wk-item ${t.done?'done':''}" data-id="${t.id}" data-date="${iso}" style="--c:${cat.color}">
+              <button class="wk-check" data-act="toggle" title="Concluir">${t.done?'✓':''}</button>
               <button class="wk-del" data-act="del" title="Excluir">✕</button>
-              <div class="wk-time">
-                ${it.start ? esc(it.start) : ''}${it.end ? ' – ' + esc(it.end) : (it.start ? '' : 'sem horário')}
+              <div class="wk-body">
+                <div class="wk-time">${t.start ? esc(t.start) : 'sem horário'}</div>
+                <div class="wk-title">${esc(t.title)}</div>
               </div>
-              <div class="wk-title">${esc(it.title)}</div>
             </div>`;
         }).join('') : `<div class="wk-empty">livre</div>`}
       </div>`;
@@ -1013,9 +1040,9 @@ function renderWeekly(){
 }
 
 /* ============================================================
-   RENDER: DASHBOARD
+   ESTATÍSTICAS
    ============================================================ */
-function collectDailyStats(){
+function collectStats(){
   let total = 0, done = 0, mins = 0;
   const catCount = {};
   Object.values(data.daily).forEach(arr => {
@@ -1027,23 +1054,6 @@ function collectDailyStats(){
     });
   });
   return { total, done, pending: total - done, mins, catCount };
-}
-
-function collectWeeklyStats(){
-  let total = 0, done = 0, mins = 0;
-  const catCount = {};
-  const perDay = {};
-  DAYS.forEach(d => {
-    const arr = data.weekly[d.key] || [];
-    perDay[d.key] = arr.length;
-    arr.forEach(t => {
-      total++;
-      if(t.done) done++;
-      mins += durationMin(t);
-      catCount[t.cat] = (catCount[t.cat] || 0) + 1;
-    });
-  });
-  return { total, done, pending: total - done, mins, catCount, perDay };
 }
 
 function catEntries(catCount){
@@ -1102,84 +1112,95 @@ function barsHTML(values, labels, highlightIdx){
     </div>`;
 }
 
+/* ============================================================
+   RENDER: DASHBOARD
+   ============================================================ */
 function renderDashboard(){
-  const D = collectDailyStats();
-  const W = collectWeeklyStats();
+  const S = collectStats();
+  const pct = S.total ? Math.round((S.done / S.total) * 100) : 0;
 
-  const dailyPct   = D.total ? Math.round((D.done / D.total) * 100) : 0;
-  const weeklyPct  = W.total ? Math.round((W.done / W.total) * 100) : 0;
-
-  const days = [];
+  // últimos 7 dias (diário)
+  const last7 = [];
   const now = new Date();
   for(let i = 6; i >= 0; i--){
     const dt = new Date(now);
     dt.setDate(now.getDate() - i);
-    const iso = dt.toLocaleDateString('sv-SE');
+    const iso = isoOf(dt);
     const tasks = data.daily[iso] || [];
-    days.push({
+    last7.push({
       iso,
       label: dt.toLocaleDateString('pt-BR', { weekday:'short' }).replace('.',''),
-      count: tasks.length,
-      done: tasks.filter(t => t.done).length
+      count: tasks.length
     });
   }
 
-  const todayTasks = sortByTime(data.daily[todayISO()] || []);
-  const todayIdx = dayIndexOfToday();
+  // semana atual (seg-dom)
+  const monday = mondayOf(todayISO());
+  const weekDates = [];
+  for(let i = 0; i < 7; i++){
+    const dt = new Date(monday);
+    dt.setDate(monday.getDate() + i);
+    weekDates.push(dt);
+  }
+  const weekValues = weekDates.map(dt => (data.daily[isoOf(dt)] || []).length);
+  const weekLabels = weekDates.map(dt =>
+    dt.toLocaleDateString('pt-BR', { weekday:'short' }).replace('.','')
+  );
+  const todayIdx = weekDates.findIndex(dt => isoOf(dt) === todayISO());
 
-  const weeklyValues = DAYS.map(d => W.perDay[d.key]);
-  const weeklyLabels = DAYS.map(d => d.short);
+  const todayTasks = sortByTime(data.daily[todayISO()] || []);
+  const weekTotal = weekValues.reduce((a,b) => a+b, 0);
 
   $('#dashContent').innerHTML = `
     <div class="stat-grid">
       <div class="stat-card blue">
-        <div class="k">Tarefas diárias</div>
-        <div class="v">${D.total}</div>
-        <div class="s">${D.done} concluídas · ${D.pending} pendentes</div>
+        <div class="k">Total de tarefas</div>
+        <div class="v">${S.total}</div>
+        <div class="s">${Object.keys(data.daily).length} dia(s) com planos</div>
       </div>
       <div class="stat-card green">
-        <div class="k">Conclusão diária</div>
-        <div class="v">${dailyPct}%</div>
-        <div class="s">${fmtDuration(D.mins)} planejadas no total</div>
+        <div class="k">Conclusão</div>
+        <div class="v">${pct}%</div>
+        <div class="s">${S.done} concluídas · ${S.pending} pendentes</div>
       </div>
       <div class="stat-card purple">
-        <div class="k">Blocos semanais</div>
-        <div class="v">${W.total}</div>
-        <div class="s">${W.done} concluídos · ${weeklyPct}%</div>
+        <div class="k">Esta semana</div>
+        <div class="v">${weekTotal}</div>
+        <div class="s">${weekTotal} tarefa(s) na semana atual</div>
       </div>
       <div class="stat-card">
-        <div class="k">Carga semanal</div>
-        <div class="v">${fmtDuration(W.mins)}</div>
-        <div class="s">tempo total planejado na semana</div>
+        <div class="k">Tempo planejado</div>
+        <div class="v">${fmtDuration(S.mins)}</div>
+        <div class="s">somatório de todas as durações</div>
       </div>
     </div>
 
     <div class="panel">
       <div class="panel-head">
-        <h3>☀️ Rotina Diária</h3>
-        <span class="chip">${Object.keys(data.daily).length} dia(s) registrado(s)</span>
+        <h3>📊 Últimos 7 dias</h3>
+        <span class="chip">tarefas por dia</span>
       </div>
-      <div class="dash-cols">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">
-            Últimos 7 dias
-          </div>
-          ${barsHTML(days.map(d => d.count), days.map(d => d.label), 6)}
-        </div>
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;">
-            Distribuição por categoria
-          </div>
-          <div class="donut-wrap">
-            ${donutHTML(catEntries(D.catCount), 'tarefas')}
-          </div>
+      ${barsHTML(last7.map(d => d.count), last7.map(d => d.label), 6)}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🗓️ Semana atual</h3>
+        <span class="chip">${fmtDuration(weekTotal ? S.mins : 0)} acumulado</span>
+      </div>
+      ${barsHTML(weekValues, weekLabels, todayIdx)}
+    </div>
+
+    <div class="dash-cols">
+      <div class="panel">
+        <div class="panel-head"><h3>🎨 Distribuição por categoria</h3></div>
+        <div class="donut-wrap">
+          ${donutHTML(catEntries(S.catCount), 'tarefas')}
         </div>
       </div>
 
-      <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--border-soft);">
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">
-          Hoje · ${fmtDateLong(todayISO())}
-        </div>
+      <div class="panel">
+        <div class="panel-head"><h3>☀️ Hoje</h3></div>
         ${todayTasks.length ? `
           <ul class="mini-list">
             ${todayTasks.map(t => {
@@ -1196,49 +1217,6 @@ function renderDashboard(){
           </div>`}
       </div>
     </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <h3>🗓️ Cronograma Semanal</h3>
-        <span class="chip">${fmtDuration(W.mins)} por semana</span>
-      </div>
-      <div class="dash-cols">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">
-            Blocos por dia da semana
-          </div>
-          ${barsHTML(weeklyValues, weeklyLabels, todayIdx)}
-        </div>
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;">
-            Distribuição por categoria
-          </div>
-          <div class="donut-wrap">
-            ${donutHTML(catEntries(W.catCount), 'blocos')}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><h3>⚖️ Resumo Comparativo</h3></div>
-      <div class="dash-cols">
-        <div>
-          <div class="progress-top">
-            <strong>Diário — ${D.done}/${D.total} concluídas</strong>
-            <span>${dailyPct}%</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${dailyPct}%"></div></div>
-        </div>
-        <div>
-          <div class="progress-top">
-            <strong>Semanal — ${W.done}/${W.total} concluídos</strong>
-            <span>${weeklyPct}%</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${weeklyPct}%"></div></div>
-        </div>
-      </div>
-    </div>
   `;
 }
 
@@ -1253,36 +1231,27 @@ function render(){
 }
 
 /* ============================================================
-   POPULAR SELECTS
+   POPULAR SELECT
    ============================================================ */
 function fillCategorySelects(){
   const opts = Object.entries(CATEGORIES)
     .map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('');
   $('#qCat').innerHTML = opts;
   $('#fCat').innerHTML = opts;
-  $('#fDay').innerHTML = DAYS.map(d => `<option value="${d.key}">${d.label}</option>`).join('');
 }
 
 /* ============================================================
-   MODAL
+   MODAL (apenas tarefas diárias — que alimentam as 3 visões)
    ============================================================ */
 let modalCtx = null;
 
 function openModal(opts){
   modalCtx = opts;
-  const isDaily = opts.type === 'daily';
   const item = opts.item || {};
 
-  $('#rowDate').hidden = !isDaily;
-  $('#rowDay').hidden  = isDaily;
-  $('#modalTitle').textContent =
-    opts.mode === 'new'
-      ? (isDaily ? 'Nova atividade do dia' : 'Novo bloco semanal')
-      : 'Editar atividade';
-
+  $('#modalTitle').textContent = opts.mode === 'new' ? 'Nova atividade' : 'Editar atividade';
   $('#fTitle').value = item.title || '';
-  $('#fDate').value  = opts.date || todayISO();
-  $('#fDay').value   = opts.day  || 'seg';
+  $('#fDate').value  = opts.date || ui.date || todayISO();
   $('#fStart').value = item.start || '';
   $('#fEnd').value   = item.end || '';
   $('#fCat').value   = item.cat || 'formacao-inicial';
@@ -1299,15 +1268,15 @@ function closeModal(){
 }
 
 /* ============================================================
-   AÇÕES
+   AÇÕES (todas gravam em data.daily → sincronizadas nas 3 views)
    ============================================================ */
-function toggleDaily(date, id){
+function toggleTask(date, id){
   const arr = data.daily[date] || [];
   const t = arr.find(x => x.id === id);
   if(t){ t.done = !t.done; save(); render(); }
 }
 
-function deleteDaily(date, id){
+function deleteTask(date, id){
   const arr = data.daily[date] || [];
   const idx = arr.findIndex(x => x.id === id);
   if(idx < 0) return;
@@ -1317,51 +1286,41 @@ function deleteDaily(date, id){
   save(); render();
 }
 
-function deleteWeekly(day, id){
-  const arr = data.weekly[day] || [];
-  const idx = arr.findIndex(x => x.id === id);
-  if(idx < 0) return;
-  if(!confirm('Excluir este bloco da semana?')) return;
-  arr.splice(idx, 1);
-  save(); render();
+/* ============================================================
+   NAVEGAÇÃO DE DATA / SEMANA
+   ============================================================ */
+function setDate(iso){
+  ui.date = iso;
+  const [y,m] = iso.split('-').map(Number);
+  ui.calMonth = { year: y, month: m-1 };
+  save();
+}
+function shiftDay(delta){
+  const [y,m,d] = ui.date.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  dt.setDate(dt.getDate() + delta);
+  setDate(isoOf(dt));
+  render();
 }
 
 /* ============================================================
    EVENTOS
    ============================================================ */
-$$('.tab[data-tab]').forEach(btn => {
+$$('.tab').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-/* --- navegação de data (diário) --- */
-function shiftDay(delta){
-  const [y,m,d] = ui.date.split('-').map(Number);
-  const dt = new Date(y, m-1, d);
-  dt.setDate(dt.getDate() + delta);
-  ui.date = dt.toLocaleDateString('sv-SE');
-  // se mudou de mês, atualiza o calendário também
-  ui.calMonth = { year: dt.getFullYear(), month: dt.getMonth() };
-  save(); renderDaily();
-}
+/* --- Diário: navegação --- */
 $('#prevDay').addEventListener('click', () => shiftDay(-1));
 $('#nextDay').addEventListener('click', () => shiftDay(1));
-$('#todayBtn').addEventListener('click', () => {
-  ui.date = todayISO();
-  const now = new Date();
-  ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
-  save(); renderDaily();
-});
+$('#todayBtn').addEventListener('click', () => { setDate(todayISO()); render(); });
 $('#dailyDate').addEventListener('change', e => {
-  if(e.target.value){
-    ui.date = e.target.value;
-    const [y,m] = ui.date.split('-').map(Number);
-    ui.calMonth = { year: y, month: m-1 };
-    save(); renderDaily();
-  }
+  if(e.target.value){ setDate(e.target.value); render(); }
 });
 $('#openCalendarBtn').addEventListener('click', () => switchTab('calendar'));
+$('#openWeeklyBtn').addEventListener('click', () => switchTab('weekly'));
 
-/* --- calendário: navegação de mês --- */
+/* --- Calendário: navegação de mês --- */
 $('#calPrev').addEventListener('click', () => {
   const { year, month } = ui.calMonth;
   const d = new Date(year, month - 1, 1);
@@ -1377,22 +1336,57 @@ $('#calNext').addEventListener('click', () => {
 $('#calToday').addEventListener('click', () => {
   const now = new Date();
   ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
-  ui.date = todayISO();
-  save(); renderCalendar();
+  setDate(todayISO());
+  renderCalendar();
 });
 
-/* --- calendário: clique em um dia leva ao diário --- */
+/* --- Calendário: clique em um dia leva ao Diário --- */
 $('#calGrid').addEventListener('click', e => {
   const cell = e.target.closest('.cal-cell');
   if(!cell) return;
-  ui.date = cell.dataset.date;
-  const [y,m] = ui.date.split('-').map(Number);
-  ui.calMonth = { year: y, month: m-1 };
-  save();
+  setDate(cell.dataset.date);
   switchTab('daily');
 });
 
-/* --- quick add diário --- */
+/* --- Semanal: navegação de semana --- */
+$('#wkPrev').addEventListener('click', () => shiftDay(-7));
+$('#wkNext').addEventListener('click', () => shiftDay(7));
+$('#wkToday').addEventListener('click', () => { setDate(todayISO()); render(); });
+
+/* --- Semanal: interações na grade --- */
+$('#weekGrid').addEventListener('click', e => {
+  // botão + de cada coluna
+  const addBtn = e.target.closest('[data-add-date]');
+  if(addBtn){
+    const iso = addBtn.dataset.addDate;
+    setDate(iso);
+    openModal({ mode:'new', date: iso });
+    return;
+  }
+
+  // clicar no nome do dia (abre no Diário)
+  const gotoEl = e.target.closest('[data-goto]');
+  if(gotoEl){
+    setDate(gotoEl.dataset.goto);
+    switchTab('daily');
+    return;
+  }
+
+  // item da tarefa
+  const wk = e.target.closest('.wk-item');
+  if(!wk) return;
+  const id  = wk.dataset.id;
+  const date = wk.dataset.date;
+  const act = e.target.closest('[data-act]')?.dataset.act;
+
+  if(act === 'toggle'){ toggleTask(date, id); return; }
+  if(act === 'del'){ deleteTask(date, id); return; }
+
+  const item = (data.daily[date] || []).find(t => t.id === id);
+  if(item) openModal({ mode:'edit', date, item });
+});
+
+/* --- Diário: quick add --- */
 $('#dailyForm').addEventListener('submit', e => {
   e.preventDefault();
   const title = $('#qTitle').value.trim();
@@ -1418,7 +1412,7 @@ $('#dailyForm').addEventListener('submit', e => {
   $('#qTitle').focus();
 });
 
-/* --- lista diária (delegação) --- */
+/* --- Diário: lista (delegação) --- */
 $('#dailyList').addEventListener('click', e => {
   const li = e.target.closest('.task');
   if(!li) return;
@@ -1426,38 +1420,15 @@ $('#dailyList').addEventListener('click', e => {
   const act = e.target.closest('[data-act]')?.dataset.act;
   const date = ui.date;
 
-  if(act === 'toggle') toggleDaily(date, id);
-  else if(act === 'del') deleteDaily(date, id);
+  if(act === 'toggle') toggleTask(date, id);
+  else if(act === 'del') deleteTask(date, id);
   else if(act === 'edit'){
     const item = (data.daily[date] || []).find(t => t.id === id);
-    if(item) openModal({ type:'daily', mode:'edit', date, item });
+    if(item) openModal({ mode:'edit', date, item });
   }
 });
 
-/* --- grade semanal (delegação) --- */
-$('#weekGrid').addEventListener('click', e => {
-  const addBtn = e.target.closest('.add');
-  if(addBtn){
-    openModal({ type:'weekly', mode:'new', day: addBtn.dataset.day });
-    return;
-  }
-  const wk = e.target.closest('.wk-item');
-  if(!wk) return;
-  const day = wk.dataset.day;
-  const id  = wk.dataset.id;
-  const act = e.target.closest('[data-act]')?.dataset.act;
-
-  if(act === 'del'){ deleteWeekly(day, id); return; }
-
-  const item = (data.weekly[day] || []).find(t => t.id === id);
-  if(item) openModal({ type:'weekly', mode:'edit', day, item });
-});
-
-$('#addWeeklyBtn').addEventListener('click', () => {
-  openModal({ type:'weekly', mode:'new', day: DAYS[dayIndexOfToday()].key });
-});
-
-/* --- modal: submit --- */
+/* --- Modal: submit --- */
 $('#modalForm').addEventListener('submit', e => {
   e.preventDefault();
   if(!modalCtx) return;
@@ -1474,50 +1445,30 @@ $('#modalForm').addEventListener('submit', e => {
     notes: $('#fNotes').value.trim()
   };
 
-  if(modalCtx.type === 'daily'){
-    const newDate = $('#fDate').value || todayISO();
+  const newDate = $('#fDate').value || ui.date || todayISO();
 
-    if(modalCtx.mode === 'new'){
-      if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
-      data.daily[newDate].push({ id: uid(), done:false, ...base });
-      ui.date = newDate;
-      const [y,m] = newDate.split('-').map(Number);
-      ui.calMonth = { year: y, month: m-1 };
-    } else {
-      const oldDate = modalCtx.date;
-      const oldArr  = data.daily[oldDate] || [];
-      const idx     = oldArr.findIndex(t => t.id === modalCtx.item.id);
-      const wasDone = idx >= 0 ? oldArr[idx].done : false;
-      if(idx >= 0) oldArr.splice(idx, 1);
-      if(!oldArr.length) delete data.daily[oldDate];
-
-      if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
-      data.daily[newDate].push({ id: modalCtx.item.id, done: wasDone, ...base });
-      ui.date = newDate;
-      const [y,m] = newDate.split('-').map(Number);
-      ui.calMonth = { year: y, month: m-1 };
-    }
+  if(modalCtx.mode === 'new'){
+    if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
+    data.daily[newDate].push({ id: uid(), done:false, ...base });
   } else {
-    const newDay = $('#fDay').value;
+    const oldDate = modalCtx.date;
+    const oldArr  = data.daily[oldDate] || [];
+    const idx     = oldArr.findIndex(t => t.id === modalCtx.item.id);
+    const wasDone = idx >= 0 ? oldArr[idx].done : false;
+    if(idx >= 0) oldArr.splice(idx, 1);
+    if(!oldArr.length) delete data.daily[oldDate];
 
-    if(modalCtx.mode === 'new'){
-      data.weekly[newDay].push({ id: uid(), done:false, ...base });
-    } else {
-      const oldDay = modalCtx.day;
-      const oldArr = data.weekly[oldDay] || [];
-      const idx    = oldArr.findIndex(t => t.id === modalCtx.item.id);
-      const wasDone = idx >= 0 ? oldArr[idx].done : false;
-      if(idx >= 0) oldArr.splice(idx, 1);
-      data.weekly[newDay].push({ id: modalCtx.item.id, done: wasDone, ...base });
-    }
+    if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
+    data.daily[newDate].push({ id: modalCtx.item.id, done: wasDone, ...base });
   }
 
+  setDate(newDate);
   save();
   closeModal();
   render();
 });
 
-/* --- modal: fechar --- */
+/* --- Modal: fechar --- */
 $('#modalClose').addEventListener('click', closeModal);
 $('#btnCancel').addEventListener('click', closeModal);
 $('#modal').addEventListener('click', e => {
@@ -1525,97 +1476,6 @@ $('#modal').addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape' && !$('#modal').hidden) closeModal();
-});
-
-/* ============================================================
-   EXPORTAR / IMPORTAR
-   ============================================================ */
-function contarTudo(d){
-  let daily = 0, weekly = 0;
-  Object.values(d.daily || {}).forEach(arr => daily += arr.length);
-  Object.values(d.weekly || {}).forEach(arr => weekly += arr.length);
-  return { daily, weekly };
-}
-
-$('#btnExport').addEventListener('click', () => {
-  const payload = {
-    app: 'Cronoplano',
-    versao: 2,
-    exportadoEm: new Date().toISOString(),
-    dados: {
-      daily:  data.daily,
-      weekly: data.weekly
-    }
-  };
-
-  const json = JSON.stringify(payload, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-
-  const dataStr = new Date().toLocaleDateString('sv-SE');
-  const nomeArquivo = `cronoplano-${dataStr}.json`;
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nomeArquivo;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  const tot = contarTudo(data);
-  alert(`Arquivo "${nomeArquivo}" gerado!\n\n` +
-        `${tot.daily} tarefa(s) diária(s) + ${tot.weekly} bloco(s) semanal(is).`);
-});
-
-$('#btnImport').addEventListener('click', () => {
-  $('#fileInput').click();
-});
-
-$('#fileInput').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-  reader.onload = evt => {
-    try{
-      const parsed = JSON.parse(evt.target.result);
-      const novoDaily  = parsed.dados?.daily  || parsed.daily  || {};
-      const novoWeekly = parsed.dados?.weekly || parsed.weekly || {};
-
-      if(typeof novoDaily !== 'object' || typeof novoWeekly !== 'object'){
-        throw new Error('Formato inválido.');
-      }
-
-      const antes = contarTudo(data);
-      const novo  = contarTudo({ daily: novoDaily, weekly: novoWeekly });
-
-      const ok = confirm(
-        `Substituir os dados atuais pelos do arquivo?\n\n` +
-        `Atual: ${antes.daily} diárias + ${antes.weekly} semanais\n` +
-        `Novo:  ${novo.daily} diárias + ${novo.weekly} semanais\n\n` +
-        `Essa ação não pode ser desfeita.`
-      );
-      if(!ok) return;
-
-      data.daily  = novoDaily;
-      data.weekly = novoWeekly;
-
-      DAYS.forEach(d => {
-        if(!Array.isArray(data.weekly[d.key])) data.weekly[d.key] = [];
-      });
-
-      save();
-      render();
-      alert('Dados importados com sucesso!');
-
-    }catch(err){
-      alert('Não foi possível ler o arquivo.\n\nDetalhe: ' + err.message);
-    }finally{
-      e.target.value = '';
-    }
-  };
-  reader.readAsText(file);
 });
 
 /* ============================================================
@@ -1631,7 +1491,7 @@ function init(){
     ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
   }
 
-  $$('.tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
+  $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + ui.tab));
 
   render();
