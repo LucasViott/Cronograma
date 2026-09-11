@@ -7,16 +7,17 @@
 <style>
 :root{
   color-scheme: dark;
-  --bg:#0a0e14;
-  --bg-2:#0f151d;
-  --surface:#141b25;
-  --surface-2:#1a2330;
-  --border:#233040;
-  --border-soft:#1b2531;
-  --text:#e8eef7;
-  --muted:#7d8b9c;
-  --accent:#5b8cff;
-  --accent-2:#8b5cf6;
+  /* TEMA CINZA MAIS ESCURO E NEUTRO */
+  --bg:#0a0a0b;
+  --bg-2:#111113;
+  --surface:#17171a;
+  --surface-2:#1e1e22;
+  --border:#29292e;
+  --border-soft:#1f1f23;
+  --text:#e8e8ec;
+  --muted:#7c7c85;
+  --accent:#7c8bff;
+  --accent-2:#a78bfa;
   --ok:#34d399;
   --warn:#fbbf24;
   --danger:#f87171;
@@ -37,15 +38,15 @@ body::before{
   content:'';
   position:fixed; inset:0; z-index:-1; pointer-events:none;
   background:
-    radial-gradient(900px 520px at 10% -12%, rgba(91,140,255,.16), transparent 62%),
-    radial-gradient(820px 520px at 92% -4%, rgba(139,92,246,.14), transparent 58%);
+    radial-gradient(900px 520px at 10% -12%, rgba(124,139,255,.10), transparent 62%),
+    radial-gradient(820px 520px at 92% -4%, rgba(167,139,250,.08), transparent 58%);
 }
 [hidden]{display:none !important;}
 
 /* ---------- TOPBAR ---------- */
 .topbar{
   position:sticky; top:0; z-index:60;
-  background:rgba(10,14,20,.8);
+  background:rgba(10,10,11,.82);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border-soft);
@@ -59,7 +60,7 @@ body::before{
   width:34px;height:34px;border-radius:11px;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   display:grid;place-items:center;font-size:17px;
-  box-shadow:0 6px 22px rgba(91,140,255,.35);
+  box-shadow:0 6px 22px rgba(124,139,255,.28);
 }
 .brand small{display:block;font-size:10.5px;font-weight:500;color:var(--muted);letter-spacing:.3px;margin-top:1px;}
 
@@ -71,13 +72,13 @@ body::before{
 }
 .tab{
   appearance:none;border:0;background:transparent;color:var(--muted);
-  padding:8px 16px;border-radius:9px;font:inherit;font-size:13.5px;font-weight:600;
-  cursor:pointer;transition:.18s;display:flex;align-items:center;gap:7px;white-space:nowrap;
+  padding:8px 15px;border-radius:9px;font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;transition:.18s;display:flex;align-items:center;gap:6px;white-space:nowrap;
 }
 .tab:hover{color:var(--text);}
 .tab.active{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#fff;box-shadow:0 4px 16px rgba(91,140,255,.32);
+  color:#fff;box-shadow:0 4px 16px rgba(124,139,255,.28);
 }
 #btnExport, #btnImport{
   border:1px dashed var(--border);
@@ -103,7 +104,7 @@ main{max-width:1280px;margin:0 auto;padding:26px 22px 90px;}
 .section-head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;}
 
 .panel{
-  background:linear-gradient(180deg,rgba(255,255,255,.022),transparent),var(--surface);
+  background:linear-gradient(180deg,rgba(255,255,255,.018),transparent),var(--surface);
   border:1px solid var(--border);
   border-radius:var(--radius);
   padding:18px;
@@ -132,15 +133,15 @@ input,select,textarea{
   outline:none;
   transition:border-color .15s, box-shadow .15s, background .15s;
 }
-input:hover,select:hover,textarea:hover{border-color:#2c3c50;}
+input:hover,select:hover,textarea:hover{border-color:#35353c;}
 input:focus,select:focus,textarea:focus{
   border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(91,140,255,.15);
-  background:#0d141d;
+  box-shadow:0 0 0 3px rgba(124,139,255,.15);
+  background:#141416;
 }
 textarea{resize:vertical;min-height:60px;}
 select{cursor:pointer;appearance:none;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237d8b9c' stroke-width='3' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c7c85' stroke-width='3' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
 }
 .field{display:block;margin-bottom:14px;}
@@ -159,18 +160,18 @@ select{cursor:pointer;appearance:none;
 }
 .btn.primary{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#fff;box-shadow:0 6px 18px rgba(91,140,255,.28);
+  color:#fff;box-shadow:0 6px 18px rgba(124,139,255,.25);
 }
-.btn.primary:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(91,140,255,.4);}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(124,139,255,.35);}
 .btn.ghost{background:var(--surface-2);color:var(--text);border-color:var(--border);}
-.btn.ghost:hover{background:#212c3b;border-color:#2f4055;}
+.btn.ghost:hover{background:#26262b;border-color:#35353c;}
 
 /* ---------- QUICK ADD ---------- */
 .quick-add{
   display:grid;
-  grid-template-columns:118px 1fr 168px auto;
+  grid-template-columns:118px 1fr 200px auto;
   gap:10px;
-  background:linear-gradient(180deg,rgba(255,255,255,.022),transparent),var(--surface);
+  background:linear-gradient(180deg,rgba(255,255,255,.018),transparent),var(--surface);
   border:1px solid var(--border);
   border-radius:var(--radius);
   padding:14px;
@@ -190,7 +191,7 @@ select{cursor:pointer;appearance:none;
   background:var(--surface-2);border:1px solid var(--border);color:var(--text);
   font-size:17px;cursor:pointer;transition:.16s;display:grid;place-items:center;
 }
-.date-nav .nav-btn:hover{background:#212c3b;border-color:#2f4055;}
+.date-nav .nav-btn:hover{background:#26262b;border-color:#35353c;}
 .date-nav input[type=date]{width:auto;flex:0 0 auto;padding:8px 11px;font-size:13.5px;}
 .date-nav .label{
   font-size:14px;font-weight:600;color:var(--text);
@@ -208,7 +209,7 @@ select{cursor:pointer;appearance:none;
   height:100%;border-radius:20px;
   background:linear-gradient(90deg,var(--accent),var(--accent-2));
   transition:width .45s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 0 14px rgba(91,140,255,.5);
+  box-shadow:0 0 14px rgba(124,139,255,.4);
 }
 
 /* ---------- TASK LIST ---------- */
@@ -217,7 +218,7 @@ select{cursor:pointer;appearance:none;
   display:grid;
   grid-template-columns:auto 82px 1fr auto;
   gap:14px;align-items:center;
-  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--surface);
+  background:linear-gradient(180deg,rgba(255,255,255,.018),transparent),var(--surface);
   border:1px solid var(--border);
   border-left:3px solid var(--c,var(--accent));
   border-radius:12px;
@@ -225,17 +226,17 @@ select{cursor:pointer;appearance:none;
   transition:.18s;
   animation:fade .22s ease;
 }
-.task:hover{border-color:#2c3c50;border-left-color:var(--c,var(--accent));transform:translateX(2px);}
+.task:hover{border-color:#35353c;border-left-color:var(--c,var(--accent));transform:translateX(2px);}
 .task.done{opacity:.5;}
 .task.done .t-title{text-decoration:line-through;text-decoration-color:var(--muted);}
 
 .check{
   width:23px;height:23px;border-radius:50%;flex:0 0 auto;
-  border:2px solid #33445a;background:transparent;color:#fff;
+  border:2px solid #3b3b42;background:transparent;color:#fff;
   cursor:pointer;transition:.18s;display:grid;place-items:center;
   font-size:12px;font-weight:800;line-height:1;
 }
-.check:hover{border-color:var(--accent);box-shadow:0 0 0 4px rgba(91,140,255,.12);}
+.check:hover{border-color:var(--accent);box-shadow:0 0 0 4px rgba(124,139,255,.12);}
 .task.done .check{
   background:linear-gradient(135deg,var(--ok),#10b981);
   border-color:transparent;
@@ -287,6 +288,99 @@ select{cursor:pointer;appearance:none;
 .empty .big{font-size:30px;display:block;margin-bottom:10px;opacity:.55;}
 .empty span{font-size:12.5px;opacity:.75;}
 
+/* ---------- CALENDAR ---------- */
+.cal-head{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.cal-title{
+  font-size:19px;font-weight:700;letter-spacing:-.3px;
+  text-transform:capitalize;
+}
+.cal-nav{display:flex;gap:6px;align-items:center;margin-left:auto;}
+.cal-nav .nav-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+  font-size:17px;cursor:pointer;transition:.16s;display:grid;place-items:center;
+}
+.cal-nav .nav-btn:hover{background:#26262b;border-color:#35353c;}
+
+.cal-weekdays{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;
+  margin-bottom:8px;
+}
+.cal-weekdays span{
+  text-align:center;font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.6px;padding:6px 0;
+}
+
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;
+}
+
+.cal-cell{
+  appearance:none;
+  background:var(--bg-2);
+  border:1px solid var(--border-soft);
+  border-radius:11px;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:5px;
+  cursor:pointer;
+  transition:.16s;
+  font:inherit;
+  color:var(--text);
+  position:relative;
+  min-height:78px;
+  text-align:left;
+}
+.cal-cell:hover{border-color:#3d3d45;background:#17171a;transform:translateY(-1px);}
+.cal-cell.other{opacity:.32;}
+.cal-cell.today{
+  border-color:var(--accent);
+  box-shadow:inset 0 0 0 1px var(--accent);
+}
+.cal-cell.selected{
+  background:linear-gradient(135deg,rgba(124,139,255,.16),rgba(167,139,250,.12));
+  border-color:var(--accent);
+}
+.cal-num{font-size:14px;font-weight:700;letter-spacing:-.2px;}
+.cal-cell.today .cal-num{color:var(--accent);}
+.cal-cell.selected .cal-num{color:#fff;}
+
+.cal-badge{
+  font-size:10px;font-weight:800;
+  padding:2px 7px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;
+  letter-spacing:.2px;
+}
+.cal-cell.all-done .cal-badge{
+  background:linear-gradient(135deg,var(--ok),#10b981);
+}
+.cal-dots{
+  display:flex;gap:3px;flex-wrap:wrap;margin-top:auto;
+}
+.cal-dots i{
+  width:6px;height:6px;border-radius:50%;
+  display:block;
+  flex:0 0 auto;
+}
+.cal-cell.has-tasks{
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--bg-2);
+  border-color:#33333a;
+}
+
+@media(max-width:640px){
+  .cal-cell{min-height:58px;padding:6px;border-radius:9px;}
+  .cal-num{font-size:12px;}
+  .cal-badge{font-size:9px;padding:1px 6px;}
+  .cal-dots i{width:5px;height:5px;}
+}
+
 /* ---------- WEEKLY GRID ---------- */
 .week-scroll{overflow-x:auto;padding-bottom:6px;}
 .week-grid{
@@ -295,15 +389,15 @@ select{cursor:pointer;appearance:none;
   gap:11px;min-width:100%;
 }
 .day-col{
-  background:linear-gradient(180deg,rgba(255,255,255,.022),transparent),var(--surface);
+  background:linear-gradient(180deg,rgba(255,255,255,.018),transparent),var(--surface);
   border:1px solid var(--border);
   border-radius:13px;padding:13px;
   display:flex;flex-direction:column;gap:9px;
   min-height:190px;
 }
 .day-col.is-today{
-  border-color:rgba(91,140,255,.55);
-  box-shadow:0 0 0 1px rgba(91,140,255,.18), 0 8px 30px rgba(91,140,255,.08);
+  border-color:rgba(124,139,255,.5);
+  box-shadow:0 0 0 1px rgba(124,139,255,.15), 0 8px 30px rgba(124,139,255,.06);
 }
 .day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .day-head .name{font-size:12.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);}
@@ -324,7 +418,7 @@ select{cursor:pointer;appearance:none;
   cursor:pointer;transition:.16s;position:relative;
   animation:fade .2s ease;
 }
-.wk-item:hover{background:#131c27;border-color:#2c3c50;border-left-color:var(--c);}
+.wk-item:hover{background:#17171a;border-color:#35353c;border-left-color:var(--c);}
 .wk-item.done{opacity:.45;}
 .wk-item.done .wk-title{text-decoration:line-through;}
 .wk-time{
@@ -347,7 +441,7 @@ select{cursor:pointer;appearance:none;
   gap:13px;margin-bottom:18px;
 }
 .stat-card{
-  background:linear-gradient(180deg,rgba(255,255,255,.03),transparent),var(--surface);
+  background:linear-gradient(180deg,rgba(255,255,255,.024),transparent),var(--surface);
   border:1px solid var(--border);border-radius:var(--radius);
   padding:16px 17px;position:relative;overflow:hidden;
 }
@@ -420,17 +514,17 @@ select{cursor:pointer;appearance:none;
 /* ---------- MODAL ---------- */
 .modal-backdrop{
   position:fixed;inset:0;z-index:200;
-  background:rgba(4,7,12,.72);
+  background:rgba(4,4,5,.75);
   backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
   display:grid;place-items:center;padding:20px;
   animation:fade .18s ease;
 }
 .modal{
   width:100%;max-width:520px;max-height:90vh;overflow-y:auto;
-  background:linear-gradient(180deg,rgba(255,255,255,.025),transparent),var(--surface);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--surface);
   border:1px solid var(--border);
   border-radius:18px;padding:22px;
-  box-shadow:0 26px 80px rgba(0,0,0,.65);
+  box-shadow:0 26px 80px rgba(0,0,0,.7);
   animation:pop .22s cubic-bezier(.4,0,.2,1);
 }
 @keyframes pop{from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:none;}}
@@ -441,14 +535,14 @@ select{cursor:pointer;appearance:none;
   background:var(--surface-2);color:var(--muted);cursor:pointer;font-size:14px;
   display:grid;place-items:center;transition:.16s;
 }
-.icon-btn:hover{background:#212c3b;color:var(--text);}
+.icon-btn:hover{background:#26262b;color:var(--text);}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
 
 /* ---------- SCROLLBAR ---------- */
 ::-webkit-scrollbar{width:10px;height:10px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:#243040;border-radius:20px;border:2px solid var(--bg);}
-::-webkit-scrollbar-thumb:hover{background:#31435a;}
+::-webkit-scrollbar-thumb{background:#2a2a2e;border-radius:20px;border:2px solid var(--bg);}
+::-webkit-scrollbar-thumb:hover{background:#38383e;}
 </style>
 </head>
 <body>
@@ -461,6 +555,7 @@ select{cursor:pointer;appearance:none;
     </div>
     <nav class="tabs">
       <button class="tab active" data-tab="daily">☀️ Diário</button>
+      <button class="tab" data-tab="calendar">📅 Calendário</button>
       <button class="tab" data-tab="weekly">🗓️ Semanal</button>
       <button class="tab" data-tab="dashboard">📊 Dashboard</button>
       <button class="tab" id="btnExport" title="Baixar arquivo com seus dados">⬇️ Exportar</button>
@@ -488,6 +583,7 @@ select{cursor:pointer;appearance:none;
       <div class="label" id="dailyDateLabel"></div>
       <div class="spacer"></div>
       <button class="btn ghost" id="todayBtn">Hoje</button>
+      <button class="btn ghost" id="openCalendarBtn">📅 Ver calendário</button>
     </div>
 
     <form class="quick-add" id="dailyForm">
@@ -500,6 +596,34 @@ select{cursor:pointer;appearance:none;
     <div class="progress-wrap" id="dailyProgress"></div>
 
     <ul class="task-list" id="dailyList"></ul>
+  </section>
+
+  <!-- ============ VIEW: CALENDÁRIO ============ -->
+  <section class="view" id="view-calendar">
+    <div class="section-head">
+      <div>
+        <h2>Calendário</h2>
+        <p>Datas com planos ficam destacadas. Clique em um dia para abrir no Diário.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="cal-head">
+        <div class="cal-title" id="calTitle">—</div>
+        <div class="cal-nav">
+          <button class="nav-btn" id="calPrev" title="Mês anterior">‹</button>
+          <button class="btn ghost" id="calToday">Hoje</button>
+          <button class="nav-btn" id="calNext" title="Próximo mês">›</button>
+        </div>
+      </div>
+
+      <div class="cal-weekdays">
+        <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span>
+        <span>Qui</span><span>Sex</span><span>Sáb</span>
+      </div>
+
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
   </section>
 
   <!-- ============ VIEW: SEMANAL ============ -->
@@ -594,15 +718,15 @@ select{cursor:pointer;appearance:none;
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v1';
+const STORAGE_KEY = 'cronoplano.v2';
 
+/* NOVAS CATEGORIAS */
 const CATEGORIES = {
-  trabalho: { label:'Trabalho', color:'#5b8cff' },
-  estudo:   { label:'Estudo',   color:'#a78bfa' },
-  saude:    { label:'Saúde',    color:'#34d399' },
-  pessoal:  { label:'Pessoal',  color:'#fbbf24' },
-  lazer:    { label:'Lazer',    color:'#f472b6' },
-  outro:    { label:'Outro',    color:'#94a3b8' }
+  'formacao-inicial':           { label:'Formação Inicial',           color:'#60a5fa' },
+  'formacao-continuada':        { label:'Formação Continuada',        color:'#a78bfa' },
+  'criacao-conteudo':           { label:'Criação de Conteúdo',        color:'#f472b6' },
+  'acompanhamento-operacional': { label:'Acompanhamento Operacional', color:'#fbbf24' },
+  'hora-operacional':           { label:'Hora Operacional',           color:'#34d399' }
 };
 
 const PRIO = {
@@ -624,15 +748,20 @@ const DAYS = [
 /* ============================================================
    ESTADO + PERSISTÊNCIA
    ============================================================ */
+function todayISO(){
+  return new Date().toLocaleDateString('sv-SE');
+}
+
 let data = { daily:{}, weekly:{} };
-let ui   = { tab:'daily', date: todayISO() };
+let ui = {
+  tab: 'daily',
+  date: todayISO(),
+  calMonth: { year: new Date().getFullYear(), month: new Date().getMonth() }
+};
 
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
-function todayISO(){
-  return new Date().toLocaleDateString('sv-SE');
-}
 function uid(){
   return Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-4);
 }
@@ -644,12 +773,17 @@ function esc(s){
 
 function load(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY)
+              || localStorage.getItem('cronoplano.v1'); // migração suave
     if(raw){
       const parsed = JSON.parse(raw);
       data.daily  = parsed.daily  || {};
       data.weekly = parsed.weekly || {};
-      if(parsed.ui) ui = Object.assign(ui, parsed.ui);
+      if(parsed.ui){
+        ui.tab = parsed.ui.tab || ui.tab;
+        ui.date = parsed.ui.date || ui.date;
+        if(parsed.ui.calMonth) ui.calMonth = parsed.ui.calMonth;
+      }
     }
   }catch(err){ console.warn('Falha ao carregar dados:', err); }
 
@@ -663,7 +797,11 @@ function save(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       daily: data.daily,
       weekly: data.weekly,
-      ui: { tab: ui.tab, date: ui.date }
+      ui: {
+        tab: ui.tab,
+        date: ui.date,
+        calMonth: ui.calMonth
+      }
     }));
   }catch(err){ console.warn('Falha ao salvar:', err); }
 }
@@ -695,7 +833,7 @@ function fmtDuration(min){
   return m ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
 }
 function catOf(key){
-  return CATEGORIES[key] || CATEGORIES.outro;
+  return CATEGORIES[key] || { label:'Sem categoria', color:'#94a3b8' };
 }
 function sortByTime(arr){
   return arr.slice().sort((a,b) =>
@@ -712,7 +850,7 @@ function dayIndexOfToday(){
    ============================================================ */
 function switchTab(tab){
   ui.tab = tab;
-  $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  $$('.tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + tab));
   save();
   render();
@@ -775,6 +913,68 @@ function renderDaily(){
           <button data-act="del"  title="Excluir">🗑</button>
         </div>
       </li>`;
+  }).join('');
+}
+
+/* ============================================================
+   RENDER: CALENDÁRIO
+   ============================================================ */
+function renderCalendar(){
+  const { year, month } = ui.calMonth;
+  const first = new Date(year, month, 1);
+  const startDay = first.getDay();           // 0 = domingo
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const prevDays    = new Date(year, month, 0).getDate();
+
+  const cells = [];
+  // Dias do mês anterior para preencher a primeira semana
+  for(let i = startDay - 1; i >= 0; i--){
+    const d = prevDays - i;
+    cells.push({ date: new Date(year, month-1, d), other: true });
+  }
+  // Dias do mês atual
+  for(let d = 1; d <= daysInMonth; d++){
+    cells.push({ date: new Date(year, month, d), other: false });
+  }
+  // Completa até 42 células (6 semanas)
+  let nextD = 1;
+  while(cells.length < 42){
+    cells.push({ date: new Date(year, month+1, nextD++), other: true });
+  }
+
+  const todayIso = todayISO();
+  const isoOf = dt => dt.toLocaleDateString('sv-SE');
+
+  $('#calTitle').textContent =
+    first.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+
+  $('#calGrid').innerHTML = cells.map(c => {
+    const iso   = isoOf(c.date);
+    const tasks = data.daily[iso] || [];
+    const count = tasks.length;
+    const doneCount = tasks.filter(t => t.done).length;
+    const allDone   = count > 0 && doneCount === count;
+    const isToday   = iso === todayIso;
+    const isSelected = iso === ui.date;
+
+    // pega até 4 cores de categoria para mostrar como pontinhos
+    const dotColors = [];
+    const seen = new Set();
+    for(const t of tasks){
+      const c = catOf(t.cat).color;
+      if(!seen.has(c)){ seen.add(c); dotColors.push(c); }
+      if(dotColors.length >= 4) break;
+    }
+
+    return `
+      <button class="cal-cell ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${count?'has-tasks':''} ${allDone?'all-done':''}" data-date="${iso}" title="${count?count+' atividade(s)':''}">
+        <span class="cal-num">${c.date.getDate()}</span>
+        ${count ? `<span class="cal-badge">${count}</span>` : ''}
+        ${dotColors.length ? `
+          <span class="cal-dots">
+            ${dotColors.map(cor => `<i style="background:${cor}"></i>`).join('')}
+          </span>` : ''}
+      </button>`;
   }).join('');
 }
 
@@ -1046,9 +1246,10 @@ function renderDashboard(){
    RENDER PRINCIPAL
    ============================================================ */
 function render(){
-  if(ui.tab === 'daily')      renderDaily();
-  else if(ui.tab === 'weekly') renderWeekly();
-  else                         renderDashboard();
+  if(ui.tab === 'daily')           renderDaily();
+  else if(ui.tab === 'calendar')   renderCalendar();
+  else if(ui.tab === 'weekly')     renderWeekly();
+  else                              renderDashboard();
 }
 
 /* ============================================================
@@ -1084,7 +1285,7 @@ function openModal(opts){
   $('#fDay').value   = opts.day  || 'seg';
   $('#fStart').value = item.start || '';
   $('#fEnd').value   = item.end || '';
-  $('#fCat').value   = item.cat || 'trabalho';
+  $('#fCat').value   = item.cat || 'formacao-inicial';
   $('#fPrio').value  = item.prio || 'media';
   $('#fNotes').value = item.notes || '';
 
@@ -1102,12 +1303,6 @@ function closeModal(){
    ============================================================ */
 function toggleDaily(date, id){
   const arr = data.daily[date] || [];
-  const t = arr.find(x => x.id === id);
-  if(t){ t.done = !t.done; save(); render(); }
-}
-
-function toggleWeekly(day, id){
-  const arr = data.weekly[day] || [];
   const t = arr.find(x => x.id === id);
   if(t){ t.done = !t.done; save(); render(); }
 }
@@ -1138,22 +1333,66 @@ $$('.tab[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
+/* --- navegação de data (diário) --- */
 function shiftDay(delta){
   const [y,m,d] = ui.date.split('-').map(Number);
   const dt = new Date(y, m-1, d);
   dt.setDate(dt.getDate() + delta);
   ui.date = dt.toLocaleDateString('sv-SE');
+  // se mudou de mês, atualiza o calendário também
+  ui.calMonth = { year: dt.getFullYear(), month: dt.getMonth() };
   save(); renderDaily();
 }
 $('#prevDay').addEventListener('click', () => shiftDay(-1));
 $('#nextDay').addEventListener('click', () => shiftDay(1));
 $('#todayBtn').addEventListener('click', () => {
-  ui.date = todayISO(); save(); renderDaily();
+  ui.date = todayISO();
+  const now = new Date();
+  ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
+  save(); renderDaily();
 });
 $('#dailyDate').addEventListener('change', e => {
-  if(e.target.value){ ui.date = e.target.value; save(); renderDaily(); }
+  if(e.target.value){
+    ui.date = e.target.value;
+    const [y,m] = ui.date.split('-').map(Number);
+    ui.calMonth = { year: y, month: m-1 };
+    save(); renderDaily();
+  }
+});
+$('#openCalendarBtn').addEventListener('click', () => switchTab('calendar'));
+
+/* --- calendário: navegação de mês --- */
+$('#calPrev').addEventListener('click', () => {
+  const { year, month } = ui.calMonth;
+  const d = new Date(year, month - 1, 1);
+  ui.calMonth = { year: d.getFullYear(), month: d.getMonth() };
+  save(); renderCalendar();
+});
+$('#calNext').addEventListener('click', () => {
+  const { year, month } = ui.calMonth;
+  const d = new Date(year, month + 1, 1);
+  ui.calMonth = { year: d.getFullYear(), month: d.getMonth() };
+  save(); renderCalendar();
+});
+$('#calToday').addEventListener('click', () => {
+  const now = new Date();
+  ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
+  ui.date = todayISO();
+  save(); renderCalendar();
 });
 
+/* --- calendário: clique em um dia leva ao diário --- */
+$('#calGrid').addEventListener('click', e => {
+  const cell = e.target.closest('.cal-cell');
+  if(!cell) return;
+  ui.date = cell.dataset.date;
+  const [y,m] = ui.date.split('-').map(Number);
+  ui.calMonth = { year: y, month: m-1 };
+  save();
+  switchTab('daily');
+});
+
+/* --- quick add diário --- */
 $('#dailyForm').addEventListener('submit', e => {
   e.preventDefault();
   const title = $('#qTitle').value.trim();
@@ -1179,6 +1418,7 @@ $('#dailyForm').addEventListener('submit', e => {
   $('#qTitle').focus();
 });
 
+/* --- lista diária (delegação) --- */
 $('#dailyList').addEventListener('click', e => {
   const li = e.target.closest('.task');
   if(!li) return;
@@ -1194,6 +1434,7 @@ $('#dailyList').addEventListener('click', e => {
   }
 });
 
+/* --- grade semanal (delegação) --- */
 $('#weekGrid').addEventListener('click', e => {
   const addBtn = e.target.closest('.add');
   if(addBtn){
@@ -1216,6 +1457,7 @@ $('#addWeeklyBtn').addEventListener('click', () => {
   openModal({ type:'weekly', mode:'new', day: DAYS[dayIndexOfToday()].key });
 });
 
+/* --- modal: submit --- */
 $('#modalForm').addEventListener('submit', e => {
   e.preventDefault();
   if(!modalCtx) return;
@@ -1239,6 +1481,8 @@ $('#modalForm').addEventListener('submit', e => {
       if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
       data.daily[newDate].push({ id: uid(), done:false, ...base });
       ui.date = newDate;
+      const [y,m] = newDate.split('-').map(Number);
+      ui.calMonth = { year: y, month: m-1 };
     } else {
       const oldDate = modalCtx.date;
       const oldArr  = data.daily[oldDate] || [];
@@ -1250,6 +1494,8 @@ $('#modalForm').addEventListener('submit', e => {
       if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
       data.daily[newDate].push({ id: modalCtx.item.id, done: wasDone, ...base });
       ui.date = newDate;
+      const [y,m] = newDate.split('-').map(Number);
+      ui.calMonth = { year: y, month: m-1 };
     }
   } else {
     const newDay = $('#fDay').value;
@@ -1271,6 +1517,7 @@ $('#modalForm').addEventListener('submit', e => {
   render();
 });
 
+/* --- modal: fechar --- */
 $('#modalClose').addEventListener('click', closeModal);
 $('#btnCancel').addEventListener('click', closeModal);
 $('#modal').addEventListener('click', e => {
@@ -1281,7 +1528,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   EXPORTAR / IMPORTAR ARQUIVO
+   EXPORTAR / IMPORTAR
    ============================================================ */
 function contarTudo(d){
   let daily = 0, weekly = 0;
@@ -1293,7 +1540,7 @@ function contarTudo(d){
 $('#btnExport').addEventListener('click', () => {
   const payload = {
     app: 'Cronoplano',
-    versao: 1,
+    versao: 2,
     exportadoEm: new Date().toISOString(),
     dados: {
       daily:  data.daily,
@@ -1379,6 +1626,10 @@ function init(){
   load();
 
   if(!ui.date) ui.date = todayISO();
+  if(!ui.calMonth){
+    const now = new Date();
+    ui.calMonth = { year: now.getFullYear(), month: now.getMonth() };
+  }
 
   $$('.tab[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + ui.tab));
