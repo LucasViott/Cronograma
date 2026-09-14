@@ -531,7 +531,6 @@ select option{background-color: var(--surface); color: var(--text);}
   box-shadow:0 0 14px rgba(30,64,175,.55);
 }
 
-/* ===== Hora Operacional banner (per-carteira) ===== */
 .hora-op-banner{
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   padding:12px 14px;margin-bottom:14px;
@@ -549,10 +548,7 @@ select option{background-color: var(--surface); color: var(--text);}
   margin:0 8px;position:relative;
 }
 [data-theme="light"] .hora-op-banner .prog{background:rgba(0,0,0,.12);}
-.hora-op-banner .prog i{
-  display:block;height:100%;border-radius:20px;
-  transition:width .4s ease;
-}
+.hora-op-banner .prog i{display:block;height:100%;border-radius:20px;transition:width .4s ease;}
 .hora-op-banner .status-chip{
   font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
   padding:3px 9px;border-radius:20px;white-space:nowrap;
@@ -599,62 +595,40 @@ select option{background-color: var(--surface); color: var(--text);}
 .hora-op-banner.neutral .prog i{background:#a3a3a3;}
 .hora-op-banner .legend-hint{
   font-size:11px; opacity:.75; font-weight:500;
-  flex-basis:100%;
-  margin-top:-2px;
+  flex-basis:100%; margin-top:-2px;
 }
 .hora-op-banner .carteiras-list{
   flex-basis:100%;
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:6px;
-  margin-top:6px;
-  padding-top:10px;
+  gap:6px; margin-top:6px; padding-top:10px;
   border-top:1px solid rgba(255,255,255,.08);
 }
-[data-theme="light"] .hora-op-banner .carteiras-list{
-  border-top-color:rgba(0,0,0,.08);
-}
+[data-theme="light"] .hora-op-banner .carteiras-list{border-top-color:rgba(0,0,0,.08);}
 .hora-op-banner .carteira-row{
   display:flex; align-items:center; gap:8px;
-  padding:6px 10px;
-  border-radius:8px;
+  padding:6px 10px; border-radius:8px;
   background:rgba(0,0,0,.18);
   border:1px solid rgba(255,255,255,.06);
   font-size:11.5px;
 }
-[data-theme="light"] .hora-op-banner .carteira-row{
-  background:rgba(0,0,0,.04);
-  border-color:rgba(0,0,0,.06);
-}
+[data-theme="light"] .hora-op-banner .carteira-row{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.06);}
 .hora-op-banner .carteira-row .nm{
   font-weight:700; letter-spacing:.2px;
   flex:1; min-width:0;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  color:var(--text);
-  text-transform:uppercase;
-  font-size:10.5px;
+  color:var(--text); text-transform:uppercase; font-size:10.5px;
 }
 .hora-op-banner .carteira-row .prog-mini{
-  flex:0 0 auto;
-  width:46px; height:5px;
-  border-radius:20px;
-  background:rgba(0,0,0,.28);
-  overflow:hidden;
-  display:inline-block;
+  flex:0 0 auto; width:46px; height:5px;
+  border-radius:20px; background:rgba(0,0,0,.28);
+  overflow:hidden; display:inline-block;
 }
-[data-theme="light"] .hora-op-banner .carteira-row .prog-mini{
-  background:rgba(0,0,0,.12);
-}
-.hora-op-banner .carteira-row .prog-mini i{
-  display:block; height:100%; border-radius:20px;
-  transition:width .35s ease;
-}
+[data-theme="light"] .hora-op-banner .carteira-row .prog-mini{background:rgba(0,0,0,.12);}
+.hora-op-banner .carteira-row .prog-mini i{display:block; height:100%; border-radius:20px; transition:width .35s ease;}
 .hora-op-banner .carteira-row .vl{
-  font-weight:800; font-variant-numeric:tabular-nums;
-  font-size:10.5px;
-  flex:0 0 auto;
-  color:var(--text);
-  opacity:.85;
+  font-weight:800; font-variant-numeric:tabular-nums; font-size:10.5px;
+  flex:0 0 auto; color:var(--text); opacity:.85;
 }
 .hora-op-banner .carteira-row.ok .prog-mini i{background:#10b981;}
 .hora-op-banner .carteira-row.warn .prog-mini i{background:#f59e0b;}
@@ -670,10 +644,8 @@ select option{background-color: var(--surface); color: var(--text);}
   background:linear-gradient(180deg,var(--overlay),transparent),var(--surface);
   border:1px solid var(--border);
   border-left:3px solid var(--c,var(--accent));
-  border-radius:12px;
-  padding:13px 15px;
-  transition:.18s;
-  animation:fade .22s ease;
+  border-radius:12px; padding:13px 15px;
+  transition:.18s; animation:fade .22s ease;
 }
 .task:hover{border-color:#3a3a3a;border-left-color:var(--c,var(--accent));transform:translateX(2px);}
 .task.readonly:hover{transform:none;}
@@ -780,10 +752,7 @@ select option{background-color: var(--surface); color: var(--text);}
   background:linear-gradient(135deg,rgba(30,64,175,.24),rgba(30,58,138,.16));
   border-color:var(--accent);
 }
-.cal-cell.holiday{
-  background:var(--holiday-bg),var(--bg-2);
-  border-color:var(--holiday-border);
-}
+.cal-cell.holiday{background:var(--holiday-bg),var(--bg-2);border-color:var(--holiday-border);}
 .cal-cell.holiday.selected{
   background:linear-gradient(135deg,rgba(30,64,175,.34),rgba(30,58,138,.22));
   border-color:var(--accent);
@@ -808,13 +777,8 @@ select option{background-color: var(--surface); color: var(--text);}
 .cal-cell.has-late .cal-badge{background:linear-gradient(135deg,#ef4444,#dc2626);}
 .cal-dots{display:flex;gap:3px;flex-wrap:wrap;margin-top:auto;}
 .cal-dots i{width:6px;height:6px;border-radius:50%;display:block;flex:0 0 auto;}
-.cal-cell.has-tasks{
-  background:linear-gradient(180deg,var(--overlay),transparent),var(--bg-2);
-  border-color:var(--border);
-}
-.cal-cell.holiday.has-tasks{
-  background:linear-gradient(180deg,rgba(30,64,175,.18),transparent),var(--bg-2);
-}
+.cal-cell.has-tasks{background:linear-gradient(180deg,var(--overlay),transparent),var(--bg-2);border-color:var(--border);}
+.cal-cell.holiday.has-tasks{background:linear-gradient(180deg,rgba(30,64,175,.18),transparent),var(--bg-2);}
 .cal-panel{padding:14px;}
 .cal-panel .cal-head{margin-bottom:12px;gap:8px;}
 .cal-panel .cal-title{font-size:14.5px;flex:1;min-width:0;}
@@ -846,26 +810,29 @@ select option{background-color: var(--surface); color: var(--text);}
 }
 [data-theme="light"] .cal-hint .legend-holiday i{background:var(--accent);box-shadow:none;}
 
-/* ===== MONTH VIEW (NOVO) ===== */
+/* ===== MONTH VIEW (7 colunas com Domingo) ===== */
 .month-panel{padding:14px;}
 .month-panel .month-weekdays{
-  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;
   margin-bottom:8px;
 }
 .month-panel .month-weekdays span{
   text-align:center;font-size:11px;font-weight:700;color:var(--muted);
   text-transform:uppercase;letter-spacing:.6px;padding:6px 0;
 }
+.month-panel .month-weekdays span.is-sunday{color:#f87171;opacity:.9;}
+[data-theme="light"] .month-panel .month-weekdays span.is-sunday{color:#dc2626;}
+
 .month-grid{
-  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;
 }
 .month-day{
   background:var(--bg-2);
   border:1px solid var(--border-soft);
   border-radius:11px;
-  padding:8px 9px;
-  display:flex;flex-direction:column;gap:5px;
-  min-height:170px;
+  padding:7px 8px;
+  display:flex;flex-direction:column;gap:4px;
+  min-height:160px;
   transition:.16s;
   position:relative;
   cursor:pointer;
@@ -877,6 +844,10 @@ select option{background-color: var(--surface); color: var(--text);}
   background:linear-gradient(180deg,rgba(30,64,175,.10),transparent),var(--bg-2);
   border-color:var(--accent);
 }
+.month-day.sunday{background:linear-gradient(180deg, rgba(239,68,68,.06), transparent), var(--bg-2);}
+.month-day.sunday .month-day-num{color:#f87171;}
+[data-theme="light"] .month-day.sunday{background:linear-gradient(180deg, rgba(239,68,68,.05), transparent), var(--bg-2);}
+[data-theme="light"] .month-day.sunday .month-day-num{color:#dc2626;}
 .month-day.holiday{
   background:var(--holiday-bg),var(--bg-2);
   border-color:var(--holiday-border);
@@ -884,10 +855,7 @@ select option{background-color: var(--surface); color: var(--text);}
 }
 .month-day.holiday:hover{transform:none;background:var(--holiday-bg),var(--bg-2);}
 .month-day-head{display:flex;align-items:center;gap:5px;}
-.month-day-num{
-  font-size:13px;font-weight:800;letter-spacing:-.2px;
-  flex:1;min-width:0;
-}
+.month-day-num{font-size:13px;font-weight:800;letter-spacing:-.2px;flex:1;min-width:0;}
 .month-day.today .month-day-num{color:#93c5fd;}
 [data-theme="light"] .month-day.today .month-day-num{color:var(--accent-2);}
 .month-day.holiday .month-day-num{color:var(--holiday-num);}
@@ -926,7 +894,7 @@ select option{background-color: var(--surface); color: var(--text);}
   margin-top:2px;
 }
 .month-task{
-  display:flex;align-items:center;gap:5px;
+  display:flex;align-items:center;gap:4px;
   padding:3px 6px;
   border-radius:6px;
   background:var(--surface);
@@ -946,6 +914,21 @@ select option{background-color: var(--surface); color: var(--text);}
   color:var(--c,var(--accent));
   flex:0 0 auto;
 }
+.month-task .mt-owner{
+  flex:0 0 auto;
+  font-size:8.5px;
+  font-weight:800;
+  letter-spacing:.2px;
+  text-transform:uppercase;
+  padding:1px 4px;
+  border-radius:4px;
+  background:color-mix(in srgb, var(--oc) 18%, transparent);
+  color:var(--oc);
+  border:1px solid color-mix(in srgb, var(--oc) 32%, transparent);
+  max-width:52px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  line-height:1.3;
+}
 .month-task .mt-title{
   flex:1;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -957,19 +940,67 @@ select option{background-color: var(--surface); color: var(--text);}
   color:var(--muted);text-align:center;
   padding:2px 0;
 }
-@media(max-width:1100px){
-  .month-day{min-height:140px;}
-}
+@media(max-width:1200px){ .month-day{min-height:145px;} }
+@media(max-width:1100px){ .month-day{min-height:130px;} }
 @media(max-width:820px){
   .month-day{min-height:110px;padding:6px;}
   .month-day-num{font-size:12px;}
-  .month-task{font-size:9.5px;padding:2px 5px;}
+  .month-task{font-size:9.5px;padding:2px 5px;gap:3px;}
   .month-task .mt-time{display:none;}
   .month-day-holiday{font-size:8px;}
 }
-@media(max-width:560px){
-  .month-grid{grid-template-columns:repeat(2,1fr);}
+@media(max-width:640px){
+  .month-grid{grid-template-columns:repeat(3,1fr);}
   .month-panel .month-weekdays{display:none;}
+  .month-day{min-height:100px;}
+}
+@media(max-width:400px){
+  .month-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ===== DAY DETAIL (modal) ===== */
+.day-detail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
+.day-detail-item{
+  display:grid;grid-template-columns:66px 1fr auto;gap:12px;align-items:flex-start;
+  background:var(--bg-2);border:1px solid var(--border-soft);
+  border-left:3px solid var(--c,var(--accent));
+  border-radius:11px;padding:11px 14px;
+  transition:.15s;
+}
+.day-detail-item:hover{background:color-mix(in srgb,var(--bg-2) 92%,var(--text) 4%);border-color:#3a3a3a;}
+.day-detail-item.done{opacity:.55;}
+.day-detail-item.done .dd-title{text-decoration:line-through;text-decoration-color:var(--muted);}
+.day-detail-item.late{border-left-color:#ef4444 !important;}
+.day-detail-item .dd-time{
+  font-size:12.5px;font-weight:800;
+  font-variant-numeric:tabular-nums;
+  color:var(--c,var(--accent));
+  line-height:1.35;padding-top:2px;
+}
+.day-detail-item .dd-time small{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:1px;}
+.day-detail-item .dd-main{min-width:0;}
+.day-detail-item .dd-title{
+  font-size:14px;font-weight:700;
+  letter-spacing:-.15px;line-height:1.4;word-break:break-word;
+}
+.day-detail-item .dd-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center;}
+.day-detail-item .dd-notes{
+  font-size:12px;color:var(--muted);font-style:italic;margin-top:6px;
+  line-height:1.5;padding-left:2px;
+  border-left:2px solid var(--border-soft);padding:4px 8px;
+}
+.day-detail-item .dd-actions{display:flex;gap:3px;opacity:0;transition:.15s;}
+.day-detail-item:hover .dd-actions{opacity:1;}
+.day-detail-item .dd-actions button{
+  width:28px;height:28px;border-radius:7px;border:1px solid transparent;
+  background:transparent;color:var(--muted);cursor:pointer;font-size:12px;
+  transition:.15s;display:grid;place-items:center;
+}
+.day-detail-item .dd-actions button:hover{background:var(--surface-2);color:var(--text);border-color:var(--border);}
+.day-detail-item .dd-actions button[data-act="del"]:hover{color:#f87171;border-color:rgba(239,68,68,.35);}
+@media(max-width:560px){
+  .day-detail-item{grid-template-columns:56px 1fr;}
+  .day-detail-item .dd-actions{grid-column:2;opacity:1;}
 }
 
 .week-scroll{overflow-x:auto;padding-bottom:6px;}
@@ -985,14 +1016,8 @@ select option{background-color: var(--surface); color: var(--text);}
   border-color:rgba(30,64,175,.6);
   box-shadow:0 0 0 1px rgba(30,64,175,.2), 0 8px 30px rgba(30,64,175,.12);
 }
-.day-col.is-holiday{
-  background:linear-gradient(180deg,rgba(30,64,175,.1),transparent),var(--surface);
-  border-color:var(--holiday-border);
-}
-.day-col.is-selected{
-  background:linear-gradient(180deg,rgba(30,64,175,.14),transparent),var(--surface);
-  border-color:var(--accent);
-}
+.day-col.is-holiday{background:linear-gradient(180deg,rgba(30,64,175,.1),transparent),var(--surface);border-color:var(--holiday-border);}
+.day-col.is-selected{background:linear-gradient(180deg,rgba(30,64,175,.14),transparent),var(--surface);border-color:var(--accent);}
 .day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .day-head .name{
   font-size:12.5px;font-weight:700;letter-spacing:.3px;
@@ -1141,10 +1166,7 @@ select option{background-color: var(--surface); color: var(--text);}
 .mini-item .mi-t{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 .filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
-.filter-group{
-  display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);
-  padding:5px;border-radius:11px;
-}
+.filter-group{display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);padding:5px;border-radius:11px;}
 .filter-chip{
   appearance:none;border:0;background:transparent;color:var(--muted);
   padding:7px 13px;border-radius:8px;font:inherit;font-size:12.5px;font-weight:600;
@@ -1153,29 +1175,23 @@ select option{background-color: var(--surface); color: var(--text);}
 .filter-chip:hover{color:var(--text);}
 .filter-chip.active{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#fff;
-  box-shadow:0 4px 14px rgba(30,64,175,.4);
+  color:#fff;box-shadow:0 4px 14px rgba(30,64,175,.4);
 }
 .filter-chip .ct{
   background:rgba(0,0,0,.28);color:inherit;
-  font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:20px;
-  margin-left:2px;
+  font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:2px;
 }
 .filter-chip.active .ct{background:rgba(255,255,255,.22);}
 .team-user-select{width:auto;min-width:200px;padding:9px 34px 9px 12px;font-size:13px;}
 
-.members-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:12px;
-}
+.members-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
 .member-card{
   background:linear-gradient(180deg,var(--overlay-2),transparent),var(--bg-2);
   border:1px solid var(--border-soft);
   border-left:3px solid var(--c);
   border-radius:12px;padding:13px 14px;
   display:flex;flex-direction:column;gap:10px;
-  transition:.16s;cursor:pointer;
-  position:relative;
+  transition:.16s;cursor:pointer;position:relative;
 }
 .member-card:hover{border-color:#3a3a3a;transform:translateY(-1px);}
 .member-card.active{
@@ -1198,12 +1214,8 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-top .cargo{font-size:11px;color:var(--muted);margin-top:1px;}
 .member-top .email{font-size:10.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .role-icon{
-  font-size:16px;
-  opacity:.7;
-  flex:0 0 auto;
-  line-height:1;
-  filter: grayscale(.15);
-  margin-right: 56px;
+  font-size:16px; opacity:.7; flex:0 0 auto; line-height:1;
+  filter: grayscale(.15); margin-right: 56px;
 }
 .member-card.is-me .role-icon{margin-right: 0;}
 
@@ -1223,13 +1235,11 @@ select option{background-color: var(--surface); color: var(--text);}
 
 .member-hora-op{
   display:flex; align-items:center; gap:8px;
-  padding:7px 10px;
-  border-radius:9px;
+  padding:7px 10px; border-radius:9px;
   border:1px solid var(--border-soft);
   background:var(--surface);
   font-size:11.5px;
-  transition:.16s;
-  min-width:0;
+  transition:.16s; min-width:0;
 }
 .member-hora-op .ico{font-size:13px; flex:0 0 auto; line-height:1; opacity:.85;}
 .member-hora-op .lbl{
@@ -1240,30 +1250,21 @@ select option{background-color: var(--surface); color: var(--text);}
   flex:1; min-width:34px;
   height:5px; border-radius:20px;
   background:rgba(0,0,0,.28);
-  overflow:hidden;
-  display:inline-block;
+  overflow:hidden; display:inline-block;
 }
 [data-theme="light"] .member-hora-op .prog{background:rgba(0,0,0,.1);}
-.member-hora-op .prog i{
-  display:block; height:100%; border-radius:20px;
-  transition:width .35s ease;
-  background:var(--muted);
-}
+.member-hora-op .prog i{display:block; height:100%; border-radius:20px; transition:width .35s ease; background:var(--muted);}
 .member-hora-op .vl{
   font-size:10.5px; font-weight:800;
-  font-variant-numeric:tabular-nums;
-  letter-spacing:-.2px;
-  flex:0 0 auto;
-  color:var(--muted);
+  font-variant-numeric:tabular-nums; letter-spacing:-.2px;
+  flex:0 0 auto; color:var(--muted);
 }
 .member-hora-op .chip{
   font-size:9.5px; font-weight:800;
   letter-spacing:.3px; text-transform:uppercase;
   padding:2px 8px; border-radius:20px;
   white-space:nowrap; flex:0 0 auto;
-  background:var(--surface-2);
-  color:var(--muted);
-  border:1px solid var(--border);
+  background:var(--surface-2); color:var(--muted); border:1px solid var(--border);
 }
 .member-hora-op.ok{
   border-color:rgba(16,185,129,.4);
@@ -1272,10 +1273,7 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-hora-op.ok .prog i{background:#10b981;}
 .member-hora-op.ok .vl{color:#34d399;}
 [data-theme="light"] .member-hora-op.ok .vl{color:#059669;}
-.member-hora-op.ok .chip{
-  background:rgba(16,185,129,.18); color:#34d399;
-  border-color:rgba(16,185,129,.38);
-}
+.member-hora-op.ok .chip{background:rgba(16,185,129,.18); color:#34d399; border-color:rgba(16,185,129,.38);}
 [data-theme="light"] .member-hora-op.ok .chip{color:#059669;}
 .member-hora-op.warn{
   border-color:rgba(245,158,11,.4);
@@ -1284,10 +1282,7 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-hora-op.warn .prog i{background:#f59e0b;}
 .member-hora-op.warn .vl{color:#fbbf24;}
 [data-theme="light"] .member-hora-op.warn .vl{color:#b45309;}
-.member-hora-op.warn .chip{
-  background:rgba(245,158,11,.18); color:#fbbf24;
-  border-color:rgba(245,158,11,.38);
-}
+.member-hora-op.warn .chip{background:rgba(245,158,11,.18); color:#fbbf24; border-color:rgba(245,158,11,.38);}
 [data-theme="light"] .member-hora-op.warn .chip{color:#b45309;}
 .member-hora-op.bad{
   border-color:rgba(239,68,68,.4);
@@ -1296,10 +1291,7 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-hora-op.bad .prog i{background:#ef4444;}
 .member-hora-op.bad .vl{color:#f87171;}
 [data-theme="light"] .member-hora-op.bad .vl{color:#dc2626;}
-.member-hora-op.bad .chip{
-  background:rgba(239,68,68,.18); color:#f87171;
-  border-color:rgba(239,68,68,.38);
-}
+.member-hora-op.bad .chip{background:rgba(239,68,68,.18); color:#f87171; border-color:rgba(239,68,68,.38);}
 [data-theme="light"] .member-hora-op.bad .chip{color:#dc2626;}
 .member-hora-op.neutral{background:var(--surface); border-color:var(--border-soft);}
 .member-hora-op.neutral .chip{background:var(--surface-2); color:var(--muted);}
@@ -1309,8 +1301,7 @@ select option{background-color: var(--surface); color: var(--text);}
   width:24px; height:24px; border-radius:7px;
   border:1px solid transparent; background:transparent;
   color:var(--muted); cursor:pointer; font-size:12px;
-  opacity:0; transition:.15s; display:grid; place-items:center;
-  line-height:1;
+  opacity:0; transition:.15s; display:grid; place-items:center; line-height:1;
 }
 .member-card:hover .member-edit{opacity:1;}
 .member-edit:hover{
@@ -1324,14 +1315,10 @@ select option{background-color: var(--surface); color: var(--text);}
   width:24px; height:24px; border-radius:7px;
   border:1px solid transparent; background:transparent;
   color:var(--muted); cursor:pointer; font-size:12px;
-  opacity:0; transition:.15s; display:grid; place-items:center;
-  line-height:1;
+  opacity:0; transition:.15s; display:grid; place-items:center; line-height:1;
 }
 .member-card:hover .member-delete{opacity:1;}
-.member-delete:hover{
-  background:rgba(239,68,68,.15); color:#f87171;
-  border-color:rgba(239,68,68,.4);
-}
+.member-delete:hover{background:rgba(239,68,68,.15); color:#f87171; border-color:rgba(239,68,68,.4);}
 [data-theme="light"] .member-delete:hover{color:#dc2626;}
 
 .team-task-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
@@ -1447,18 +1434,15 @@ select option{background-color: var(--surface); color: var(--text);}
 .photo-hint{font-size:11px; color:var(--muted); line-height:1.4;}
 
 .carteiras-picker{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:6px;
-  margin-bottom:10px;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:6px; margin-bottom:10px;
 }
 .carteira-opt{
   appearance:none;border:1px solid var(--border);background:var(--bg-2);
   color:var(--text);padding:8px 10px;border-radius:9px;
   font:inherit;font-size:12.5px;font-weight:600;
   cursor:pointer;transition:.15s;text-align:left;
-  display:flex;align-items:center;gap:8px;
-  min-width:0;
+  display:flex;align-items:center;gap:8px; min-width:0;
 }
 .carteira-opt:hover{border-color:#3a3a3a;background:var(--surface-2);}
 .carteira-opt.on{
@@ -1470,12 +1454,9 @@ select option{background-color: var(--surface); color: var(--text);}
 .carteira-opt .chk{
   width:14px;height:14px;border-radius:4px;border:1.5px solid var(--border);
   display:grid;place-items:center;flex:0 0 auto;font-size:9px; line-height:1;
-  background:var(--surface);
-  color:transparent;
+  background:var(--surface); color:transparent;
 }
-.carteira-opt.on .chk{
-  background:var(--accent); border-color:var(--accent); color:#fff;
-}
+.carteira-opt.on .chk{background:var(--accent); border-color:var(--accent); color:#fff;}
 .carteira-opt .lbl{
   flex:1; min-width:0;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -1663,7 +1644,14 @@ select option{background-color: var(--surface); color: var(--text);}
       <button class="tab" data-tab="team" data-leader-only hidden>👥 Equipe</button>
     </nav>
 
+    <!-- PERFIL primeiro, depois CONFIGURAÇÕES -->
     <div class="user-wrap">
+      <button class="user-chip" id="userChip" title="Editar meu perfil">
+        <span class="avatar" id="userChipAvatar">?</span>
+        <span id="userChipName">—</span>
+        <span class="role-badge member" id="userChipRole">membro</span>
+      </button>
+
       <div class="settings-wrap">
         <button class="icon-chip-btn icon-only" id="settingsBtn" title="Configurações" aria-haspopup="true" aria-expanded="false">
           <span class="ico">⚙️</span>
@@ -1698,12 +1686,6 @@ select option{background-color: var(--surface); color: var(--text);}
           </button>
         </div>
       </div>
-
-      <button class="user-chip" id="userChip" title="Editar meu perfil">
-        <span class="avatar" id="userChipAvatar">?</span>
-        <span id="userChipName">—</span>
-        <span class="role-badge member" id="userChipRole">membro</span>
-      </button>
     </div>
   </div>
 </header>
@@ -1814,12 +1796,11 @@ select option{background-color: var(--surface); color: var(--text);}
     </div>
   </section>
 
-  <!-- ============ VIEW: MÊS (NOVO) ============ -->
   <section class="view" id="view-month">
     <div class="section-head">
       <div>
         <h2 id="monthTitle">Visão Mensal</h2>
-        <p id="monthSubtitle">Todos os dias do mês com suas atividades.</p>
+        <p id="monthSubtitle">Todos os dias do mês com suas atividades. Clique em "+" para adicionar ou no dia para ver detalhes.</p>
       </div>
     </div>
     <div class="date-nav">
@@ -1848,6 +1829,7 @@ select option{background-color: var(--surface); color: var(--text);}
       <div class="month-weekdays">
         <span>Seg</span><span>Ter</span><span>Qua</span>
         <span>Qui</span><span>Sex</span><span>Sáb</span>
+        <span class="is-sunday">Dom</span>
       </div>
       <div class="month-grid" id="monthGrid"></div>
     </div>
@@ -1945,6 +1927,21 @@ select option{background-color: var(--surface); color: var(--text);}
   </div>
 </div>
 
+<!-- MODAL: DETALHES DO DIA -->
+<div class="modal-backdrop" id="dayDetailModal" hidden>
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-head">
+      <h3 id="dayDetailTitle">Detalhes do dia</h3>
+      <button class="icon-btn" id="dayDetailClose" type="button">✕</button>
+    </div>
+    <div id="dayDetailBody"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="dayDetailBtnClose">Fechar</button>
+      <button type="button" class="btn primary" id="dayDetailBtnAdd" hidden>+ Adicionar tarefa</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: ADICIONAR MEMBRO -->
 <div class="modal-backdrop" id="userModal" hidden>
   <div class="modal" style="max-width:560px;">
@@ -2008,9 +2005,7 @@ select option{background-color: var(--surface); color: var(--text);}
             <button type="button" class="btn ghost" id="pPhotoRemoveBtn">Remover</button>
             <input type="file" id="pPhotoInput" accept="image/*" hidden>
           </div>
-          <div class="photo-hint">
-            JPG, PNG ou WebP · redimensionada automaticamente para 200×200.
-          </div>
+          <div class="photo-hint">JPG, PNG ou WebP · redimensionada automaticamente para 200×200.</div>
         </div>
       </div>
 
@@ -2044,7 +2039,7 @@ select option{background-color: var(--surface); color: var(--text);}
   </div>
 </div>
 
-<!-- MODAL: EDITAR MEMBRO (líder) -->
+<!-- MODAL: EDITAR MEMBRO -->
 <div class="modal-backdrop" id="editMemberModal" hidden>
   <div class="modal" style="max-width:560px;">
     <div class="modal-head">
@@ -2060,9 +2055,7 @@ select option{background-color: var(--surface); color: var(--text);}
             <button type="button" class="btn ghost" id="emPhotoRemoveBtn">Remover</button>
             <input type="file" id="emPhotoInput" accept="image/*" hidden>
           </div>
-          <div class="photo-hint">
-            JPG, PNG ou WebP · redimensionada automaticamente para 200×200.
-          </div>
+          <div class="photo-hint">JPG, PNG ou WebP · redimensionada automaticamente para 200×200.</div>
         </div>
       </div>
 
@@ -2151,14 +2144,11 @@ select option{background-color: var(--surface); color: var(--text);}
     </div>
 
     <div class="import-actions">
-      <button type="button" class="btn ghost" id="importDownloadTemplate">
-        ⬇️ Baixar planilha-modelo
-      </button>
+      <button type="button" class="btn ghost" id="importDownloadTemplate">⬇️ Baixar planilha-modelo</button>
     </div>
 
     <div id="importLeaderSection" hidden>
       <div class="section-divider">Destinatários</div>
-
       <label class="field"><span>Modo de importação</span></label>
       <div class="role-picker" style="margin-bottom:14px;">
         <button type="button" class="role-opt active" data-import-mode="single">
@@ -2243,9 +2233,9 @@ select option{background-color: var(--surface); color: var(--text);}
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v18';
+const STORAGE_KEY = 'cronoplano.v19';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','month','dashboard','team'];
 const ALL_MEMBERS = '__all__';
 const PHOTO_SIZE = 200;
@@ -2375,6 +2365,7 @@ let importCtx = {
   mode: 'single', single: null, multi: []
 };
 let editMemberCtx = { userId: null, carteiras: [], photo: '', role: 'member' };
+let dayDetailCtx = { date: null };
 
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => [...r.querySelectorAll(s)];
@@ -2389,6 +2380,9 @@ function esc(s){
 }
 function initialOf(name){
   return (name || '?').trim().charAt(0).toUpperCase() || '?';
+}
+function firstNameOf(name){
+  return (name || '').trim().split(/\s+/)[0] || '';
 }
 function fmtDateFull(iso){
   if(!iso) return '';
@@ -2765,13 +2759,9 @@ function renderHoraOpBanner(owner){
   const pct = targetMins > 0 ? Math.min(100, Math.round((totalMins / targetMins) * 100)) : 0;
 
   let cls, chipLabel;
-  if(allOk){
-    cls = 'ok';
-    chipLabel = `✓ ${carteirasOk}/${carteiras.length} ok`;
-  } else if(none){
-    cls = 'bad';
-    chipLabel = 'Meta não iniciada';
-  } else {
+  if(allOk){ cls = 'ok'; chipLabel = `✓ ${carteirasOk}/${carteiras.length} ok`; }
+  else if(none){ cls = 'bad'; chipLabel = 'Meta não iniciada'; }
+  else {
     cls = 'warn';
     const falta = Math.max(0, targetMins - totalMins);
     chipLabel = `Faltam ${fmtDurationShort(falta)}`;
@@ -3142,7 +3132,7 @@ function renderDaily(){
 }
 
 /* ============================================================
-   RENDER: CALENDÁRIO (mini)
+   RENDER: CALENDÁRIO (mini — sem domingo)
    ============================================================ */
 function buildCalendarCells(year, month){
   const cells = [];
@@ -3171,6 +3161,38 @@ function buildCalendarCells(year, month){
   }
   return cells;
 }
+
+/* ============================================================
+   RENDER: MONTH cells (inclui domingo)
+   ============================================================ */
+function buildMonthCells(year, month){
+  const cells = [];
+  const first = new Date(year, month, 1);
+  const dow1 = first.getDay(); // 0=dom
+  // Começa na segunda da semana do primeiro dia
+  let startDate;
+  if(dow1 === 0){
+    startDate = new Date(year, month, -5); // seg antes do dom 1
+  } else if(dow1 === 1){
+    startDate = new Date(year, month, 1);
+  } else {
+    startDate = new Date(year, month, 1 - (dow1 - 1));
+  }
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const cur = new Date(startDate);
+  let safety = 0;
+  while(safety++ < 100){
+    cells.push({ date: new Date(cur), other: cur.getMonth() !== month });
+    if(cur >= lastDayOfMonth && cur.getDay() === 0) break; // parou no domingo
+    cur.setDate(cur.getDate() + 1);
+  }
+  while(cells.length % 7 !== 0){
+    cur.setDate(cur.getDate() + 1);
+    cells.push({ date: new Date(cur), other: true });
+  }
+  return cells;
+}
+
 function renderCalendar(){
   const { year, month } = ui.calMonth;
   const first = new Date(year, month, 1);
@@ -3322,18 +3344,21 @@ function renderWeekly(){
 }
 
 /* ============================================================
-   RENDER: MÊS (NOVO)
+   RENDER: MÊS (7 colunas com Domingo)
    ============================================================ */
 function renderMonth(){
   const { year, month } = ui.calMonth;
   const first = new Date(year, month, 1);
-  const cells = buildCalendarCells(year, month);
+  const cells = buildMonthCells(year, month);
   const todayIso = todayISO();
   const viewId = ui.viewUserId;
   const canEdit = canEditCurrentView();
   const allView = viewingAll();
   const viewed = viewedUser();
   const other = !!viewed && viewed.id !== ui.currentUserId;
+
+  // Exibir nome do membro nas tarefas quando não é a própria agenda
+  const showOwner = allView || (other && viewed);
 
   if(allView){
     $('#monthTitle').textContent = 'Mês da Equipe';
@@ -3343,7 +3368,7 @@ function renderMonth(){
     $('#monthSubtitle').textContent = 'Visualização do cronograma do colaborador.';
   } else {
     $('#monthTitle').textContent = 'Visão Mensal';
-    $('#monthSubtitle').textContent = 'Todos os dias do mês com suas atividades. Clique em "+" para adicionar.';
+    $('#monthSubtitle').textContent = 'Todos os dias do mês. Clique em "+" para adicionar ou no dia para ver detalhes.';
   }
 
   $('#moLabel').textContent = first.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
@@ -3364,7 +3389,7 @@ function renderMonth(){
     banner.classList.remove('all-banner');
   }
 
-  const MAX_TASKS = 6;
+  const MAX_TASKS = 5;
 
   $('#monthGrid').innerHTML = cells.map(c => {
     const iso = isoOf(c.date);
@@ -3373,6 +3398,7 @@ function renderMonth(){
     const isSelected = iso === ui.date;
     const holidayName = holidayNameOf(iso);
     const isHoliday = !!holidayName;
+    const isSunday = c.date.getDay() === 0;
 
     const showAdd = !isHoliday && !c.other && canEdit && !allView;
 
@@ -3384,9 +3410,14 @@ function renderMonth(){
       const status = taskStatus(t, iso);
       const doneCls = t.done ? 'done' : '';
       const lateCls = status === 'late' ? 'late' : '';
+      const owner = userById(t.ownerId);
+      const ownerChip = showOwner
+        ? `<span class="mt-owner" style="--oc:${owner.color}" title="${esc(owner.name)}">${esc(firstNameOf(owner.name))}</span>`
+        : '';
       return `
         <div class="month-task ${doneCls} ${lateCls}" data-mo-task="${t.id}" data-mo-date="${iso}" style="--c:${cat.color}" title="${esc(t.title)}${t.carteira ? ' · ' + esc(t.carteira) : ''}">
           <span class="mt-time">${t.start ? esc(t.start) : '--:--'}</span>
+          ${ownerChip}
           <span class="mt-title">${esc(t.title)}</span>
         </div>`;
     }).join('') + (extraCount ? `<div class="month-more">+${extraCount} mais</div>` : '');
@@ -3394,7 +3425,7 @@ function renderMonth(){
     const titleAttr = isHoliday ? `🎉 ${holidayName}` : (tasks.length ? `${tasks.length} atividade(s)` : '');
 
     return `
-      <div class="month-day ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${isHoliday?'holiday':''}" data-mo-day="${iso}" title="${esc(titleAttr)}">
+      <div class="month-day ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${isHoliday?'holiday':''} ${isSunday?'sunday':''}" data-mo-day="${iso}" title="${esc(titleAttr)}">
         <div class="month-day-head">
           <span class="month-day-num">${c.date.getDate()}</span>
           ${tasks.length ? `<span class="month-day-count">${tasks.length}</span>` : ''}
@@ -3405,6 +3436,89 @@ function renderMonth(){
         ${isHoliday && !tasks.length ? `<div class="month-day-locked">🔒 Sem agendamento</div>` : ''}
       </div>`;
   }).join('');
+}
+
+/* ============================================================
+   MODAL: DETALHES DO DIA
+   ============================================================ */
+function openDayDetail(dateIso){
+  dayDetailCtx.date = dateIso;
+
+  const tasks = sortByTime(tasksOfDate(dateIso, ui.viewUserId));
+  const holiday = holidayNameOf(dateIso);
+  const allView = viewingAll();
+  const canEdit = canEditCurrentView() && !holiday;
+  const viewed = viewedUser();
+  const me = currentUser();
+  const showOwner = allView || (viewed && me && viewed.id !== me.id);
+
+  $('#dayDetailTitle').textContent = fmtDateLong(dateIso);
+
+  const holidayHTML = holiday
+    ? `<div class="io-hint" style="margin-bottom:12px;">🎉 <b>${esc(holiday)}</b> — Feriado nacional</div>`
+    : '';
+
+  if(!tasks.length){
+    $('#dayDetailBody').innerHTML = holidayHTML + `
+      <div class="empty" style="padding:30px 16px;">
+        <span class="big">${holiday ? '🎉' : '☀️'}</span>
+        ${holiday ? 'Feriado — sem agendamento.' : 'Nenhuma atividade para este dia.'}
+      </div>`;
+  } else {
+    $('#dayDetailBody').innerHTML = holidayHTML + `
+      <ul class="day-detail-list">
+        ${tasks.map(t => {
+          const cat = catOf(t.cat);
+          const prio = PRIO[t.prio] || PRIO.media;
+          const status = taskStatus(t, dateIso);
+          const owner = userById(t.ownerId);
+          const start = t.start || '';
+          const end = t.end || '';
+          const actions = canEdit ? `
+            <div class="dd-actions">
+              <button data-dd-act="edit" data-dd-id="${t.id}" title="Editar">✎</button>
+              <button data-dd-act="del"  data-dd-id="${t.id}" title="Excluir">🗑</button>
+            </div>` : '';
+          const statusBadge =
+            status === 'done' ? `<span class="status-badge done">Concluída</span>` :
+            status === 'late' ? `<span class="status-badge late">Atrasada</span>` :
+            `<span class="status-badge pending">Pendente</span>`;
+          return `
+            <li class="day-detail-item ${t.done?'done':''} ${status==='late'?'late':''}" style="--c:${cat.color}">
+              <div class="dd-time">
+                ${start ? esc(start) : '--:--'}
+                ${end ? `<small>${esc(end)}</small>` : ''}
+              </div>
+              <div class="dd-main">
+                <div class="dd-title">${esc(t.title)}</div>
+                <div class="dd-meta">
+                  ${showOwner ? `<span class="pill owner-pill" style="--c:${owner.color}">${avatarHTML(owner)}${esc(owner.name)}</span>` : ''}
+                  <span class="pill" style="--c:${cat.color}">${cat.label}</span>
+                  ${t.carteira ? `<span class="pill carteira">🏷️ ${esc(t.carteira)}</span>` : ''}
+                  ${t.prio && t.prio !== 'media' ? `<span class="pill prio-${t.prio}">${prio.label}</span>` : ''}
+                  ${statusBadge}
+                </div>
+                ${t.notes ? `<div class="dd-notes">${esc(t.notes)}</div>` : ''}
+              </div>
+              ${actions}
+            </li>`;
+        }).join('')}
+      </ul>`;
+  }
+
+  const addBtn = $('#dayDetailBtnAdd');
+  if(canEdit && !allView){
+    addBtn.hidden = false;
+  } else {
+    addBtn.hidden = true;
+  }
+
+  $('#dayDetailModal').hidden = false;
+}
+
+function closeDayDetail(){
+  $('#dayDetailModal').hidden = true;
+  dayDetailCtx.date = null;
 }
 
 /* ============================================================
@@ -3490,7 +3604,7 @@ function barsHTML(values, labels, highlightIdx){
 }
 
 /* ============================================================
-   RENDER: DASHBOARD
+   RENDER: DASHBOARD (sem domingo em últimos 7 dias e semana atual)
    ============================================================ */
 function renderDashboard(){
   const targetId = ui.viewUserId || ui.currentUserId;
@@ -3511,23 +3625,28 @@ function renderDashboard(){
     $('#dashSubtitle').textContent = 'Sua visão pessoal de produtividade.';
   }
 
+  /* Últimos 7 dias — SEM DOMINGO */
   const last7 = [];
   const now = new Date();
-  for(let i = 6; i >= 0; i--){
-    const dt = new Date(now);
-    dt.setDate(now.getDate() - i);
-    const iso = isoOf(dt);
-    const tasks = tasksOfDate(iso, targetId);
-    last7.push({
-      iso,
-      label: dt.toLocaleDateString('pt-BR', { weekday:'short' }).replace('.',''),
-      count: tasks.length
-    });
+  const cursor = new Date(now);
+  let safety = 0;
+  while(last7.length < 7 && safety++ < 30){
+    if(cursor.getDay() !== 0){ // pula domingo
+      const iso = isoOf(cursor);
+      const tasks = tasksOfDate(iso, targetId);
+      last7.unshift({
+        iso,
+        label: cursor.toLocaleDateString('pt-BR', { weekday:'short' }).replace('.',''),
+        count: tasks.length
+      });
+    }
+    cursor.setDate(cursor.getDate() - 1);
   }
 
+  /* Semana atual — Seg a Sáb (SEM DOMINGO) */
   const monday = mondayOf(todayISO());
   const weekDates = [];
-  for(let i = 0; i < 7; i++){
+  for(let i = 0; i < 6; i++){ // 6 dias: seg, ter, qua, qui, sex, sáb
     const dt = new Date(monday);
     dt.setDate(monday.getDate() + i);
     weekDates.push(dt);
@@ -3570,7 +3689,7 @@ function renderDashboard(){
     <div class="panel">
       <div class="panel-head">
         <h3>📊 Últimos 7 dias</h3>
-        <span class="chip">tarefas por dia</span>
+        <span class="chip">sem domingo</span>
       </div>
       ${barsHTML(last7.map(d => d.count), last7.map(d => d.label), 6)}
     </div>
@@ -3578,7 +3697,7 @@ function renderDashboard(){
     <div class="panel">
       <div class="panel-head">
         <h3>🗓️ Semana atual</h3>
-        <span class="chip">distribuição por dia</span>
+        <span class="chip">Seg a Sáb</span>
       </div>
       ${barsHTML(weekValues, weekLabels, todayIdx)}
     </div>
@@ -4771,7 +4890,7 @@ $('#weekGrid').addEventListener('click', e => {
 });
 
 /* ============================================================
-   MÊS (NOVO) — navegação + interações
+   MÊS — navegação + interações
    ============================================================ */
 $('#moPrev').addEventListener('click', () => shiftMonth(-1));
 $('#moNext').addEventListener('click', () => shiftMonth(1));
@@ -4782,36 +4901,81 @@ $('#moToday').addEventListener('click', () => {
 });
 
 $('#monthGrid').addEventListener('click', e => {
-  /* botão + para adicionar */
+  /* botão + → adicionar */
   const addBtn = e.target.closest('[data-mo-add]');
   if(addBtn){
     e.stopPropagation();
     const iso = addBtn.dataset.moAdd;
-    if(holidayNameOf(iso)) return; // trava feriado (defensivo)
+    if(holidayNameOf(iso)) return;
     setDate(iso);
     openModal({ mode:'new', date: iso });
     return;
   }
-  /* clicar em tarefa → editar */
+  /* tarefa → editar (se puder) */
   const taskEl = e.target.closest('[data-mo-task]');
   if(taskEl){
     e.stopPropagation();
     const date = taskEl.dataset.moDate;
     const id = taskEl.dataset.moTask;
-    if(!canEditCurrentView()) return;
-    const item = (data.daily[date] || []).find(t => t.id === id);
-    if(item) openModal({ mode:'edit', date, item });
+    if(canEditCurrentView()){
+      const item = (data.daily[date] || []).find(t => t.id === id);
+      if(item){ openModal({ mode:'edit', date, item }); return; }
+    }
+    /* sem permissão → detalhes do dia */
+    openDayDetail(date);
     return;
   }
-  /* clicar no dia em branco → abrir modal para adicionar */
+  /* clique no dia → detalhes do dia */
   const dayEl = e.target.closest('[data-mo-day]');
   if(!dayEl) return;
   const iso = dayEl.dataset.moDay;
-  /* feriado: sem agendamento */
-  if(holidayNameOf(iso)) return;
-  if(!canEditCurrentView() || viewingAll()) return;
-  setDate(iso);
-  openModal({ mode:'new', date: iso });
+  openDayDetail(iso);
+});
+
+/* ============================================================
+   DETALHES DO DIA — eventos
+   ============================================================ */
+$('#dayDetailClose').addEventListener('click', closeDayDetail);
+$('#dayDetailBtnClose').addEventListener('click', closeDayDetail);
+$('#dayDetailModal').addEventListener('click', e => {
+  if(e.target.id === 'dayDetailModal') closeDayDetail();
+});
+$('#dayDetailBtnAdd').addEventListener('click', () => {
+  const d = dayDetailCtx.date;
+  if(!d) return;
+  closeDayDetail();
+  setDate(d);
+  openModal({ mode:'new', date: d });
+});
+$('#dayDetailBody').addEventListener('click', e => {
+  const btn = e.target.closest('[data-dd-act]');
+  if(!btn) return;
+  const d = dayDetailCtx.date;
+  if(!d) return;
+  const id = btn.dataset.ddId;
+  const act = btn.dataset.ddAct;
+  if(act === 'edit'){
+    const item = (data.daily[d] || []).find(t => t.id === id);
+    if(item){
+      closeDayDetail();
+      openModal({ mode:'edit', date: d, item });
+    }
+  } else if(act === 'del'){
+    const arr = data.daily[d] || [];
+    const item = arr.find(t => t.id === id);
+    if(!item) return;
+    if(!confirm('Excluir esta atividade?')) return;
+    const idx = arr.findIndex(t => t.id === id);
+    arr.splice(idx, 1);
+    if(!arr.length) delete data.daily[d];
+    save(); render();
+    /* refresh do modal */
+    if(data.daily[d] && data.daily[d].length){
+      openDayDetail(d);
+    } else {
+      closeDayDetail();
+    }
+  }
 });
 
 /* Quick add diário */
@@ -5240,6 +5404,7 @@ document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
   closeSettingsMenu();
   if(!$('#modal').hidden) closeModal();
+  if(!$('#dayDetailModal').hidden) closeDayDetail();
   if(!$('#userModal').hidden) closeUserModal();
   if(!$('#profileModal').hidden) closeProfileModal();
   if(!$('#editMemberModal').hidden) closeEditMemberModal();
