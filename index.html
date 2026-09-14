@@ -16,9 +16,9 @@
   --border-soft:#1a1a1a;
   --text:#f0f0f0;
   --muted:#7a7a7a;
-  --accent:#1e40af;       /* azul escuro */
-  --accent-2:#1e3a8a;     /* azul escuro mais profundo */
-  --danger:#2563eb;       /* azul médio (era vermelho) */
+  --accent:#1e40af;
+  --accent-2:#1e3a8a;
+  --danger:#2563eb;
   --radius:14px;
 
   --overlay:rgba(255,255,255,.018);
@@ -39,6 +39,10 @@
   --status-pend-br:rgba(163,163,163,.3);
   --done-check:linear-gradient(135deg,#e5e5e5,#8a8a8a);
   --done-check-color:#0a0a0a;
+
+  --holiday-bg:linear-gradient(180deg, rgba(30,64,175,.22), transparent);
+  --holiday-border:rgba(59,130,246,.55);
+  --holiday-num:#bfdbfe;
 }
 [data-theme="light"]{
   color-scheme: light;
@@ -72,6 +76,10 @@
   --status-pend-br:rgba(115,115,115,.3);
   --done-check:linear-gradient(135deg,#18181b,#404040);
   --done-check-color:#ffffff;
+
+  --holiday-bg:linear-gradient(180deg, rgba(30,64,175,.12), transparent);
+  --holiday-border:rgba(30,64,175,.45);
+  --holiday-num:#1e3a8a;
 }
 
 *{box-sizing:border-box;}
@@ -336,19 +344,28 @@ input:focus,select:focus,textarea:focus{
 }
 input:disabled,select:disabled{opacity:.55;cursor:not-allowed;}
 textarea{resize:vertical;min-height:60px;}
-select{cursor:pointer;appearance:none;
+
+/* ===== SELECT FIX para tema escuro ===== */
+select{
+  cursor:pointer;appearance:none;
+  background-color:var(--bg-2);
+  color:var(--text);
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a7a7a' stroke-width='3' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
 }
+select option{
+  background-color: var(--surface);
+  color: var(--text);
+}
+[data-theme="light"] select option{
+  background-color: var(--surface);
+  color: var(--text);
+}
+
 .field{display:block;margin-bottom:14px;}
 .field > span{
   display:block;font-size:11.5px;font-weight:700;color:var(--muted);
   margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px;
-}
-.field .hint{
-  display:block;
-  font-size:11px; color:var(--muted); font-weight:500;
-  text-transform:none; letter-spacing:0; margin-top:6px;
 }
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:560px){.row{grid-template-columns:1fr;gap:0;}}
@@ -416,7 +433,9 @@ select{cursor:pointer;appearance:none;
 .filter-wrap .ico{color:var(--muted);font-size:13px;}
 .filter-select{
   width:auto; min-width:150px; max-width:220px;
-  background:transparent;border:0;
+  background-color:transparent;
+  border:0;
+  color:var(--text);
   padding:8px 26px 8px 2px;
   font-size:13px;font-weight:600;
   border-radius:0;
@@ -425,6 +444,10 @@ select{cursor:pointer;appearance:none;
   background-position:right 8px center;
 }
 .filter-select:hover,.filter-select:focus{background-color:transparent;box-shadow:none;border:0;}
+.filter-select option{
+  background-color: var(--surface);
+  color: var(--text);
+}
 
 .readonly-banner{
   display:flex;align-items:center;gap:10px;
@@ -563,7 +586,7 @@ select{cursor:pointer;appearance:none;
 .empty .big{font-size:30px;display:block;margin-bottom:10px;opacity:.55;}
 .empty span{font-size:12.5px;opacity:.75;}
 
-/* CALENDAR */
+/* ===== CALENDAR (agora SEM domingos) ===== */
 .cal-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .cal-title{font-size:19px;font-weight:700;letter-spacing:-.3px;text-transform:capitalize;}
 .cal-nav{display:flex;gap:6px;align-items:center;margin-left:auto;}
@@ -573,12 +596,17 @@ select{cursor:pointer;appearance:none;
   font-size:17px;cursor:pointer;transition:.16s;display:grid;place-items:center;
 }
 .cal-nav .nav-btn:hover{background:color-mix(in srgb,var(--surface-2) 60%,var(--text) 6%);border-color:#3a3a3a;}
-.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px;}
+
+.cal-weekdays{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+  margin-bottom:8px;
+}
 .cal-weekdays span{
   text-align:center;font-size:11px;font-weight:700;color:var(--muted);
   text-transform:uppercase;letter-spacing:.6px;padding:6px 0;
 }
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+
 .cal-cell{
   appearance:none;background:var(--bg-2);border:1px solid var(--border-soft);
   border-radius:11px;padding:8px;display:flex;flex-direction:column;
@@ -593,9 +621,23 @@ select{cursor:pointer;appearance:none;
   background:linear-gradient(135deg,rgba(30,64,175,.24),rgba(30,58,138,.16));
   border-color:var(--accent);
 }
-.cal-num{font-size:14px;font-weight:700;letter-spacing:-.2px;}
+.cal-cell.holiday{
+  background:var(--holiday-bg),var(--bg-2);
+  border-color:var(--holiday-border);
+}
+.cal-cell.holiday.selected{
+  background:linear-gradient(135deg,rgba(30,64,175,.34),rgba(30,58,138,.22));
+  border-color:var(--accent);
+}
+.cal-num{font-size:14px;font-weight:700;letter-spacing:-.2px;display:inline-flex;align-items:center;gap:4px;}
+.cal-holiday-dot{
+  width:6px;height:6px;border-radius:50%;display:inline-block;
+  background:#3b82f6;box-shadow:0 0 6px rgba(59,130,246,.7);
+}
+[data-theme="light"] .cal-holiday-dot{background:var(--accent);box-shadow:none;}
 .cal-cell.today .cal-num{color:#93c5fd;}
 [data-theme="light"] .cal-cell.today .cal-num{color:var(--accent-2);}
+.cal-cell.holiday .cal-num{color:var(--holiday-num);}
 .cal-cell.selected .cal-num{color:#fff;}
 [data-theme="light"] .cal-cell.selected .cal-num{color:var(--accent-2);}
 .cal-badge{
@@ -611,6 +653,10 @@ select{cursor:pointer;appearance:none;
   background:linear-gradient(180deg,var(--overlay),transparent),var(--bg-2);
   border-color:var(--border);
 }
+.cal-cell.holiday.has-tasks{
+  background:linear-gradient(180deg,rgba(30,64,175,.18),transparent),var(--bg-2);
+}
+
 .cal-panel{padding:14px;}
 .cal-panel .cal-head{margin-bottom:12px;gap:8px;}
 .cal-panel .cal-title{font-size:14.5px;flex:1;min-width:0;}
@@ -620,22 +666,31 @@ select{cursor:pointer;appearance:none;
 .cal-panel .cal-weekdays span{font-size:9.5px;letter-spacing:.4px;padding:2px 0;}
 .cal-panel .cal-grid{gap:3px;}
 .cal-panel .cal-cell{min-height:46px;padding:5px;border-radius:7px;gap:2px;}
-.cal-panel .cal-num{font-size:12px;letter-spacing:-.1px;}
+.cal-panel .cal-num{font-size:12px;letter-spacing:-.1px;gap:3px;}
+.cal-panel .cal-holiday-dot{width:4px;height:4px;}
 .cal-panel .cal-badge{font-size:9px;padding:1px 5px;border-radius:8px;}
 .cal-panel .cal-dots{gap:2px;}
 .cal-panel .cal-dots i{width:4px;height:4px;}
 .cal-hint{
   margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);
   font-size:11px;color:var(--muted);
-  display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;
 }
 .cal-hint .chip{
   font-size:10.5px;font-weight:600;color:var(--muted);
   background:var(--surface-2);border:1px solid var(--border);
   padding:3px 9px;border-radius:20px;
 }
+.cal-hint .legend-holiday{
+  display:inline-flex;align-items:center;gap:5px;color:var(--muted);
+}
+.cal-hint .legend-holiday i{
+  width:8px;height:8px;border-radius:50%;background:#3b82f6;
+  box-shadow:0 0 6px rgba(59,130,246,.7);display:inline-block;
+}
+[data-theme="light"] .cal-hint .legend-holiday i{background:var(--accent);box-shadow:none;}
 
-/* WEEKLY */
+/* ===== WEEKLY ===== */
 .week-scroll{overflow-x:auto;padding-bottom:6px;}
 .week-grid{display:grid;grid-template-columns:repeat(7,minmax(168px,1fr));gap:11px;min-width:100%;}
 .day-col{
@@ -649,6 +704,10 @@ select{cursor:pointer;appearance:none;
   border-color:rgba(30,64,175,.6);
   box-shadow:0 0 0 1px rgba(30,64,175,.2), 0 8px 30px rgba(30,64,175,.12);
 }
+.day-col.is-holiday{
+  background:linear-gradient(180deg,rgba(30,64,175,.1),transparent),var(--surface);
+  border-color:var(--holiday-border);
+}
 .day-col.is-selected{
   background:linear-gradient(180deg,rgba(30,64,175,.14),transparent),var(--surface);
   border-color:var(--accent);
@@ -660,7 +719,8 @@ select{cursor:pointer;appearance:none;
 }
 .day-head .name:hover{color:var(--text);}
 .day-col.is-today .day-head .name{color:#93c5fd;}
-[data-theme="light"] .day-col.is-today .day-head .name{color:var(--accent-2);}
+.day-col.is-holiday .day-head .name{color:var(--holiday-num);}
+[data-theme="light"] .day-col.is-holiday .day-head .name{color:var(--accent-2);}
 .day-head .add{
   width:24px;height:24px;border-radius:7px;border:1px solid var(--border);
   background:var(--surface-2);color:var(--muted);cursor:pointer;font-size:14px;
@@ -668,6 +728,15 @@ select{cursor:pointer;appearance:none;
 }
 .day-head .add:hover{background:var(--accent);color:#fff;border-color:transparent;}
 .day-count{font-size:10.5px;color:var(--muted);font-weight:600;}
+.holiday-tag{
+  display:inline-block;margin-top:4px;
+  font-size:9.5px; font-weight:700; letter-spacing:.3px;
+  padding:2px 7px; border-radius:20px;
+  background:rgba(59,130,246,.18); color:#93c5fd;
+  border:1px solid rgba(59,130,246,.4);
+  text-transform:uppercase;
+}
+[data-theme="light"] .holiday-tag{background:rgba(30,64,175,.1); color:var(--accent-2); border-color:rgba(30,64,175,.3);}
 .wk-item{
   background:var(--bg-2);border:1px solid var(--border-soft);
   border-left:3px solid var(--c,var(--accent));
@@ -713,7 +782,7 @@ select{cursor:pointer;appearance:none;
 [data-theme="light"] .wk-del:hover{color:var(--accent-2);}
 .wk-empty{font-size:11.5px;color:var(--muted);text-align:center;padding:14px 4px;opacity:.6;}
 
-/* DASHBOARD */
+/* ===== DASHBOARD ===== */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:18px;}
 .stat-card{
   background:linear-gradient(180deg,var(--overlay-2),transparent),var(--surface);
@@ -790,7 +859,7 @@ select{cursor:pointer;appearance:none;
 .mini-item .mi-h{font-size:11.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto;}
 .mini-item .mi-t{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* TEAM */
+/* ===== TEAM ===== */
 .filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .filter-group{
   display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);
@@ -932,7 +1001,7 @@ select{cursor:pointer;appearance:none;
   .tt-actions{grid-column:2;opacity:1;}
 }
 
-/* MODAL */
+/* ===== MODAL ===== */
 .modal-backdrop{
   position:fixed;inset:0;z-index:200;
   background:var(--backdrop);
@@ -973,37 +1042,51 @@ select{cursor:pointer;appearance:none;
 .role-opt .t{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px;}
 .role-opt .d{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.4;}
 
-.chips-input{
-  display:flex; gap:6px; flex-wrap:wrap; align-items:center;
-  background:var(--bg-2); border:1px solid var(--border); border-radius:10px;
-  padding:7px 9px; min-height:42px;
-  transition:border-color .15s, box-shadow .15s;
+/* ===== Carteiras picker ===== */
+.carteiras-picker{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:6px;
+  margin-bottom:10px;
 }
-.chips-input:focus-within{
+.carteira-opt{
+  appearance:none;border:1px solid var(--border);background:var(--bg-2);
+  color:var(--text);padding:8px 10px;border-radius:9px;
+  font:inherit;font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:.15s;text-align:left;
+  display:flex;align-items:center;gap:8px;
+  min-width:0;
+}
+.carteira-opt:hover{border-color:#3a3a3a;background:var(--surface-2);}
+.carteira-opt.on{
   border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(30,64,175,.28);
-}
-.chips-input input{
-  flex:1; min-width:120px; border:0; background:transparent; padding:5px 4px;
-  font-size:13.5px;
-}
-.chips-input input:focus{box-shadow:none; background:transparent;}
-.chip-tag{
-  display:inline-flex; align-items:center; gap:5px;
-  font-size:11.5px; font-weight:700; letter-spacing:.3px;
-  padding:3px 5px 3px 10px; border-radius:20px;
-  background:color-mix(in srgb,var(--accent) 18%,transparent);
+  background:color-mix(in srgb, var(--accent) 20%, transparent);
   color:#93c5fd;
-  border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);
-  text-transform:uppercase;
 }
-[data-theme="light"] .chip-tag{color:var(--accent-2);}
-.chip-tag button{
-  appearance:none; border:0; background:transparent; cursor:pointer;
-  color:inherit; opacity:.7; padding:0; width:14px; height:14px;
-  display:grid; place-items:center; font-size:11px; line-height:1;
+[data-theme="light"] .carteira-opt.on{color:var(--accent-2);}
+.carteira-opt .chk{
+  width:14px;height:14px;border-radius:4px;border:1.5px solid var(--border);
+  display:grid;place-items:center;flex:0 0 auto;font-size:9px; line-height:1;
+  background:var(--surface);
+  color:transparent;
 }
-.chip-tag button:hover{opacity:1;}
+.carteira-opt.on .chk{
+  background:var(--accent); border-color:var(--accent); color:#fff;
+}
+.carteira-opt .lbl{
+  flex:1; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.custom-carteira-wrap{
+  display:flex; gap:6px; margin-bottom:6px;
+}
+.custom-carteira-wrap input{
+  flex:1; padding:8px 11px; font-size:13px;
+}
+.custom-carteira-wrap button{
+  padding:8px 12px; font-size:12.5px;
+}
 
 .section-divider{
   display:flex; align-items:center; gap:10px;
@@ -1198,7 +1281,6 @@ select{cursor:pointer;appearance:none;
 
 <main id="appMain" hidden>
 
-  <!-- DIÁRIO -->
   <section class="view active" id="view-daily">
     <div class="daily-layout">
       <div class="daily-main">
@@ -1255,12 +1337,13 @@ select{cursor:pointer;appearance:none;
             </div>
           </div>
           <div class="cal-weekdays">
-            <span>D</span><span>S</span><span>T</span><span>Q</span>
-            <span>Q</span><span>S</span><span>S</span>
+            <span>Seg</span><span>Ter</span><span>Qua</span>
+            <span>Qui</span><span>Sex</span><span>Sáb</span>
           </div>
           <div class="cal-grid" id="calGrid"></div>
           <div class="cal-hint">
-            <button class="chip" id="calToday" type="button" style="cursor:pointer;font:inherit;">Ir para hoje</button>
+            <span class="legend-holiday"><i></i> Feriado nacional</span>
+            <button class="chip" id="calToday" type="button" style="cursor:pointer;font:inherit;">Hoje</button>
             <span class="chip" id="calMonthTotal">0 no mês</span>
           </div>
         </div>
@@ -1268,7 +1351,6 @@ select{cursor:pointer;appearance:none;
     </div>
   </section>
 
-  <!-- SEMANAL -->
   <section class="view" id="view-weekly">
     <div class="section-head">
       <div>
@@ -1303,7 +1385,6 @@ select{cursor:pointer;appearance:none;
     </div>
   </section>
 
-  <!-- DASHBOARD -->
   <section class="view" id="view-dashboard">
     <div class="section-head">
       <div>
@@ -1324,7 +1405,6 @@ select{cursor:pointer;appearance:none;
     <div id="dashContent"></div>
   </section>
 
-  <!-- EQUIPE -->
   <section class="view" id="view-team">
     <div class="section-head">
       <div>
@@ -1399,7 +1479,7 @@ select{cursor:pointer;appearance:none;
 
 <!-- MODAL: ADICIONAR MEMBRO -->
 <div class="modal-backdrop" id="userModal" hidden>
-  <div class="modal" style="max-width:500px;">
+  <div class="modal" style="max-width:560px;">
     <div class="modal-head">
       <h3 id="userModalTitle">Adicionar membro à equipe</h3>
       <button class="icon-btn" id="userModalClose" type="button">✕</button>
@@ -1429,9 +1509,12 @@ select{cursor:pointer;appearance:none;
         </button>
       </div>
 
-      <label class="field"><span>Carteiras (separadas por vírgula)</span>
-        <input type="text" id="uCarteiras" placeholder="Ex: Saúde, Educação, Assistência" maxlength="200">
-      </label>
+      <label class="field"><span>Carteiras</span></label>
+      <div class="carteiras-picker" id="uCarteirasPicker"></div>
+      <div class="custom-carteira-wrap">
+        <input type="text" id="uCarteiraCustom" placeholder="Adicionar carteira personalizada">
+        <button type="button" class="btn ghost" id="uCarteiraAdd">＋</button>
+      </div>
 
       <div class="modal-actions">
         <button type="button" class="btn ghost" id="userBtnCancel">Cancelar</button>
@@ -1443,7 +1526,7 @@ select{cursor:pointer;appearance:none;
 
 <!-- MODAL: MEU PERFIL -->
 <div class="modal-backdrop" id="profileModal" hidden>
-  <div class="modal" style="max-width:520px;">
+  <div class="modal" style="max-width:560px;">
     <div class="modal-head">
       <h3 id="profileModalTitle">Meu perfil</h3>
       <button class="icon-btn" id="profileModalClose" type="button">✕</button>
@@ -1462,11 +1545,13 @@ select{cursor:pointer;appearance:none;
       </label>
 
       <label class="field"><span>Carteiras</span></label>
-      <div class="chips-input" id="pCarteirasWrap" style="margin-bottom:6px;">
-        <input type="text" id="pCarteiraInput" placeholder="Digite e pressione Enter (ex: Saúde)">
+      <div class="carteiras-picker" id="pCarteirasPicker"></div>
+      <div class="custom-carteira-wrap">
+        <input type="text" id="pCarteiraCustom" placeholder="Adicionar carteira personalizada">
+        <button type="button" class="btn ghost" id="pCarteiraAdd">＋</button>
       </div>
-      <div class="io-hint" style="margin-top:8px; margin-bottom:0;">
-        Digite o nome da carteira e pressione <b>Enter</b> ou <b>vírgula</b> para adicionar. Ela ficará disponível ao criar tarefas e no filtro.
+      <div class="io-hint" style="margin-top:6px; margin-bottom:0;">
+        Toque nas carteiras acima para selecionar/desselecionar. Carteiras personalizadas podem ser adicionadas no campo abaixo.
       </div>
 
       <div class="section-divider">🔑 Alterar senha</div>
@@ -1556,22 +1641,23 @@ select{cursor:pointer;appearance:none;
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v8';
+const STORAGE_KEY = 'cronoplano.v9';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','dashboard','team'];
 const ALL_MEMBERS = '__all__';
 
-/* Paleta de cores dos usuários — azuis escuros + cinzas */
 const USER_COLORS = [
-  '#2563eb', // azul médio
-  '#737373', // cinza
-  '#1e40af', // azul escuro
-  '#525252', // cinza
-  '#1d4ed8', // azul royal
-  '#404040', // cinza escuro
-  '#1e3a8a', // azul profundo
-  '#666666'  // cinza
+  '#2563eb','#737373','#1e40af','#525252',
+  '#1d4ed8','#404040','#1e3a8a','#666666'
+];
+
+/* Carteiras padrão da empresa */
+const DEFAULT_CARTEIRAS = [
+  'GM','GM Jud','GM Fleet','Creditas','FIAP','BMW','Honda',
+  'Stellantis Locadora','Stellantis Financiamento','Finamax',
+  'C6 Bank','Quinto Andar','Banco Pan','Recovery','ADM',
+  'Ativos SA','Ativos Imobiliário','Safra'
 ];
 
 const PREDEFINED_USERS = [
@@ -1605,6 +1691,73 @@ const LEGACY_CAT_MAP = {
 };
 
 const PRIO = { alta:{label:'Alta'}, media:{label:'Média'}, baixa:{label:'Baixa'} };
+
+/* ============================================================
+   FERIADOS NACIONAIS BRASILEIROS
+   ============================================================ */
+function easterSunday(year){
+  // Algoritmo de Meeus/Jones/Butcher
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19*a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2*e + 2*i - h - k) % 7;
+  const m = Math.floor((a + 11*h + 22*l) / 451);
+  const month = Math.floor((h + l - 7*m + 114) / 31); // 3 = Março, 4 = Abril
+  const day = ((h + l - 7*m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+const _holidaysCache = {};
+function getBrazilianHolidays(year){
+  if(_holidaysCache[year]) return _holidaysCache[year];
+  const h = {};
+  const pad = n => String(n).padStart(2, '0');
+  const set = (m, d, name) => {
+    h[`${year}-${pad(m)}-${pad(d)}`] = name;
+  };
+  // Fixos
+  set(1, 1, 'Confraternização Universal');
+  set(4, 21, 'Tiradentes');
+  set(5, 1, 'Dia do Trabalho');
+  set(9, 7, 'Independência do Brasil');
+  set(10, 12, 'Nossa Senhora Aparecida');
+  set(11, 2, 'Finados');
+  set(11, 15, 'Proclamação da República');
+  set(11, 20, 'Consciência Negra');
+  set(12, 25, 'Natal');
+  // Móveis (baseados na Páscoa)
+  const easter = easterSunday(year);
+  const shift = (n) => {
+    const dt = new Date(easter);
+    dt.setDate(easter.getDate() + n);
+    return dt;
+  };
+  const setDateObj = (dt, name) => {
+    const k = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+    h[k] = name;
+  };
+  setDateObj(shift(-48), 'Carnaval (Segunda)');
+  setDateObj(shift(-47), 'Carnaval (Terça)');
+  setDateObj(shift(-46), 'Quarta-feira de Cinzas');
+  setDateObj(shift(-2),  'Sexta-feira Santa');
+  setDateObj(shift(60),  'Corpus Christi');
+
+  _holidaysCache[year] = h;
+  return h;
+}
+function holidayNameOf(iso){
+  if(!iso) return '';
+  const y = iso.slice(0,4);
+  const h = getBrazilianHolidays(Number(y));
+  return h[iso] || '';
+}
 
 /* ============================================================
    ESTADO
@@ -1686,13 +1839,6 @@ function findUserByName(input){
   if(!n) return null;
   return usersList().find(u => normalizeName(u.name) === n) || null;
 }
-function parseCarteiras(str){
-  return String(str || '')
-    .split(/[,\n;]+/)
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && s.length <= 40)
-    .filter((v,i,a) => a.indexOf(v) === i);
-}
 function carteirasOf(user){
   if(!user) return [];
   return Array.isArray(user.carteiras) ? user.carteiras : [];
@@ -1705,16 +1851,10 @@ function seedPredefinedUsers(){
       return;
     }
     if(!data.users[p.id]){
-      data.users[p.id] = {
-        ...p,
-        passwordHash: '',
-        carteiras: [],
-        cargo: '',
-        email: ''
-      };
+      data.users[p.id] = { ...p, passwordHash:'', carteiras:[], cargo:'', email:'' };
     } else {
-      data.users[p.id].name  = p.name;
-      data.users[p.id].role  = p.role;
+      data.users[p.id].name = p.name;
+      data.users[p.id].role = p.role;
       data.users[p.id].color = p.color;
       if(!Array.isArray(data.users[p.id].carteiras)) data.users[p.id].carteiras = [];
       if(typeof data.users[p.id].passwordHash !== 'string') data.users[p.id].passwordHash = '';
@@ -1723,7 +1863,6 @@ function seedPredefinedUsers(){
     }
   });
 }
-/* líder: pode editar sempre. membro: só a própria */
 function canEditCurrentView(){
   if(!currentUser()) return false;
   if(isLeader()) return true;
@@ -1804,7 +1943,7 @@ function toggleTheme(){
 }
 
 /* ============================================================
-   HELPERS GERAIS
+   HELPERS
    ============================================================ */
 function fmtDateLong(iso){
   if(!iso) return '';
@@ -1860,19 +1999,26 @@ function tasksOfDate(dateIso, ownerId, carteiraFilter){
   else if(cf) arr = arr.filter(t => t.carteira === cf);
   return arr.slice();
 }
-/* carteiras do contexto atual */
 function carteirasForCurrentView(){
   if(viewingAll()){
-    const set = new Set();
+    const set = new Set(DEFAULT_CARTEIRAS);
     usersList().forEach(u => carteirasOf(u).forEach(c => set.add(c)));
-    // também considera carteiras que existem em tarefas mas não no perfil
     Object.values(data.daily).forEach(arr => {
       arr.forEach(t => { if(t.carteira) set.add(t.carteira); });
     });
     return [...set].sort();
   }
   const u = viewedUser() || currentUser();
-  return carteirasOf(u);
+  const set = new Set(carteirasOf(u));
+  // Adiciona as carteiras padrão para permitir filtrar por qualquer carteira
+  DEFAULT_CARTEIRAS.forEach(c => set.add(c));
+  // Adiciona carteiras que aparecem nas tarefas desse usuário
+  Object.values(data.daily).forEach(arr => {
+    arr.forEach(t => {
+      if(t.carteira && (!u || t.ownerId === u.id)) set.add(t.carteira);
+    });
+  });
+  return [...set].sort();
 }
 function ownerPillHTML(t){
   const owner = userById(t.ownerId);
@@ -1950,9 +2096,7 @@ function completeLogin(user){
   ui.currentUserId = user.id;
   ui.date = todayISO();
   ui.carteiraFilter = '';
-
   if(user.role === 'leader'){
-    // líder: por padrão vê TODOS os membros (não tem cronograma próprio)
     ui.viewUserId = ALL_MEMBERS;
   } else {
     ui.viewUserId = user.id;
@@ -1999,7 +2143,7 @@ function switchTab(tab){
 }
 
 /* ============================================================
-   SELECTS "VER"
+   SELECTS
    ============================================================ */
 function buildViewUserOptions(selectEl, selectedId){
   if(!selectEl) return;
@@ -2007,24 +2151,15 @@ function buildViewUserOptions(selectEl, selectedId){
   const leader = isLeader();
 
   let opts = '';
-
-  // líder: opção "Todos os membros" no topo
   if(leader){
     opts += `<option value="${ALL_MEMBERS}" ${selectedId === ALL_MEMBERS ? 'selected' : ''}>
       👥 Todos os membros
     </option>`;
-  }
-
-  usersList().forEach(u => {
-    const isMe = me && u.id === me.id;
-    // líder não vê a própria agenda
-    if(leader && isMe) return;
-    opts += `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>${esc(u.name)}</option>`;
-  });
-
-  // membro vendo a si mesmo: opção "Minha agenda"
-  if(!leader && me){
-    // substitui pelo próprio label
+    usersList().forEach(u => {
+      if(u.id === me.id) return;
+      opts += `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>${esc(u.name)}</option>`;
+    });
+  } else {
     opts = usersList().map(u => {
       const isMe = u.id === me.id;
       return `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>
@@ -2032,7 +2167,6 @@ function buildViewUserOptions(selectEl, selectedId){
       </option>`;
     }).join('');
   }
-
   selectEl.innerHTML = opts;
 }
 function buildCarteiraFilterOptions(selectEl){
@@ -2057,12 +2191,10 @@ function refreshViewSelects(){
 function refreshTopbarCarteiras(){
   const el = $('#topbarCarteiras');
   if(!el) return;
-
   if(viewingAll()){
     el.innerHTML = `<span class="carteira-chip all-members">👥 Todos os membros</span>`;
     return;
   }
-
   const viewed = viewedUser() || currentUser();
   if(!viewed){ el.innerHTML = ''; return; }
   const carteiras = carteirasOf(viewed);
@@ -2083,7 +2215,7 @@ function refreshTopbarCarteiras(){
    RENDER: DIÁRIO
    ============================================================ */
 function renderDaily(){
-  const date  = ui.date;
+  const date = ui.date;
   const viewId = ui.viewUserId;
   const tasks = sortByTime(tasksOfDate(date, viewId));
 
@@ -2106,7 +2238,6 @@ function renderDaily(){
     $('#dailySubtitle').textContent = 'Suas atividades do dia. Crie, marque como concluída e acompanhe.';
   }
 
-  // banner
   const banner = $('#dailyReadonly');
   if(allView){
     banner.hidden = false;
@@ -2123,10 +2254,8 @@ function renderDaily(){
     banner.classList.remove('all-banner');
   }
 
-  // quick-add só quando pode editar E não está na visão "todos"
   $('#dailyForm').hidden = !canEdit || allView;
 
-  // carteira do quick-add
   const carteiras = carteirasForCurrentView();
   const qCar = $('#qCarteira');
   const curQCar = qCar.value;
@@ -2139,14 +2268,19 @@ function renderDaily(){
   const done  = tasks.filter(t => t.done).length;
   const mins  = tasks.reduce((a,t) => a + durationMin(t), 0);
   const pct   = total ? Math.round((done/total)*100) : 0;
+  const holidayName = holidayNameOf(date);
 
-  $('#dailyProgress').innerHTML = total ? `
+  const holidayBanner = holidayName
+    ? `<div class="holiday-tag" style="margin-bottom:12px;">🎉 Feriado: ${esc(holidayName)}</div>`
+    : '';
+
+  $('#dailyProgress').innerHTML = holidayBanner + (total ? `
     <div class="progress-top">
       <strong>${done} de ${total} concluída${total>1?'s':''}</strong>
       <span>${pct}% · ${fmtDuration(mins)} planejadas</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-  ` : '';
+  ` : '');
 
   const list = $('#dailyList');
   if(!total){
@@ -2192,27 +2326,60 @@ function renderDaily(){
 }
 
 /* ============================================================
-   RENDER: CALENDÁRIO
+   RENDER: CALENDÁRIO (SEM DOMINGOS + FERIADOS)
    ============================================================ */
+function buildCalendarCells(year, month){
+  const cells = [];
+  const first = new Date(year, month, 1);
+  const dow1 = first.getDay(); // 0=Dom..6=Sáb
+
+  // Determina a data inicial (sempre uma segunda)
+  let startDate;
+  if(dow1 === 0){
+    // dia 1 é domingo -> começa no dia 2 (segunda)
+    startDate = new Date(year, month, 2);
+  } else if(dow1 === 1){
+    startDate = new Date(year, month, 1);
+  } else {
+    // volta para a segunda da semana
+    startDate = new Date(year, month, 1 - (dow1 - 1));
+  }
+
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+
+  // Itera dia a dia a partir de startDate, pulando domingos
+  const cur = new Date(startDate);
+  let safety = 0;
+  while(safety++ < 100){
+    const dow = cur.getDay();
+    if(dow !== 0){ // ignora domingo
+      cells.push({
+        date: new Date(cur),
+        other: cur.getMonth() !== month
+      });
+    }
+    // Para quando já passou o mês E fechou a semana no sábado
+    if(cur >= lastDayOfMonth && dow === 6){
+      break;
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  // Garante múltiplo de 6 (linha cheia)
+  while(cells.length % 6 !== 0){
+    cur.setDate(cur.getDate() + 1);
+    if(cur.getDay() !== 0){
+      cells.push({ date: new Date(cur), other: true });
+    }
+  }
+  return cells;
+}
+
 function renderCalendar(){
   const { year, month } = ui.calMonth;
   const first = new Date(year, month, 1);
-  const startDay = first.getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  const prevDays    = new Date(year, month, 0).getDate();
 
-  const cells = [];
-  for(let i = startDay - 1; i >= 0; i--){
-    cells.push({ date: new Date(year, month-1, prevDays - i), other: true });
-  }
-  for(let d = 1; d <= daysInMonth; d++){
-    cells.push({ date: new Date(year, month, d), other: false });
-  }
-  let nextD = 1;
-  while(cells.length < 42){
-    cells.push({ date: new Date(year, month+1, nextD++), other: true });
-  }
-
+  const cells = buildCalendarCells(year, month);
   const todayIso = todayISO();
   const viewId = ui.viewUserId;
   let monthTotal = 0;
@@ -2229,6 +2396,8 @@ function renderCalendar(){
     const hasLate   = tasks.some(t => taskStatus(t, iso) === 'late');
     const isToday   = iso === todayIso;
     const isSelected = iso === ui.date;
+    const holidayName = holidayNameOf(iso);
+    const isHoliday = !!holidayName;
 
     if(!c.other) monthTotal += count;
 
@@ -2240,9 +2409,17 @@ function renderCalendar(){
       if(dotColors.length >= 4) break;
     }
 
+    const titleParts = [];
+    if(isHoliday) titleParts.push(`🎉 ${holidayName}`);
+    if(count) titleParts.push(`${count} atividade(s)`);
+    const title = titleParts.join(' · ');
+
     return `
-      <button class="cal-cell ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${count?'has-tasks':''} ${allDone?'all-done':''} ${hasLate?'has-late':''}" data-date="${iso}" title="${count?count+' atividade(s)':''}">
-        <span class="cal-num">${c.date.getDate()}</span>
+      <button class="cal-cell ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${count?'has-tasks':''} ${allDone?'all-done':''} ${hasLate?'has-late':''} ${isHoliday?'holiday':''}" data-date="${iso}" title="${esc(title)}">
+        <span class="cal-num">
+          ${c.date.getDate()}
+          ${isHoliday ? '<span class="cal-holiday-dot"></span>' : ''}
+        </span>
         ${count ? `<span class="cal-badge">${count}</span>` : ''}
         ${dotColors.length ? `
           <span class="cal-dots">
@@ -2313,17 +2490,21 @@ function renderWeekly(){
     const isToday = iso === todayIso;
     const isSelected = iso === ui.date;
     const label = dayNames[dt.getDay()];
+    const holidayName = holidayNameOf(iso);
+    const isHoliday = !!holidayName;
 
     return `
-      <div class="day-col ${isToday?'is-today':''} ${isSelected?'is-selected':''}">
+      <div class="day-col ${isToday?'is-today':''} ${isSelected?'is-selected':''} ${isHoliday?'is-holiday':''}">
         <div class="day-head">
           <div>
             <div class="name" data-goto="${iso}" title="Abrir no Diário">
               ${label} · ${String(dt.getDate()).padStart(2,'0')}
             </div>
             <div class="day-count">${tasks.length} ${tasks.length===1?'item':'itens'}</div>
+            ${isHoliday ? `<div class="holiday-tag">🎉 ${esc(holidayName)}</div>` : ''}
           </div>
-          ${canEdit ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
+          ${canEdit && !isHoliday ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
+          ${canEdit && isHoliday ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
         </div>
         ${tasks.length ? tasks.map(t => {
           const cat = catOf(t.cat);
@@ -2770,14 +2951,12 @@ function renderTeam(){
 function render(){
   if(!ui.currentUserId || !data.users[ui.currentUserId]) return;
 
-  // garante coerência do viewUserId
   if(!ui.viewUserId){
     ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
   }
   if(ui.viewUserId !== ALL_MEMBERS && !data.users[ui.viewUserId]){
     ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
   }
-  // líder não vê a própria agenda — converte para ALL
   if(isLeader() && ui.viewUserId === ui.currentUserId){
     ui.viewUserId = ALL_MEMBERS;
   }
@@ -2795,7 +2974,7 @@ function render(){
 }
 
 /* ============================================================
-   SELECTS
+   SELECTS: CATEGORIAS / DONO / CARTEIRA
    ============================================================ */
 function fillCategorySelects(){
   const opts = Object.entries(CATEGORIES)
@@ -2804,7 +2983,6 @@ function fillCategorySelects(){
   $('#fCat').innerHTML = opts;
 }
 function fillOwnerSelect(selectedId){
-  const me = currentUser();
   const opts = usersList().map(u =>
     `<option value="${u.id}" ${u.id===selectedId?'selected':''}>${esc(u.name)}</option>`
   ).join('');
@@ -2812,15 +2990,50 @@ function fillOwnerSelect(selectedId){
 }
 function fillCarteiraSelect(selectEl, ownerId, selectedValue){
   if(!selectEl) return;
-  // carteiras: união das carteiras do dono + qualquer carteira global
+  const set = new Set(DEFAULT_CARTEIRAS);
   const owner = ownerId && ownerId !== ALL_MEMBERS ? userById(ownerId) : null;
-  const set = new Set(carteirasOf(owner));
+  carteirasOf(owner).forEach(c => set.add(c));
   usersList().forEach(u => carteirasOf(u).forEach(c => set.add(c)));
   Object.values(data.daily).forEach(arr => arr.forEach(t => { if(t.carteira) set.add(t.carteira); }));
   const carteiras = [...set].sort();
   const opts = ['<option value="">Sem carteira</option>']
     .concat(carteiras.map(c => `<option value="${esc(c)}" ${selectedValue===c?'selected':''}>${esc(c)}</option>`));
   selectEl.innerHTML = opts.join('');
+}
+
+/* ============================================================
+   CARTEIRAS PICKER (perfil / adicionar membro)
+   ============================================================ */
+function renderCarteiraPicker(wrapEl, selectedList){
+  if(!wrapEl) return;
+  const selected = new Set(selectedList || []);
+  // Carteiras padrão + quaisquer customizadas já selecionadas
+  const all = new Set(DEFAULT_CARTEIRAS);
+  (selectedList || []).forEach(c => all.add(c));
+  const list = [...all];
+  wrapEl.innerHTML = list.map(c => {
+    const on = selected.has(c);
+    return `
+      <button type="button" class="carteira-opt ${on?'on':''}" data-carteira="${esc(c)}">
+        <span class="chk">${on ? '✓' : ''}</span>
+        <span class="lbl" title="${esc(c)}">${esc(c)}</span>
+      </button>`;
+  }).join('');
+}
+function bindCarteiraPicker(wrapEl, ctxRef, after){
+  if(!wrapEl || wrapEl.dataset.bound) return;
+  wrapEl.dataset.bound = '1';
+  wrapEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-carteira]');
+    if(!btn) return;
+    const c = btn.dataset.carteira;
+    const arr = ctxRef.list;
+    const i = arr.indexOf(c);
+    if(i >= 0) arr.splice(i, 1);
+    else arr.push(c);
+    renderCarteiraPicker(wrapEl, arr);
+    if(after) after();
+  });
 }
 
 /* ============================================================
@@ -2837,7 +3050,6 @@ function openModal(opts){
   $('#modalTitle').textContent = editing ? 'Editar atividade' : 'Nova atividade';
   $('#fTitle').value = item.title || '';
 
-  // dono padrão
   let defaultOwner;
   if(item.ownerId) defaultOwner = item.ownerId;
   else if(ui.viewUserId && ui.viewUserId !== ALL_MEMBERS) defaultOwner = ui.viewUserId;
@@ -2875,17 +3087,18 @@ function closeModal(){
 /* ============================================================
    MODAL: ADICIONAR MEMBRO
    ============================================================ */
-let userModalCtx = null;
+let userModalCtx = { role: 'member', carteiras: [] };
 function openUserModal(){
-  userModalCtx = { role: 'member' };
+  userModalCtx = { role: 'member', carteiras: [] };
   $('#userModalTitle').textContent = 'Adicionar membro à equipe';
   $('#uName').value = '';
   $('#uCargo').value = '';
   $('#uEmail').value = '';
-  $('#uCarteiras').value = '';
+  $('#uCarteiraCustom').value = '';
   $$('.role-opt[data-role]').forEach(b =>
     b.classList.toggle('active', b.dataset.role === userModalCtx.role)
   );
+  renderCarteiraPicker($('#uCarteirasPicker'), userModalCtx.carteiras);
   $('#userModal').hidden = false;
   setTimeout(() => $('#uName').focus(), 60);
 }
@@ -2910,31 +3123,14 @@ function openProfileModal(){
   $('#pEmail').value = u.email || '';
   $('#pPwdNew').value = '';
   $('#pPwdNew2').value = '';
+  $('#pCarteiraCustom').value = '';
 
-  renderProfileChips();
+  renderCarteiraPicker($('#pCarteirasPicker'), profileCtx.carteiras);
   $('#profileModal').hidden = false;
   setTimeout(() => $('#pName').focus(), 60);
 }
 function closeProfileModal(){
   $('#profileModal').hidden = true;
-}
-function renderProfileChips(){
-  const wrap = $('#pCarteirasWrap');
-  const input = $('#pCarteiraInput');
-  $$('.chip-tag', wrap).forEach(c => c.remove());
-  profileCtx.carteiras.forEach(c => {
-    const el = document.createElement('span');
-    el.className = 'chip-tag';
-    el.innerHTML = `${esc(c)} <button type="button" data-rm="${esc(c)}" title="Remover">✕</button>`;
-    wrap.insertBefore(el, input);
-  });
-}
-function addCarteiraToProfile(name){
-  const n = String(name || '').trim();
-  if(!n || n.length > 40) return;
-  if(profileCtx.carteiras.includes(n)) return;
-  profileCtx.carteiras.push(n);
-  renderProfileChips();
 }
 
 /* ============================================================
@@ -3023,7 +3219,7 @@ function renderUserChip(){
 }
 
 /* ============================================================
-   IMPORTAR EXCEL
+   IMPORTAR / EXPORTAR EXCEL
    ============================================================ */
 function parseDateExcel(val){
   if(val === null || val === undefined || val === '') return null;
@@ -3231,9 +3427,6 @@ function confirmImport(){
   alert(`✅ ${n} tarefa(s) importada(s) com sucesso!`);
 }
 
-/* ============================================================
-   EXPORTAR EXCEL
-   ============================================================ */
 let exportCtx = { mode: 'all' };
 function openExportModal(){
   if(!isLeader()) return;
@@ -3428,7 +3621,6 @@ function onViewUserChange(e){
   if(!val) return;
   if(val !== ALL_MEMBERS && !data.users[val]) return;
   ui.viewUserId = val;
-  // ajusta filtro de carteira
   const cs = carteirasForCurrentView();
   if(ui.carteiraFilter && ui.carteiraFilter !== '__none__' && !cs.includes(ui.carteiraFilter)){
     ui.carteiraFilter = '';
@@ -3654,12 +3846,23 @@ $('#modal').addEventListener('click', e => {
   if(e.target.id === 'modal') closeModal();
 });
 
+/* user modal */
 $$('.role-opt[data-role]').forEach(b => {
   b.addEventListener('click', () => {
     if(!userModalCtx) return;
     userModalCtx.role = b.dataset.role;
     $$('.role-opt[data-role]').forEach(x => x.classList.toggle('active', x === b));
   });
+});
+$('#uCarteiraAdd').addEventListener('click', () => {
+  const v = $('#uCarteiraCustom').value.trim();
+  if(!v) return;
+  if(!userModalCtx.carteiras.includes(v)) userModalCtx.carteiras.push(v);
+  $('#uCarteiraCustom').value = '';
+  renderCarteiraPicker($('#uCarteirasPicker'), userModalCtx.carteiras);
+});
+$('#uCarteiraCustom').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); $('#uCarteiraAdd').click(); }
 });
 $('#userForm').addEventListener('submit', e => {
   e.preventDefault();
@@ -3679,7 +3882,7 @@ $('#userForm').addEventListener('submit', e => {
     cargo: $('#uCargo').value.trim().slice(0, 40),
     email: $('#uEmail').value.trim(),
     passwordHash: '',
-    carteiras: parseCarteiras($('#uCarteiras').value)
+    carteiras: userModalCtx.carteiras.slice()
   };
 
   data.deletedUserIds = (data.deletedUserIds || []).filter(x => x !== id);
@@ -3696,32 +3899,16 @@ $('#userModal').addEventListener('click', e => {
 });
 
 /* perfil */
-$('#pCarteirasWrap').addEventListener('click', e => {
-  const rm = e.target.closest('[data-rm]');
-  if(rm){
-    profileCtx.carteiras = profileCtx.carteiras.filter(c => c !== rm.dataset.rm);
-    renderProfileChips();
-    return;
-  }
-  $('#pCarteiraInput').focus();
+$('#pCarteiraAdd').addEventListener('click', () => {
+  const v = $('#pCarteiraCustom').value.trim();
+  if(!v) return;
+  if(!profileCtx.carteiras.includes(v)) profileCtx.carteiras.push(v);
+  $('#pCarteiraCustom').value = '';
+  renderCarteiraPicker($('#pCarteirasPicker'), profileCtx.carteiras);
 });
-$('#pCarteiraInput').addEventListener('keydown', e => {
-  if(e.key === 'Enter' || e.key === ',' || e.key === ';'){
-    e.preventDefault();
-    addCarteiraToProfile($('#pCarteiraInput').value);
-    $('#pCarteiraInput').value = '';
-  } else if(e.key === 'Backspace' && !$('#pCarteiraInput').value && profileCtx.carteiras.length){
-    profileCtx.carteiras.pop();
-    renderProfileChips();
-  }
+$('#pCarteiraCustom').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); $('#pCarteiraAdd').click(); }
 });
-$('#pCarteiraInput').addEventListener('blur', () => {
-  if($('#pCarteiraInput').value.trim()){
-    addCarteiraToProfile($('#pCarteiraInput').value);
-    $('#pCarteiraInput').value = '';
-  }
-});
-
 $('#profileForm').addEventListener('submit', e => {
   e.preventDefault();
   const u = currentUser();
@@ -3757,7 +3944,7 @@ $('#profileModal').addEventListener('click', e => {
   if(e.target.id === 'profileModal') closeProfileModal();
 });
 
-/* import */
+/* import / export */
 $('#importFile').addEventListener('change', e => {
   const f = e.target.files[0];
   if(f) handleImportFile(f);
@@ -3769,7 +3956,6 @@ $('#importModal').addEventListener('click', e => {
   if(e.target.id === 'importModal') closeImportModal();
 });
 
-/* export */
 $$('.export-opt').forEach(o => {
   o.addEventListener('click', () => {
     $$('.export-opt').forEach(x => x.classList.remove('active'));
@@ -3802,6 +3988,10 @@ function init(){
   try{ savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; }catch(e){}
   applyTheme(savedTheme);
 
+  // bind pickers persistentes
+  bindCarteiraPicker($('#pCarteirasPicker'), profileCtx);
+  bindCarteiraPicker($('#uCarteirasPicker'), userModalCtx);
+
   fillCategorySelects();
   load();
   seedPredefinedUsers();
@@ -3817,9 +4007,7 @@ function init(){
   if(ui.currentUserId && data.users[ui.currentUserId]){
     const cu = data.users[ui.currentUserId];
 
-    // coerência de viewUserId
     if(cu.role === 'leader'){
-      // líder nunca vê a própria agenda
       if(!ui.viewUserId || ui.viewUserId === ui.currentUserId || !data.users[ui.viewUserId]){
         ui.viewUserId = ALL_MEMBERS;
       }
