@@ -30,6 +30,7 @@
   --body-glow-2:rgba(255,255,255,.02);
   --shadow-modal:0 26px 80px rgba(0,0,0,.75);
   --shadow-login:0 30px 80px rgba(0,0,0,.7);
+  --shadow-menu:0 14px 40px rgba(0,0,0,.55);
   --readonly-bg:linear-gradient(90deg, rgba(163,163,163,.08), transparent);
   --readonly-border:rgba(163,163,163,.2);
   --readonly-accent:#a3a3a3;
@@ -39,7 +40,6 @@
   --status-pend-br:rgba(163,163,163,.3);
   --done-check:linear-gradient(135deg,#e5e5e5,#8a8a8a);
   --done-check-color:#0a0a0a;
-
   --holiday-bg:linear-gradient(180deg, rgba(30,64,175,.22), transparent);
   --holiday-border:rgba(59,130,246,.55);
   --holiday-num:#bfdbfe;
@@ -67,6 +67,7 @@
   --body-glow-2:rgba(0,0,0,.015);
   --shadow-modal:0 26px 80px rgba(0,0,0,.18);
   --shadow-login:0 30px 80px rgba(0,0,0,.15);
+  --shadow-menu:0 14px 40px rgba(0,0,0,.15);
   --readonly-bg:linear-gradient(90deg, rgba(115,115,115,.08), transparent);
   --readonly-border:rgba(115,115,115,.25);
   --readonly-accent:#71717a;
@@ -76,7 +77,6 @@
   --status-pend-br:rgba(115,115,115,.3);
   --done-check:linear-gradient(135deg,#18181b,#404040);
   --done-check-color:#ffffff;
-
   --holiday-bg:linear-gradient(180deg, rgba(30,64,175,.12), transparent);
   --holiday-border:rgba(30,64,175,.45);
   --holiday-num:#1e3a8a;
@@ -268,6 +268,8 @@ body::before{
   width:26px;height:26px;border-radius:8px;flex:0 0 auto;
   display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;
   letter-spacing:-.3px;
+  background-size:cover;
+  background-position:center;
 }
 .user-chip .role-badge{
   font-size:9.5px;font-weight:800;letter-spacing:.4px;
@@ -287,12 +289,47 @@ body::before{
   transition:.16s; white-space:nowrap;
 }
 .icon-chip-btn:hover{background:var(--surface-2);border-color:#3a3a3a;color:var(--text);}
-.icon-chip-btn.danger:hover{
-  border-color:color-mix(in srgb, var(--accent) 55%, transparent);color:#93c5fd;
-  background:color-mix(in srgb, var(--accent) 12%, transparent);
-}
-[data-theme="light"] .icon-chip-btn.danger:hover{color:var(--accent-2);}
 .icon-chip-btn.icon-only{padding:0;width:32px;justify-content:center;}
+.icon-chip-btn.icon-only .ico{
+  font-size:15px;line-height:1;display:inline-block;
+}
+
+/* ===== SETTINGS ===== */
+.settings-wrap{position:relative;}
+.settings-menu{
+  position:absolute;top:calc(100% + 8px);right:0;
+  background:linear-gradient(180deg,var(--overlay-2),transparent),var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:6px;
+  min-width:250px;
+  box-shadow:var(--shadow-menu);
+  z-index:120;
+  animation:fade .16s ease;
+}
+.settings-title{
+  font-size:10.5px;font-weight:800;color:var(--muted);
+  padding:8px 10px 6px;text-transform:uppercase;letter-spacing:.7px;
+}
+.settings-item{
+  appearance:none;width:100%;background:transparent;border:0;
+  display:flex;align-items:center;gap:11px;
+  padding:9px 10px;border-radius:8px;
+  color:var(--text);font:inherit;font-size:13px;font-weight:500;
+  cursor:pointer;transition:.14s;text-align:left;
+}
+.settings-item:hover{background:var(--surface-2);}
+.settings-item .settings-ico{
+  width:18px;text-align:center;font-size:14px;line-height:1;
+  flex:0 0 auto;opacity:.9;
+}
+.settings-item .lbl{flex:1;min-width:0;}
+.settings-item.danger{color:#93c5fd;}
+[data-theme="light"] .settings-item.danger{color:var(--accent-2);}
+.settings-item.danger:hover{background:color-mix(in srgb,var(--accent) 15%,transparent);}
+.settings-divider{
+  height:1px;background:var(--border-soft);margin:5px 4px;
+}
 
 /* ===== MAIN ===== */
 main{max-width:1400px;margin:0 auto;padding:26px 22px 90px;}
@@ -343,9 +380,8 @@ input:focus,select:focus,textarea:focus{
   box-shadow:0 0 0 3px rgba(30,64,175,.28);
 }
 input:disabled,select:disabled{opacity:.55;cursor:not-allowed;}
-textarea{resize:vertical;min-height:60px;}
+textarea{resize:vertical;min-height:60px; font-family:inherit;}
 
-/* ===== SELECT FIX para tema escuro ===== */
 select{
   cursor:pointer;appearance:none;
   background-color:var(--bg-2);
@@ -354,10 +390,6 @@ select{
   background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
 }
 select option{
-  background-color: var(--surface);
-  color: var(--text);
-}
-[data-theme="light"] select option{
   background-color: var(--surface);
   color: var(--text);
 }
@@ -384,26 +416,54 @@ select option{
 .btn.ghost{background:var(--surface-2);color:var(--text);border-color:var(--border);}
 .btn.ghost:hover{background:color-mix(in srgb, var(--surface-2) 60%, var(--text) 6%);border-color:#3a3a3a;}
 
+/* ===== QUICK ADD (HUD maior) ===== */
 .quick-add{
   display:grid;
-  grid-template-columns:106px 106px 1fr 170px 150px auto;
-  gap:9px;
+  grid-template-columns: 108px 108px 1fr 1fr auto;
+  grid-template-areas:
+    "start end cat car btn"
+    "title title title title title";
+  gap:10px;
   background:linear-gradient(180deg,var(--overlay),transparent),var(--surface);
   border:1px solid var(--border);
   border-radius:var(--radius);
-  padding:14px;
+  padding:16px;
   margin-bottom:18px;
 }
-.quick-add input[type=time]{font-variant-numeric:tabular-nums;text-align:center;padding-left:6px;padding-right:6px;}
-@media(max-width:1180px){
-  .quick-add{grid-template-columns:110px 110px 1fr 1fr;}
-  .quick-add input[type=text]{grid-column:1 / -1;}
+.quick-add #qTime        { grid-area:start; font-variant-numeric:tabular-nums; text-align:center; padding-left:6px; padding-right:6px; }
+.quick-add #qEnd         { grid-area:end;   font-variant-numeric:tabular-nums; text-align:center; padding-left:6px; padding-right:6px; }
+.quick-add #qCat         { grid-area:cat; }
+.quick-add #qCarteira    { grid-area:car; }
+.quick-add button        { grid-area:btn; white-space:nowrap; }
+.quick-add #qTitle       {
+  grid-area:title;
+  min-height:88px;
+  padding:12px 14px;
+  font-size:14.5px;
+  line-height:1.5;
+  resize:vertical;
 }
-@media(max-width:640px){
-  .quick-add{grid-template-columns:1fr 1fr;}
-  .quick-add input[type=text]{grid-column:1 / -1;}
-  .quick-add select{grid-column:1 / -1;}
-  .quick-add button{grid-column:1 / -1;}
+@media(max-width:980px){
+  .quick-add{
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "start end"
+      "cat   car"
+      "title title"
+      "btn   btn";
+  }
+}
+@media(max-width:560px){
+  .quick-add{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "start"
+      "end"
+      "cat"
+      "car"
+      "title"
+      "btn";
+  }
 }
 
 .date-nav{
@@ -530,7 +590,7 @@ select option{
 .t-time{display:flex;flex-direction:column;gap:1px;line-height:1.25;}
 .t-time strong{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.2px;}
 .t-main{min-width:0;}
-.t-title{font-size:14.5px;font-weight:600;letter-spacing:-.15px;word-break:break-word;}
+.t-title{font-size:14.5px;font-weight:600;letter-spacing:-.15px;word-break:break-word; line-height:1.45;}
 .t-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;align-items:center;}
 .pill{
   font-size:10.5px;font-weight:700;letter-spacing:.3px;
@@ -586,7 +646,7 @@ select option{
 .empty .big{font-size:30px;display:block;margin-bottom:10px;opacity:.55;}
 .empty span{font-size:12.5px;opacity:.75;}
 
-/* ===== CALENDAR (agora SEM domingos) ===== */
+/* ===== CALENDAR ===== */
 .cal-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .cal-title{font-size:19px;font-weight:700;letter-spacing:-.3px;text-transform:capitalize;}
 .cal-nav{display:flex;gap:6px;align-items:center;margin-left:auto;}
@@ -596,7 +656,6 @@ select option{
   font-size:17px;cursor:pointer;transition:.16s;display:grid;place-items:center;
 }
 .cal-nav .nav-btn:hover{background:color-mix(in srgb,var(--surface-2) 60%,var(--text) 6%);border-color:#3a3a3a;}
-
 .cal-weekdays{
   display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
   margin-bottom:8px;
@@ -606,7 +665,6 @@ select option{
   text-transform:uppercase;letter-spacing:.6px;padding:6px 0;
 }
 .cal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
-
 .cal-cell{
   appearance:none;background:var(--bg-2);border:1px solid var(--border-soft);
   border-radius:11px;padding:8px;display:flex;flex-direction:column;
@@ -656,7 +714,6 @@ select option{
 .cal-cell.holiday.has-tasks{
   background:linear-gradient(180deg,rgba(30,64,175,.18),transparent),var(--bg-2);
 }
-
 .cal-panel{padding:14px;}
 .cal-panel .cal-head{margin-bottom:12px;gap:8px;}
 .cal-panel .cal-title{font-size:14.5px;flex:1;min-width:0;}
@@ -1042,7 +1099,34 @@ select option{
 .role-opt .t{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:6px;}
 .role-opt .d{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.4;}
 
-/* ===== Carteiras picker ===== */
+/* ===== PHOTO UPLOADER ===== */
+.photo-uploader{
+  display:flex; align-items:center; gap:16px;
+  padding:14px;
+  border:1px dashed var(--border);
+  border-radius:12px;
+  background:var(--bg-2);
+  margin-bottom:18px;
+}
+.photo-preview{
+  width:84px; height:84px; border-radius:18px;
+  flex:0 0 auto;
+  background:var(--surface);
+  border:1px solid var(--border);
+  display:grid; place-items:center;
+  color:#fff; font-size:30px; font-weight:800;
+  overflow:hidden;
+  background-size:cover; background-position:center;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.photo-preview img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.photo-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}
+.photo-info .btns{display:flex; gap:6px; flex-wrap:wrap;}
+.photo-info .btns button{padding:7px 12px; font-size:12.5px;}
+.photo-hint{font-size:11px; color:var(--muted); line-height:1.4;}
+
 .carteiras-picker{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
@@ -1077,16 +1161,11 @@ select option{
   flex:1; min-width:0;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-
 .custom-carteira-wrap{
   display:flex; gap:6px; margin-bottom:6px;
 }
-.custom-carteira-wrap input{
-  flex:1; padding:8px 11px; font-size:13px;
-}
-.custom-carteira-wrap button{
-  padding:8px 12px; font-size:12.5px;
-}
+.custom-carteira-wrap input{flex:1; padding:8px 11px; font-size:13px;}
+.custom-carteira-wrap button{padding:8px 12px; font-size:12.5px;}
 
 .section-divider{
   display:flex; align-items:center; gap:10px;
@@ -1113,6 +1192,11 @@ select option{
   font-weight:600;
 }
 [data-theme="light"] .io-hint code{color:var(--accent-2);}
+
+.import-actions{
+  display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;
+}
+.import-actions .btn{font-size:12.5px; padding:9px 14px;}
 
 .import-preview{
   margin-top:14px; max-height:240px; overflow-y:auto;
@@ -1263,18 +1347,46 @@ select option{
     </nav>
 
     <div class="user-wrap">
-      <button class="icon-chip-btn icon-only" id="themeBtn" title="Alternar tema">
-        <span id="themeIcon">☀️</span>
-      </button>
-      <button class="icon-chip-btn icon-only" id="importBtn" title="Importar cronograma (Excel)">📥</button>
-      <button class="icon-chip-btn" id="exportBtn" title="Exportar cronogramas (Excel)" hidden>📊 Exportar</button>
-      <button class="icon-chip-btn" id="userAddBtn" title="Adicionar membro à equipe" hidden>＋ Membro</button>
+      <div class="settings-wrap">
+        <button class="icon-chip-btn icon-only" id="settingsBtn" title="Configurações" aria-haspopup="true" aria-expanded="false">
+          <span class="ico">⚙️</span>
+        </button>
+        <div class="settings-menu" id="settingsMenu" hidden>
+          <div class="settings-title">Configurações</div>
+          <button type="button" class="settings-item" id="setImport">
+            <span class="settings-ico">📥</span>
+            <span class="lbl">Importar cronograma</span>
+          </button>
+          <button type="button" class="settings-item" id="setExport" data-leader-only hidden>
+            <span class="settings-ico">📊</span>
+            <span class="lbl">Exportar cronogramas</span>
+          </button>
+          <button type="button" class="settings-item" id="setAddMember" data-leader-only hidden>
+            <span class="settings-ico">＋</span>
+            <span class="lbl">Adicionar membro</span>
+          </button>
+          <div class="settings-divider"></div>
+          <button type="button" class="settings-item" id="setChangePwd">
+            <span class="settings-ico">🔑</span>
+            <span class="lbl">Alterar senha</span>
+          </button>
+          <button type="button" class="settings-item" id="setTheme">
+            <span class="settings-ico" id="setThemeIcon">☀️</span>
+            <span class="lbl" id="setThemeLabel">Modo claro</span>
+          </button>
+          <div class="settings-divider"></div>
+          <button type="button" class="settings-item danger" id="setLogout">
+            <span class="settings-ico">🚪</span>
+            <span class="lbl">Sair</span>
+          </button>
+        </div>
+      </div>
+
       <button class="user-chip" id="userChip" title="Editar meu perfil">
         <span class="avatar" id="userChipAvatar">?</span>
         <span id="userChipName">—</span>
         <span class="role-badge member" id="userChipRole">membro</span>
       </button>
-      <button class="icon-chip-btn danger" id="logoutBtn" title="Encerrar sessão">Sair</button>
     </div>
   </div>
 </header>
@@ -1317,10 +1429,10 @@ select option{
         <form class="quick-add" id="dailyForm">
           <input type="time" id="qTime" title="Horário de início" required>
           <input type="time" id="qEnd" title="Horário de término">
-          <input type="text" id="qTitle" placeholder="O que você vai fazer?" maxlength="90" required>
           <select id="qCat"></select>
           <select id="qCarteira"></select>
           <button class="btn primary" type="submit">+ Adicionar</button>
+          <textarea id="qTitle" placeholder="Descreva o que você vai fazer no dia — pode detalhar o quanto quiser..." maxlength="500" required></textarea>
         </form>
 
         <div class="progress-wrap" id="dailyProgress"></div>
@@ -1524,7 +1636,7 @@ select option{
   </div>
 </div>
 
-<!-- MODAL: MEU PERFIL -->
+<!-- MODAL: MEU PERFIL (SEM SENHA) -->
 <div class="modal-backdrop" id="profileModal" hidden>
   <div class="modal" style="max-width:560px;">
     <div class="modal-head">
@@ -1532,6 +1644,21 @@ select option{
       <button class="icon-btn" id="profileModalClose" type="button">✕</button>
     </div>
     <form id="profileForm">
+      <!-- Foto de perfil -->
+      <div class="photo-uploader">
+        <div class="photo-preview" id="pPhotoPreview">?</div>
+        <div class="photo-info">
+          <div class="btns">
+            <button type="button" class="btn ghost" id="pPhotoBtn">📷 Escolher imagem</button>
+            <button type="button" class="btn ghost" id="pPhotoRemoveBtn">Remover</button>
+            <input type="file" id="pPhotoInput" accept="image/*" hidden>
+          </div>
+          <div class="photo-hint">
+            JPG, PNG ou WebP · redimensionada automaticamente para 200×200.
+          </div>
+        </div>
+      </div>
+
       <label class="field"><span>Nome</span>
         <input type="text" id="pName" placeholder="Nome e sobrenome" maxlength="40" required>
       </label>
@@ -1554,17 +1681,6 @@ select option{
         Toque nas carteiras acima para selecionar/desselecionar. Carteiras personalizadas podem ser adicionadas no campo abaixo.
       </div>
 
-      <div class="section-divider">🔑 Alterar senha</div>
-      <div class="io-hint" style="margin-top:0;">
-        Deixe em branco para <b>não alterar</b> a senha atual.
-      </div>
-      <label class="field"><span>Nova senha</span>
-        <input type="password" id="pPwdNew" placeholder="Mínimo 4 caracteres" autocomplete="new-password">
-      </label>
-      <label class="field"><span>Confirmar nova senha</span>
-        <input type="password" id="pPwdNew2" placeholder="Repita a nova senha" autocomplete="new-password">
-      </label>
-
       <div class="modal-actions">
         <button type="button" class="btn ghost" id="profileBtnCancel">Cancelar</button>
         <button type="submit" class="btn primary">Salvar alterações</button>
@@ -1573,27 +1689,59 @@ select option{
   </div>
 </div>
 
+<!-- MODAL: ALTERAR SENHA -->
+<div class="modal-backdrop" id="passwordModal" hidden>
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-head">
+      <h3>🔑 Alterar senha</h3>
+      <button class="icon-btn" id="passwordModalClose" type="button">✕</button>
+    </div>
+    <form id="passwordForm">
+      <label class="field"><span>Nova senha</span>
+        <input type="password" id="pwNew" placeholder="Mínimo 4 caracteres" autocomplete="new-password" required>
+      </label>
+      <label class="field"><span>Confirmar nova senha</span>
+        <input type="password" id="pwNew2" placeholder="Repita a nova senha" autocomplete="new-password" required>
+      </label>
+      <div class="login-error" id="pwError" hidden></div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="passwordBtnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar nova senha</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- MODAL: IMPORTAR EXCEL -->
 <div class="modal-backdrop" id="importModal" hidden>
-  <div class="modal" style="max-width:640px;">
+  <div class="modal" style="max-width:680px;">
     <div class="modal-head">
       <h3>📥 Importar cronograma (Excel)</h3>
       <button class="icon-btn" id="importModalClose" type="button">✕</button>
     </div>
     <div class="io-hint">
-      A planilha deve ter as colunas:
-      <code>Data</code>, <code>Hora Início</code>, <code>Hora Fim</code>, <code>Descrição</code>, <code>Categoria</code>.
-      Opcional: <code>Carteira</code>.<br>
+      A planilha deve ter <b>obrigatoriamente</b> as colunas:
+      <code>Data</code>, <code>Hora Início</code>, <code>Hora Fim</code>, <code>Descrição</code>, <code>Categoria</code> e <code>Carteira</code>.<br>
+      Linhas sem <b>Carteira</b> preenchida serão ignoradas.<br>
       As tarefas serão importadas para <b id="importOwnerName">—</b>.
     </div>
+
+    <div class="import-actions">
+      <button type="button" class="btn ghost" id="importDownloadTemplate">
+        ⬇️ Baixar planilha-modelo
+      </button>
+    </div>
+
     <label class="field">
       <span>Arquivo (.xlsx, .xls, .csv)</span>
       <input type="file" id="importFile" accept=".xlsx,.xls,.csv">
     </label>
+
     <div id="importPreviewWrap" hidden>
       <div class="import-stats" id="importStats"></div>
       <div class="import-preview" id="importPreview"></div>
     </div>
+
     <div class="modal-actions">
       <button type="button" class="btn ghost" id="importBtnCancel">Cancelar</button>
       <button type="button" class="btn primary" id="importConfirmBtn" disabled>Importar</button>
@@ -1641,18 +1789,18 @@ select option{
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v9';
+const STORAGE_KEY = 'cronoplano.v11';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','dashboard','team'];
 const ALL_MEMBERS = '__all__';
+const PHOTO_SIZE = 200; // px (redimensionamento)
 
 const USER_COLORS = [
   '#2563eb','#737373','#1e40af','#525252',
   '#1d4ed8','#404040','#1e3a8a','#666666'
 ];
 
-/* Carteiras padrão da empresa */
 const DEFAULT_CARTEIRAS = [
   'GM','GM Jud','GM Fleet','Creditas','FIAP','BMW','Honda',
   'Stellantis Locadora','Stellantis Financiamento','Finamax',
@@ -1693,10 +1841,9 @@ const LEGACY_CAT_MAP = {
 const PRIO = { alta:{label:'Alta'}, media:{label:'Média'}, baixa:{label:'Baixa'} };
 
 /* ============================================================
-   FERIADOS NACIONAIS BRASILEIROS
+   FERIADOS
    ============================================================ */
 function easterSunday(year){
-  // Algoritmo de Meeus/Jones/Butcher
   const a = year % 19;
   const b = Math.floor(year / 100);
   const c = year % 100;
@@ -1709,20 +1856,16 @@ function easterSunday(year){
   const k = c % 4;
   const l = (32 + 2*e + 2*i - h - k) % 7;
   const m = Math.floor((a + 11*h + 22*l) / 451);
-  const month = Math.floor((h + l - 7*m + 114) / 31); // 3 = Março, 4 = Abril
+  const month = Math.floor((h + l - 7*m + 114) / 31);
   const day = ((h + l - 7*m + 114) % 31) + 1;
   return new Date(year, month - 1, day);
 }
-
 const _holidaysCache = {};
 function getBrazilianHolidays(year){
   if(_holidaysCache[year]) return _holidaysCache[year];
   const h = {};
   const pad = n => String(n).padStart(2, '0');
-  const set = (m, d, name) => {
-    h[`${year}-${pad(m)}-${pad(d)}`] = name;
-  };
-  // Fixos
+  const set = (m, d, name) => { h[`${year}-${pad(m)}-${pad(d)}`] = name; };
   set(1, 1, 'Confraternização Universal');
   set(4, 21, 'Tiradentes');
   set(5, 1, 'Dia do Trabalho');
@@ -1732,13 +1875,8 @@ function getBrazilianHolidays(year){
   set(11, 15, 'Proclamação da República');
   set(11, 20, 'Consciência Negra');
   set(12, 25, 'Natal');
-  // Móveis (baseados na Páscoa)
   const easter = easterSunday(year);
-  const shift = (n) => {
-    const dt = new Date(easter);
-    dt.setDate(easter.getDate() + n);
-    return dt;
-  };
+  const shift = (n) => { const dt = new Date(easter); dt.setDate(easter.getDate() + n); return dt; };
   const setDateObj = (dt, name) => {
     const k = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
     h[k] = name;
@@ -1748,7 +1886,6 @@ function getBrazilianHolidays(year){
   setDateObj(shift(-46), 'Quarta-feira de Cinzas');
   setDateObj(shift(-2),  'Sexta-feira Santa');
   setDateObj(shift(60),  'Corpus Christi');
-
   _holidaysCache[year] = h;
   return h;
 }
@@ -1816,6 +1953,64 @@ function hashPassword(pwd){
   }
   return (h >>> 0).toString(16);
 }
+/* Avatar HTML helper (foto ou inicial) */
+function avatarHTML(user, cls){
+  const u = user || {};
+  const color = u.color || '#666';
+  if(u.photo){
+    return `<span class="avatar ${cls||''}" style="background-color:${color};background-image:url('${u.photo}');background-size:cover;background-position:center;"></span>`;
+  }
+  return `<span class="avatar ${cls||''}" style="background:${color}">${initialOf(u.name)}</span>`;
+}
+/* Aplica foto/inicial num elemento .avatar existente */
+function applyAvatar(el, user){
+  if(!el) return;
+  const u = user || {};
+  const color = u.color || '#666';
+  if(u.photo){
+    el.textContent = '';
+    el.style.background = '';
+    el.style.backgroundColor = color;
+    el.style.backgroundImage = `url('${u.photo}')`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+  } else {
+    el.textContent = initialOf(u.name);
+    el.style.background = color;
+    el.style.backgroundImage = '';
+    el.style.backgroundSize = '';
+    el.style.backgroundPosition = '';
+  }
+}
+/* Redimensiona imagem para base64 JPEG */
+function resizeImageFile(file, maxSize){
+  return new Promise((resolve, reject) => {
+    if(!file || !/^image\//.test(file.type)){
+      reject(new Error('Arquivo não é imagem'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        // fundo escuro (caso PNG transparente)
+        ctx.fillStyle = '#151515';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 /* ============================================================
    USUÁRIOS
@@ -1851,7 +2046,7 @@ function seedPredefinedUsers(){
       return;
     }
     if(!data.users[p.id]){
-      data.users[p.id] = { ...p, passwordHash:'', carteiras:[], cargo:'', email:'' };
+      data.users[p.id] = { ...p, passwordHash:'', carteiras:[], cargo:'', email:'', photo:'' };
     } else {
       data.users[p.id].name = p.name;
       data.users[p.id].role = p.role;
@@ -1860,6 +2055,7 @@ function seedPredefinedUsers(){
       if(typeof data.users[p.id].passwordHash !== 'string') data.users[p.id].passwordHash = '';
       if(typeof data.users[p.id].email !== 'string') data.users[p.id].email = '';
       if(typeof data.users[p.id].cargo !== 'string') data.users[p.id].cargo = '';
+      if(typeof data.users[p.id].photo !== 'string') data.users[p.id].photo = '';
     }
   });
 }
@@ -1899,6 +2095,7 @@ function load(){
     }
   }catch(err){ console.warn('Falha ao carregar dados:', err); }
   if(!VALID_TABS.includes(ui.tab)) ui.tab = 'daily';
+  if(ui.carteiraFilter === '__none__') ui.carteiraFilter = '';
 }
 function save(){
   try{
@@ -1932,10 +2129,10 @@ function applyTheme(theme){
   const t = theme === 'light' ? 'light' : 'dark';
   document.documentElement.dataset.theme = t;
   try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
-  const icon = $('#themeIcon');
+  const icon = $('#setThemeIcon');
   if(icon) icon.textContent = t === 'light' ? '🌙' : '☀️';
-  const btn = $('#themeBtn');
-  if(btn) btn.title = t === 'light' ? 'Mudar para escuro' : 'Mudar para claro';
+  const label = $('#setThemeLabel');
+  if(label) label.textContent = t === 'light' ? 'Modo escuro' : 'Modo claro';
 }
 function toggleTheme(){
   const cur = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
@@ -1995,35 +2192,34 @@ function tasksOfDate(dateIso, ownerId, carteiraFilter){
     arr = arr.filter(t => t.ownerId === ownerId);
   }
   const cf = carteiraFilter !== undefined ? carteiraFilter : ui.carteiraFilter;
-  if(cf === '__none__') arr = arr.filter(t => !t.carteira);
-  else if(cf) arr = arr.filter(t => t.carteira === cf);
+  if(cf) arr = arr.filter(t => t.carteira === cf);
   return arr.slice();
 }
 function carteirasForCurrentView(){
+  const set = new Set(DEFAULT_CARTEIRAS);
   if(viewingAll()){
-    const set = new Set(DEFAULT_CARTEIRAS);
     usersList().forEach(u => carteirasOf(u).forEach(c => set.add(c)));
     Object.values(data.daily).forEach(arr => {
       arr.forEach(t => { if(t.carteira) set.add(t.carteira); });
     });
-    return [...set].sort();
-  }
-  const u = viewedUser() || currentUser();
-  const set = new Set(carteirasOf(u));
-  // Adiciona as carteiras padrão para permitir filtrar por qualquer carteira
-  DEFAULT_CARTEIRAS.forEach(c => set.add(c));
-  // Adiciona carteiras que aparecem nas tarefas desse usuário
-  Object.values(data.daily).forEach(arr => {
-    arr.forEach(t => {
-      if(t.carteira && (!u || t.ownerId === u.id)) set.add(t.carteira);
+  } else {
+    const u = viewedUser() || currentUser();
+    carteirasOf(u).forEach(c => set.add(c));
+    Object.values(data.daily).forEach(arr => {
+      arr.forEach(t => {
+        if(t.carteira && (!u || t.ownerId === u.id)) set.add(t.carteira);
+      });
     });
-  });
+  }
   return [...set].sort();
 }
 function ownerPillHTML(t){
   const owner = userById(t.ownerId);
+  const av = owner.photo
+    ? `<span class="avatar" style="background-color:${owner.color};background-image:url('${owner.photo}');background-size:cover;background-position:center;"></span>`
+    : `<span class="avatar" style="background:${owner.color}">${initialOf(owner.name)}</span>`;
   return `<span class="pill owner-pill" style="--c:${owner.color}">
-    <span class="avatar" style="background:${owner.color}">${initialOf(owner.name)}</span>
+    ${av}
     ${esc(owner.name)}
   </span>`;
 }
@@ -2062,18 +2258,14 @@ function setLoginStep(step){
 
   if(step === 'password' && u){
     $('#loginSubtitle').textContent = 'Digite sua senha';
-    const av = $('#loginPwdAvatar');
-    av.textContent = initialOf(u.name);
-    av.style.background = u.color;
+    applyAvatar($('#loginPwdAvatar'), u);
     $('#loginPwdName').textContent = u.name;
     $('#loginPwdRole').textContent = u.cargo || (u.role === 'leader' ? 'Líder' : 'Membro');
     setTimeout(() => $('#loginPwd').focus(), 60);
   }
   if(step === 'setup' && u){
     $('#loginSubtitle').textContent = 'Primeiro acesso';
-    const av = $('#loginSetupAvatar');
-    av.textContent = initialOf(u.name);
-    av.style.background = u.color;
+    applyAvatar($('#loginSetupAvatar'), u);
     $('#loginSetupName').textContent = u.name;
     $('#loginSetupRole').textContent = u.cargo || (u.role === 'leader' ? 'Líder' : 'Membro');
     setTimeout(() => $('#loginPwdNew').focus(), 60);
@@ -2121,16 +2313,10 @@ function logout(){
 /* ============================================================
    ABAS
    ============================================================ */
-function refreshTabsVisibility(){
-  $$('.tab').forEach(b => {
-    if(b.dataset.leaderOnly !== undefined){
-      b.hidden = !isLeader();
-    }
+function refreshLeaderVisibility(){
+  $$('[data-leader-only]').forEach(el => {
+    el.hidden = !isLeader();
   });
-  const addBtn = $('#userAddBtn');
-  if(addBtn) addBtn.hidden = !isLeader();
-  const exportBtn = $('#exportBtn');
-  if(exportBtn) exportBtn.hidden = !isLeader();
 }
 function switchTab(tab){
   if(!VALID_TABS.includes(tab)) tab = 'daily';
@@ -2149,7 +2335,6 @@ function buildViewUserOptions(selectEl, selectedId){
   if(!selectEl) return;
   const me = currentUser();
   const leader = isLeader();
-
   let opts = '';
   if(leader){
     opts += `<option value="${ALL_MEMBERS}" ${selectedId === ALL_MEMBERS ? 'selected' : ''}>
@@ -2177,7 +2362,6 @@ function buildCarteiraFilterOptions(selectEl){
   carteiras.forEach(c => {
     opts.push(`<option value="${esc(c)}" ${ui.carteiraFilter === c ? 'selected' : ''}>${esc(c)}</option>`);
   });
-  opts.push(`<option value="__none__" ${ui.carteiraFilter === '__none__' ? 'selected' : ''}>Sem carteira</option>`);
   selectEl.innerHTML = opts.join('');
 }
 function refreshViewSelects(){
@@ -2198,13 +2382,11 @@ function refreshTopbarCarteiras(){
   const viewed = viewedUser() || currentUser();
   if(!viewed){ el.innerHTML = ''; return; }
   const carteiras = carteirasOf(viewed);
-
   const me = currentUser();
   const isOther = viewed.id !== (me ? me.id : null);
   const prefix = isOther
     ? `<span class="carteira-chip none" style="text-transform:none;letter-spacing:0;">👁 ${esc(viewed.name)}</span>`
     : '';
-
   if(!carteiras.length){ el.innerHTML = prefix; return; }
   el.innerHTML = prefix + carteiras.map(c =>
     `<span class="carteira-chip">${esc(c)}</span>`
@@ -2259,10 +2441,9 @@ function renderDaily(){
   const carteiras = carteirasForCurrentView();
   const qCar = $('#qCarteira');
   const curQCar = qCar.value;
-  qCar.innerHTML = ['<option value="">Sem carteira</option>']
-    .concat(carteiras.map(c => `<option value="${esc(c)}">${esc(c)}</option>`))
-    .join('');
+  qCar.innerHTML = carteiras.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   if(carteiras.includes(curQCar)) qCar.value = curQCar;
+  else if(carteiras.length) qCar.value = carteiras[0];
 
   const total = tasks.length;
   const done  = tasks.filter(t => t.done).length;
@@ -2326,46 +2507,27 @@ function renderDaily(){
 }
 
 /* ============================================================
-   RENDER: CALENDÁRIO (SEM DOMINGOS + FERIADOS)
+   RENDER: CALENDÁRIO
    ============================================================ */
 function buildCalendarCells(year, month){
   const cells = [];
   const first = new Date(year, month, 1);
-  const dow1 = first.getDay(); // 0=Dom..6=Sáb
-
-  // Determina a data inicial (sempre uma segunda)
+  const dow1 = first.getDay();
   let startDate;
-  if(dow1 === 0){
-    // dia 1 é domingo -> começa no dia 2 (segunda)
-    startDate = new Date(year, month, 2);
-  } else if(dow1 === 1){
-    startDate = new Date(year, month, 1);
-  } else {
-    // volta para a segunda da semana
-    startDate = new Date(year, month, 1 - (dow1 - 1));
-  }
-
+  if(dow1 === 0){ startDate = new Date(year, month, 2); }
+  else if(dow1 === 1){ startDate = new Date(year, month, 1); }
+  else { startDate = new Date(year, month, 1 - (dow1 - 1)); }
   const lastDayOfMonth = new Date(year, month + 1, 0);
-
-  // Itera dia a dia a partir de startDate, pulando domingos
   const cur = new Date(startDate);
   let safety = 0;
   while(safety++ < 100){
     const dow = cur.getDay();
-    if(dow !== 0){ // ignora domingo
-      cells.push({
-        date: new Date(cur),
-        other: cur.getMonth() !== month
-      });
+    if(dow !== 0){
+      cells.push({ date: new Date(cur), other: cur.getMonth() !== month });
     }
-    // Para quando já passou o mês E fechou a semana no sábado
-    if(cur >= lastDayOfMonth && dow === 6){
-      break;
-    }
+    if(cur >= lastDayOfMonth && dow === 6) break;
     cur.setDate(cur.getDate() + 1);
   }
-
-  // Garante múltiplo de 6 (linha cheia)
   while(cells.length % 6 !== 0){
     cur.setDate(cur.getDate() + 1);
     if(cur.getDay() !== 0){
@@ -2374,11 +2536,9 @@ function buildCalendarCells(year, month){
   }
   return cells;
 }
-
 function renderCalendar(){
   const { year, month } = ui.calMonth;
   const first = new Date(year, month, 1);
-
   const cells = buildCalendarCells(year, month);
   const todayIso = todayISO();
   const viewId = ui.viewUserId;
@@ -2438,7 +2598,6 @@ function renderWeekly(){
   const monday = mondayOf(ui.date);
   const todayIso = todayISO();
   const viewId = ui.viewUserId;
-
   const canEdit = canEditCurrentView();
   const allView = viewingAll();
   const viewed = viewedUser();
@@ -2450,7 +2609,6 @@ function renderWeekly(){
     dt.setDate(monday.getDate() + i);
     weekDates.push(dt);
   }
-
   const sun = weekDates[6];
   const fmt = dt => `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
   $('#wkLabel').textContent = `${fmt(monday)} – ${fmt(sun)}`;
@@ -2503,8 +2661,7 @@ function renderWeekly(){
             <div class="day-count">${tasks.length} ${tasks.length===1?'item':'itens'}</div>
             ${isHoliday ? `<div class="holiday-tag">🎉 ${esc(holidayName)}</div>` : ''}
           </div>
-          ${canEdit && !isHoliday ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
-          ${canEdit && isHoliday ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
+          ${canEdit ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
         </div>
         ${tasks.length ? tasks.map(t => {
           const cat = catOf(t.cat);
@@ -2521,10 +2678,7 @@ function renderWeekly(){
               <div class="wk-body">
                 <div class="wk-time">${timeRange}${t.carteira ? ` · ${esc(t.carteira)}` : ''}</div>
                 <div class="wk-title">${esc(t.title)}</div>
-                ${allView ? `<div class="wk-owner">
-                  <span class="avatar" style="background:${owner.color}">${initialOf(owner.name)}</span>
-                  ${esc(owner.name)}
-                </div>` : ''}
+                ${allView ? `<div class="wk-owner">${avatarHTML(owner)}${esc(owner.name)}</div>` : ''}
               </div>
             </div>`;
         }).join('') : `<div class="wk-empty">livre</div>`}
@@ -2542,8 +2696,7 @@ function collectStatsFor(userId){
   Object.entries(data.daily).forEach(([iso, arr]) => {
     arr.forEach(t => {
       if(userId !== ALL_MEMBERS && t.ownerId !== userId) return;
-      if(ui.carteiraFilter === '__none__' && t.carteira) return;
-      if(ui.carteiraFilter && ui.carteiraFilter !== '__none__' && t.carteira !== ui.carteiraFilter) return;
+      if(ui.carteiraFilter && t.carteira !== ui.carteiraFilter) return;
       total++;
       if(t.done) done++;
       else if(iso < todayISO()) late++;
@@ -2622,7 +2775,6 @@ function renderDashboard(){
   const targetId = ui.viewUserId || ui.currentUserId;
   const S = collectStatsFor(targetId);
   const pct = S.total ? Math.round((S.done / S.total) * 100) : 0;
-
   const allView = viewingAll();
   const viewed = viewedUser();
   const other = !!viewed && viewed.id !== ui.currentUserId;
@@ -2761,7 +2913,6 @@ function collectTeamStats(){
     byUser[u.id] = { total:0, done:0, pending:0, late:0, user:u };
   });
   let total=0, done=0, pending=0, late=0;
-
   Object.entries(data.daily).forEach(([iso, arr]) => {
     arr.forEach(t => {
       const bucket = byUser[t.ownerId];
@@ -2770,7 +2921,6 @@ function collectTeamStats(){
       if(st === 'done') done++;
       else if(st === 'late') late++;
       else pending++;
-
       if(bucket){
         bucket.total++;
         if(st === 'done') bucket.done++;
@@ -2845,7 +2995,7 @@ function renderTeam(){
             <div class="member-card ${isActive?'active':''} ${isMe?'is-me':''}" data-user-filter="${u.id}" style="--c:${u.color}">
               ${!isMe ? `<button class="member-delete" data-act="delete-member" data-user-id="${u.id}" title="Remover ${esc(u.name)}">✕</button>` : ''}
               <div class="member-top">
-                <div class="avatar" style="background:${u.color}">${initialOf(u.name)}</div>
+                ${avatarHTML(u)}
                 <div class="info">
                   <div class="nm">${esc(u.name)}</div>
                   ${u.cargo ? `<div class="cargo">${esc(u.cargo)}</div>` : ''}
@@ -2912,14 +3062,11 @@ function renderTeam(){
               : (t.start || '');
             return `
               <li class="team-task ${t.done?'done':''} ${status==='late'?'late':''}" style="--c:${cat.color}">
-                <div class="avatar" style="background:${owner.color}" title="${esc(owner.name)}">${initialOf(owner.name)}</div>
+                ${avatarHTML(owner)}
                 <div class="tt-main">
                   <div class="tt-title">${esc(t.title)}</div>
                   <div class="tt-meta">
-                    <span class="who">
-                      <span class="avatar" style="background:${owner.color}">${initialOf(owner.name)}</span>
-                      ${esc(owner.name)}
-                    </span>
+                    <span class="who">${avatarHTML(owner)}${esc(owner.name)}</span>
                     <span>·</span>
                     <span>${fmtDateFull(date)}</span>
                     ${timeStr ? `<span>·</span><span>${esc(timeStr)}</span>` : ''}
@@ -2950,7 +3097,6 @@ function renderTeam(){
    ============================================================ */
 function render(){
   if(!ui.currentUserId || !data.users[ui.currentUserId]) return;
-
   if(!ui.viewUserId){
     ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
   }
@@ -2960,16 +3106,13 @@ function render(){
   if(isLeader() && ui.viewUserId === ui.currentUserId){
     ui.viewUserId = ALL_MEMBERS;
   }
-
-  refreshTabsVisibility();
+  refreshLeaderVisibility();
   refreshViewSelects();
   refreshTopbarCarteiras();
-
   if(ui.tab === 'daily')        renderDaily();
   else if(ui.tab === 'weekly')  renderWeekly();
   else if(ui.tab === 'team')    renderTeam();
   else                          renderDashboard();
-
   renderUserChip();
 }
 
@@ -2996,18 +3139,18 @@ function fillCarteiraSelect(selectEl, ownerId, selectedValue){
   usersList().forEach(u => carteirasOf(u).forEach(c => set.add(c)));
   Object.values(data.daily).forEach(arr => arr.forEach(t => { if(t.carteira) set.add(t.carteira); }));
   const carteiras = [...set].sort();
-  const opts = ['<option value="">Sem carteira</option>']
-    .concat(carteiras.map(c => `<option value="${esc(c)}" ${selectedValue===c?'selected':''}>${esc(c)}</option>`));
+  const opts = carteiras.map(c => `<option value="${esc(c)}" ${selectedValue===c?'selected':''}>${esc(c)}</option>`);
   selectEl.innerHTML = opts.join('');
+  if(selectedValue && carteiras.includes(selectedValue)) selectEl.value = selectedValue;
+  else if(carteiras.length) selectEl.value = carteiras[0];
 }
 
 /* ============================================================
-   CARTEIRAS PICKER (perfil / adicionar membro)
+   CARTEIRAS PICKER
    ============================================================ */
 function renderCarteiraPicker(wrapEl, selectedList){
   if(!wrapEl) return;
   const selected = new Set(selectedList || []);
-  // Carteiras padrão + quaisquer customizadas já selecionadas
   const all = new Set(DEFAULT_CARTEIRAS);
   (selectedList || []).forEach(c => all.add(c));
   const list = [...all];
@@ -3020,19 +3163,21 @@ function renderCarteiraPicker(wrapEl, selectedList){
       </button>`;
   }).join('');
 }
-function bindCarteiraPicker(wrapEl, ctxRef, after){
+function bindCarteiraPicker(wrapEl, getCtx){
   if(!wrapEl || wrapEl.dataset.bound) return;
   wrapEl.dataset.bound = '1';
   wrapEl.addEventListener('click', e => {
     const btn = e.target.closest('[data-carteira]');
     if(!btn) return;
+    e.preventDefault();
+    const ctx = getCtx();
+    if(!ctx || !Array.isArray(ctx.carteiras)) return;
     const c = btn.dataset.carteira;
-    const arr = ctxRef.list;
+    const arr = ctx.carteiras;
     const i = arr.indexOf(c);
     if(i >= 0) arr.splice(i, 1);
     else arr.push(c);
     renderCarteiraPicker(wrapEl, arr);
-    if(after) after();
   });
 }
 
@@ -3108,29 +3253,67 @@ function closeUserModal(){
 }
 
 /* ============================================================
-   MODAL: MEU PERFIL
+   MODAL: PERFIL (sem senha)
    ============================================================ */
-let profileCtx = { carteiras: [] };
+let profileCtx = { carteiras: [], photo: '' };
 
 function openProfileModal(){
   const u = currentUser();
   if(!u) return;
   profileCtx.carteiras = carteirasOf(u).slice();
+  profileCtx.photo = u.photo || '';
 
   $('#profileModalTitle').textContent = 'Meu perfil';
   $('#pName').value = u.name;
   $('#pCargo').value = u.cargo || '';
   $('#pEmail').value = u.email || '';
-  $('#pPwdNew').value = '';
-  $('#pPwdNew2').value = '';
   $('#pCarteiraCustom').value = '';
+  $('#pPhotoInput').value = '';
 
   renderCarteiraPicker($('#pCarteirasPicker'), profileCtx.carteiras);
+  renderProfilePhotoPreview();
   $('#profileModal').hidden = false;
   setTimeout(() => $('#pName').focus(), 60);
 }
 function closeProfileModal(){
   $('#profileModal').hidden = true;
+}
+function renderProfilePhotoPreview(){
+  const prev = $('#pPhotoPreview');
+  if(!prev) return;
+  const u = currentUser() || {};
+  const color = u.color || '#666';
+  if(profileCtx.photo){
+    prev.innerHTML = `<img src="${profileCtx.photo}" alt="Foto de perfil">`;
+    prev.style.background = `#000`;
+    prev.style.backgroundImage = '';
+  } else {
+    prev.innerHTML = initialOf(u.name);
+    prev.style.background = color;
+    prev.style.backgroundImage = '';
+  }
+}
+
+/* ============================================================
+   MODAL: ALTERAR SENHA
+   ============================================================ */
+function openPasswordModal(){
+  $('#pwNew').value = '';
+  $('#pwNew2').value = '';
+  $('#pwError').hidden = true;
+  $('#passwordModal').hidden = false;
+  setTimeout(() => $('#pwNew').focus(), 60);
+}
+function closePasswordModal(){
+  $('#passwordModal').hidden = true;
+}
+function showPwError(msg){
+  const el = $('#pwError');
+  el.textContent = msg;
+  el.hidden = false;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
 }
 
 /* ============================================================
@@ -3170,20 +3353,16 @@ function deleteMember(userId){
     `• Todas as tarefas dessa pessoa serão excluídas.\n` +
     `• Esta ação não pode ser desfeita.`;
   if(!confirm(msg)) return;
-
   Object.keys(data.daily).forEach(iso => {
     const arr = data.daily[iso] || [];
     const filtered = arr.filter(t => t.ownerId !== userId);
     if(filtered.length) data.daily[iso] = filtered;
     else delete data.daily[iso];
   });
-
   if(!data.deletedUserIds.includes(userId)) data.deletedUserIds.push(userId);
   delete data.users[userId];
-
   if(ui.viewUserId === userId) ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
   if(ui.teamUserFilter === userId) ui.teamUserFilter = '';
-
   save(); render();
 }
 
@@ -3210,12 +3389,27 @@ function shiftDay(delta){
 function renderUserChip(){
   const u = currentUser();
   if(!u) return;
-  $('#userChipAvatar').textContent = initialOf(u.name);
-  $('#userChipAvatar').style.background = u.color;
+  applyAvatar($('#userChipAvatar'), u);
   $('#userChipName').textContent = u.name;
   const role = $('#userChipRole');
   role.textContent = u.role === 'leader' ? 'líder' : 'membro';
   role.className = 'role-badge ' + (u.role === 'leader' ? 'leader' : 'member');
+}
+
+/* ============================================================
+   SETTINGS MENU
+   ============================================================ */
+function openSettingsMenu(){
+  $('#settingsMenu').hidden = false;
+  $('#settingsBtn').setAttribute('aria-expanded', 'true');
+}
+function closeSettingsMenu(){
+  $('#settingsMenu').hidden = true;
+  $('#settingsBtn').setAttribute('aria-expanded', 'false');
+}
+function toggleSettingsMenu(){
+  if($('#settingsMenu').hidden) openSettingsMenu();
+  else closeSettingsMenu();
 }
 
 /* ============================================================
@@ -3295,6 +3489,22 @@ function openImportModal(){
 }
 function closeImportModal(){ $('#importModal').hidden = true; }
 
+function downloadImportTemplate(){
+  const wb = XLSX.utils.book_new();
+  const rows = [
+    ['Data','Hora Início','Hora Fim','Descrição','Categoria','Carteira'],
+    ['2025-01-15','09:00','10:30','Exemplo: reunião de alinhamento semanal','Reunião','GM'],
+    ['2025-01-15','14:00','15:00','Exemplo: acompanhamento de obra','Acompanhamento','Safra'],
+    ['2025-01-16','08:30','09:15','Exemplo: criação de conteúdo para campanha','Criação de Conteúdo','BMW']
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [
+    {wch:12},{wch:11},{wch:11},{wch:44},{wch:24},{wch:20}
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
+  XLSX.writeFile(wb, 'cronoplano-modelo-importacao.xlsx');
+}
+
 function handleImportFile(file){
   if(!file) return;
   const reader = new FileReader();
@@ -3305,9 +3515,6 @@ function handleImportFile(file){
       const sheetName = wb.SheetNames[0];
       const ws = wb.Sheets[sheetName];
       const rawRows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
-
-      const owner = viewedUser() || currentUser();
-      const ownerCarteiras = carteirasOf(owner);
 
       const parsed = [];
       let errors = 0;
@@ -3323,16 +3530,10 @@ function handleImportFile(file){
         const start = parseTimeExcel(startRaw);
         const end = parseTimeExcel(endRaw);
         const desc = String(title || '').trim();
+        const carteira = String(carRaw || '').trim();
 
-        if(!iso || !desc){ errors++; return; }
-
-        let carteira = String(carRaw || '').trim();
-        if(carteira && ownerCarteiras.length && !ownerCarteiras.includes(carteira)){
-          carteira = '';
-        }
-        if(!carteira && ownerCarteiras.length === 1){
-          carteira = ownerCarteiras[0];
-        }
+        // Obrigatórios: Data, Descrição, Carteira
+        if(!iso || !desc || !carteira){ errors++; return; }
 
         parsed.push({
           iso, start, end,
@@ -3359,21 +3560,18 @@ function renderImportPreview(){
   const stats = $('#importStats');
   const prev = $('#importPreview');
   wrap.hidden = false;
-
   stats.innerHTML = `
     <div class="st ok"><div class="v">${importCtx.valid}</div><div class="k">Válidas</div></div>
     <div class="st err"><div class="v">${importCtx.errors}</div><div class="k">Ignoradas</div></div>
     <div class="st"><div class="v">${importCtx.valid + importCtx.errors}</div><div class="k">Total lidas</div></div>
   `;
-
   if(!importCtx.rows.length){
     prev.innerHTML = `<div class="empty" style="padding:22px 14px;">
       <span class="big">🤔</span>Nenhuma linha válida encontrada.<br>
-      <span>Confira se as colunas estão nomeadas corretamente.</span>
+      <span>Verifique se <b>Data</b>, <b>Descrição</b> e <b>Carteira</b> estão preenchidos.</span>
     </div>`;
     return;
   }
-
   const rows = importCtx.rows.slice(0, 40);
   prev.innerHTML = `
     <table>
@@ -3400,10 +3598,8 @@ function confirmImport(){
   if(!importCtx.rows.length) return;
   const owner = viewedUser() || currentUser();
   if(!owner){ alert('Selecione um membro específico (não "Todos") antes de importar.'); return; }
-
   const n = importCtx.rows.length;
   if(!confirm(`Importar ${n} tarefa(s) para ${owner.name}?\n\nAs atividades serão adicionadas ao cronograma existente.`)) return;
-
   importCtx.rows.forEach(r => {
     const iso = r.iso;
     if(!Array.isArray(data.daily[iso])) data.daily[iso] = [];
@@ -3420,7 +3616,6 @@ function confirmImport(){
       carteira: r.carteira || ''
     });
   });
-
   save();
   closeImportModal();
   render();
@@ -3434,16 +3629,13 @@ function openExportModal(){
   $('#exportUserWrap').hidden = true;
   $$('.export-opt').forEach(o => o.classList.remove('active'));
   $$('.export-opt')[0].classList.add('active');
-
   const sel = $('#exportUserSelect');
   sel.innerHTML = usersList().map(u =>
     `<option value="${u.id}">${esc(u.name)}</option>`
   ).join('');
-
   $('#exportModal').hidden = false;
 }
 function closeExportModal(){ $('#exportModal').hidden = true; }
-
 function buildSheetRows(tasksOf){
   const rows = [[
     'Data','Carteira','Hora Início','Hora Fim','Duração (min)',
@@ -3487,7 +3679,6 @@ function sanitizeSheetName(name){
 function doExport(){
   const mode = exportCtx.mode;
   const wb = XLSX.utils.book_new();
-
   if(mode === 'all'){
     const generalRows = buildGeneralRows();
     const wsGeral = XLSX.utils.aoa_to_sheet(generalRows);
@@ -3496,7 +3687,6 @@ function doExport(){
       {wch:38},{wch:22},{wch:11},{wch:11},{wch:26}
     ];
     XLSX.utils.book_append_sheet(wb, wsGeral, 'Geral');
-
     const usedNames = new Set(['Geral']);
     usersList().forEach(u => {
       const tasks = [];
@@ -3523,15 +3713,14 @@ function doExport(){
       usedNames.add(name);
       XLSX.utils.book_append_sheet(wb, ws, name);
     });
-
     XLSX.writeFile(wb, `cronoplano-geral-${todayISO()}.xlsx`);
   } else {
-    const uid = $('#exportUserSelect').value;
-    const u = userById(uid);
+    const uid2 = $('#exportUserSelect').value;
+    const u = userById(uid2);
     if(!u) return;
     const tasks = [];
     Object.entries(data.daily).forEach(([iso, arr]) => {
-      arr.forEach(t => { if(t.ownerId === uid) tasks.push({ t, iso }); });
+      arr.forEach(t => { if(t.ownerId === uid2) tasks.push({ t, iso }); });
     });
     tasks.sort((a,b) => {
       if(a.iso !== b.iso) return a.iso.localeCompare(b.iso);
@@ -3555,7 +3744,6 @@ function doExport(){
    ============================================================ */
 $('#loginForm').addEventListener('submit', e => {
   e.preventDefault();
-
   if(loginCtx.step === 'name'){
     const name = $('#loginName').value;
     const user = findUserByName(name);
@@ -3568,7 +3756,6 @@ $('#loginForm').addEventListener('submit', e => {
     else setLoginStep('password');
     return;
   }
-
   if(loginCtx.step === 'password'){
     const u = data.users[loginCtx.userId];
     if(!u){ setLoginStep('name'); return; }
@@ -3581,7 +3768,6 @@ $('#loginForm').addEventListener('submit', e => {
     completeLogin(u);
     return;
   }
-
   if(loginCtx.step === 'setup'){
     const u = data.users[loginCtx.userId];
     if(!u){ setLoginStep('name'); return; }
@@ -3604,25 +3790,39 @@ $('#loginForm').addEventListener('submit', e => {
 $('#loginBack2').addEventListener('click', () => { loginCtx.userId = null; setLoginStep('name'); });
 $('#loginBack3').addEventListener('click', () => { loginCtx.userId = null; setLoginStep('name'); });
 
-$('#logoutBtn').addEventListener('click', logout);
-$('#themeBtn').addEventListener('click', toggleTheme);
-
 $$('.tab').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-$('#userAddBtn').addEventListener('click', openUserModal);
-$('#userChip').addEventListener('click', openProfileModal);
-$('#importBtn').addEventListener('click', openImportModal);
-$('#exportBtn').addEventListener('click', openExportModal);
+/* ---------- SETTINGS MENU ---------- */
+$('#settingsBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  toggleSettingsMenu();
+});
+document.addEventListener('click', e => {
+  if(!e.target.closest('.settings-wrap')) closeSettingsMenu();
+});
+$('#setImport').addEventListener('click', () => { closeSettingsMenu(); openImportModal(); });
+$('#setExport').addEventListener('click', () => { closeSettingsMenu(); openExportModal(); });
+$('#setAddMember').addEventListener('click', () => { closeSettingsMenu(); openUserModal(); });
+$('#setChangePwd').addEventListener('click', () => { closeSettingsMenu(); openPasswordModal(); });
+$('#setTheme').addEventListener('click', () => { toggleTheme(); });
+$('#setLogout').addEventListener('click', () => { closeSettingsMenu(); logout(); });
 
+/* ---------- USER CHIP → perfil (sem senha) ---------- */
+$('#userChip').addEventListener('click', () => {
+  closeSettingsMenu();
+  openProfileModal();
+});
+
+/* ---------- SELECTS DE VISUALIZAÇÃO / FILTRO ---------- */
 function onViewUserChange(e){
   const val = e.target.value;
   if(!val) return;
   if(val !== ALL_MEMBERS && !data.users[val]) return;
   ui.viewUserId = val;
   const cs = carteirasForCurrentView();
-  if(ui.carteiraFilter && ui.carteiraFilter !== '__none__' && !cs.includes(ui.carteiraFilter)){
+  if(ui.carteiraFilter && !cs.includes(ui.carteiraFilter)){
     ui.carteiraFilter = '';
   }
   save(); render();
@@ -3684,7 +3884,6 @@ $('#weekGrid').addEventListener('click', e => {
     return;
   }
   if(!canEditCurrentView()) return;
-
   const addBtn = e.target.closest('[data-add-date]');
   if(addBtn){
     const iso = addBtn.dataset.addDate;
@@ -3697,10 +3896,8 @@ $('#weekGrid').addEventListener('click', e => {
   const id  = wk.dataset.id;
   const date = wk.dataset.date;
   const act = e.target.closest('[data-act]')?.dataset.act;
-
   if(act === 'toggle'){ toggleTask(date, id); return; }
   if(act === 'del'){ deleteTask(date, id); return; }
-
   const item = (data.daily[date] || []).find(t => t.id === id);
   if(item) openModal({ mode:'edit', date, item });
 });
@@ -3710,13 +3907,10 @@ $('#dailyForm').addEventListener('submit', e => {
   if(!canEditCurrentView() || viewingAll()) return;
   const title = $('#qTitle').value.trim();
   if(!title) return;
-
   const date = ui.date;
   if(!Array.isArray(data.daily[date])) data.daily[date] = [];
-
   const owner = isLeader() ? (ui.viewUserId || ui.currentUserId) : ui.currentUserId;
   if(owner === ALL_MEMBERS) return;
-
   data.daily[date].push({
     id: uid(),
     ownerId: owner,
@@ -3729,7 +3923,6 @@ $('#dailyForm').addEventListener('submit', e => {
     notes: '',
     done:  false
   });
-
   save();
   $('#qTitle').value = '';
   $('#qEnd').value = '';
@@ -3744,7 +3937,6 @@ $('#dailyList').addEventListener('click', e => {
   const id = li.dataset.id;
   const act = e.target.closest('[data-act]')?.dataset.act;
   const date = li.dataset.date || ui.date;
-
   if(act === 'toggle') toggleTask(date, id);
   else if(act === 'del') deleteTask(date, id);
   else if(act === 'edit'){
@@ -3796,10 +3988,8 @@ $('#modalForm').addEventListener('submit', e => {
   e.preventDefault();
   if(!modalCtx) return;
   if(!canEditCurrentView()){ closeModal(); return; }
-
   const title = $('#fTitle').value.trim();
   if(!title) return;
-
   const base = {
     title,
     start: $('#fStart').value || '',
@@ -3809,13 +3999,11 @@ $('#modalForm').addEventListener('submit', e => {
     prio:  $('#fPrio').value,
     notes: $('#fNotes').value.trim()
   };
-
   const newDate = $('#fDate').value || ui.date || todayISO();
   let newOwner = isLeader()
     ? ($('#fOwner').value || ui.currentUserId)
     : ui.currentUserId;
   if(!newOwner || newOwner === ALL_MEMBERS) newOwner = ui.currentUserId;
-
   if(modalCtx.mode === 'new'){
     if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
     data.daily[newDate].push({ id: uid(), ownerId:newOwner, done:false, ...base });
@@ -3827,14 +4015,12 @@ $('#modalForm').addEventListener('submit', e => {
     const oldOwner= idx >= 0 ? oldArr[idx].ownerId : newOwner;
     if(idx >= 0) oldArr.splice(idx, 1);
     if(!oldArr.length) delete data.daily[oldDate];
-
     const finalOwner = isLeader() ? newOwner : oldOwner;
     if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
     data.daily[newDate].push({
       id: modalCtx.item.id, ownerId: finalOwner, done: wasDone, ...base
     });
   }
-
   setDate(newDate);
   save();
   closeModal();
@@ -3846,7 +4032,6 @@ $('#modal').addEventListener('click', e => {
   if(e.target.id === 'modal') closeModal();
 });
 
-/* user modal */
 $$('.role-opt[data-role]').forEach(b => {
   b.addEventListener('click', () => {
     if(!userModalCtx) return;
@@ -3870,11 +4055,9 @@ $('#userForm').addEventListener('submit', e => {
   const name = $('#uName').value.trim();
   if(!name) return;
   if(findUserByName(name)){ alert('Já existe um usuário com esse nome.'); return; }
-
   const slug = normalizeName(name).replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
   const id = slug || ('u-' + uid());
   const color = USER_COLORS[Object.keys(data.users).length % USER_COLORS.length];
-
   data.users[id] = {
     id, name,
     role: userModalCtx.role,
@@ -3882,11 +4065,10 @@ $('#userForm').addEventListener('submit', e => {
     cargo: $('#uCargo').value.trim().slice(0, 40),
     email: $('#uEmail').value.trim(),
     passwordHash: '',
-    carteiras: userModalCtx.carteiras.slice()
+    carteiras: userModalCtx.carteiras.slice(),
+    photo: ''
   };
-
   data.deletedUserIds = (data.deletedUserIds || []).filter(x => x !== id);
-
   $('#userModal').hidden = true;
   userModalCtx = null;
   save();
@@ -3898,7 +4080,27 @@ $('#userModal').addEventListener('click', e => {
   if(e.target.id === 'userModal') closeUserModal();
 });
 
-/* perfil */
+/* ---------- PERFIL: foto ---------- */
+$('#pPhotoBtn').addEventListener('click', () => $('#pPhotoInput').click());
+$('#pPhotoRemoveBtn').addEventListener('click', () => {
+  profileCtx.photo = '';
+  renderProfilePhotoPreview();
+});
+$('#pPhotoInput').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  try{
+    const dataUrl = await resizeImageFile(f, PHOTO_SIZE);
+    profileCtx.photo = dataUrl;
+    renderProfilePhotoPreview();
+  }catch(err){
+    alert('Não foi possível processar a imagem: ' + err.message);
+  }finally{
+    e.target.value = '';
+  }
+});
+
+/* ---------- PERFIL: carteiras ---------- */
 $('#pCarteiraAdd').addEventListener('click', () => {
   const v = $('#pCarteiraCustom').value.trim();
   if(!v) return;
@@ -3913,27 +4115,16 @@ $('#profileForm').addEventListener('submit', e => {
   e.preventDefault();
   const u = currentUser();
   if(!u) return;
-
   const name = $('#pName').value.trim();
   if(!name){ alert('O nome não pode ficar vazio.'); return; }
-
   const nrm = normalizeName(name);
   const dup = usersList().find(x => x.id !== u.id && normalizeName(x.name) === nrm);
   if(dup){ alert('Já existe outro usuário com esse nome.'); return; }
-
-  const pwd1 = $('#pPwdNew').value;
-  const pwd2 = $('#pPwdNew2').value;
-  if(pwd1 || pwd2){
-    if(pwd1.length < 4){ alert('A senha precisa ter ao menos 4 caracteres.'); return; }
-    if(pwd1 !== pwd2){ alert('As senhas não conferem.'); return; }
-    u.passwordHash = hashPassword(pwd1);
-  }
-
   u.name = name;
   u.cargo = $('#pCargo').value.trim().slice(0, 40);
   u.email = $('#pEmail').value.trim();
   u.carteiras = profileCtx.carteiras.slice();
-
+  u.photo = profileCtx.photo || '';
   save();
   closeProfileModal();
   render();
@@ -3944,11 +4135,32 @@ $('#profileModal').addEventListener('click', e => {
   if(e.target.id === 'profileModal') closeProfileModal();
 });
 
-/* import / export */
+/* ---------- SENHA ---------- */
+$('#passwordForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const u = currentUser();
+  if(!u) return;
+  const p1 = $('#pwNew').value;
+  const p2 = $('#pwNew2').value;
+  if(!p1 || p1.length < 4){ showPwError('A senha precisa ter ao menos 4 caracteres.'); return; }
+  if(p1 !== p2){ showPwError('As senhas não conferem.'); return; }
+  u.passwordHash = hashPassword(p1);
+  save();
+  closePasswordModal();
+  alert('Senha alterada com sucesso!');
+});
+$('#passwordBtnCancel').addEventListener('click', closePasswordModal);
+$('#passwordModalClose').addEventListener('click', closePasswordModal);
+$('#passwordModal').addEventListener('click', e => {
+  if(e.target.id === 'passwordModal') closePasswordModal();
+});
+
+/* ---------- IMPORT ---------- */
 $('#importFile').addEventListener('change', e => {
   const f = e.target.files[0];
   if(f) handleImportFile(f);
 });
+$('#importDownloadTemplate').addEventListener('click', downloadImportTemplate);
 $('#importConfirmBtn').addEventListener('click', confirmImport);
 $('#importBtnCancel').addEventListener('click', closeImportModal);
 $('#importModalClose').addEventListener('click', closeImportModal);
@@ -3956,6 +4168,7 @@ $('#importModal').addEventListener('click', e => {
   if(e.target.id === 'importModal') closeImportModal();
 });
 
+/* ---------- EXPORT ---------- */
 $$('.export-opt').forEach(o => {
   o.addEventListener('click', () => {
     $$('.export-opt').forEach(x => x.classList.remove('active'));
@@ -3973,9 +4186,11 @@ $('#exportModal').addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
+  closeSettingsMenu();
   if(!$('#modal').hidden) closeModal();
   if(!$('#userModal').hidden) closeUserModal();
   if(!$('#profileModal').hidden) closeProfileModal();
+  if(!$('#passwordModal').hidden) closePasswordModal();
   if(!$('#importModal').hidden) closeImportModal();
   if(!$('#exportModal').hidden) closeExportModal();
 });
@@ -3988,9 +4203,8 @@ function init(){
   try{ savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; }catch(e){}
   applyTheme(savedTheme);
 
-  // bind pickers persistentes
-  bindCarteiraPicker($('#pCarteirasPicker'), profileCtx);
-  bindCarteiraPicker($('#uCarteirasPicker'), userModalCtx);
+  bindCarteiraPicker($('#pCarteirasPicker'), () => profileCtx);
+  bindCarteiraPicker($('#uCarteirasPicker'), () => userModalCtx);
 
   fillCategorySelects();
   load();
@@ -4006,7 +4220,6 @@ function init(){
 
   if(ui.currentUserId && data.users[ui.currentUserId]){
     const cu = data.users[ui.currentUserId];
-
     if(cu.role === 'leader'){
       if(!ui.viewUserId || ui.viewUserId === ui.currentUserId || !data.users[ui.viewUserId]){
         ui.viewUserId = ALL_MEMBERS;
@@ -4017,7 +4230,6 @@ function init(){
       }
     }
     if(!isLeader() && ui.tab === 'team') ui.tab = 'daily';
-
     $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
     $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + ui.tab));
     hideLogin();
