@@ -416,7 +416,7 @@ select option{
 .btn.ghost{background:var(--surface-2);color:var(--text);border-color:var(--border);}
 .btn.ghost:hover{background:color-mix(in srgb, var(--surface-2) 60%, var(--text) 6%);border-color:#3a3a3a;}
 
-/* ===== QUICK ADD (HUD maior) ===== */
+/* ===== QUICK ADD ===== */
 .quick-add{
   display:grid;
   grid-template-columns: 108px 108px 1fr 1fr auto;
@@ -1613,11 +1613,11 @@ select option{
       <div class="role-picker" style="margin-bottom:14px;">
         <button type="button" class="role-opt active" data-role="member">
           <div class="t">👤 Membro</div>
-          <div class="d">Vê apenas as próprias tarefas.</div>
+          <div class="d">Vê apenas cronogramas de membros.</div>
         </button>
         <button type="button" class="role-opt" data-role="leader">
           <div class="t">⭐ Líder</div>
-          <div class="d">Vê o painel da equipe e atribui tarefas.</div>
+          <div class="d">Vê o painel da equipe e todos os cronogramas.</div>
         </button>
       </div>
 
@@ -1636,7 +1636,7 @@ select option{
   </div>
 </div>
 
-<!-- MODAL: MEU PERFIL (SEM SENHA) -->
+<!-- MODAL: MEU PERFIL -->
 <div class="modal-backdrop" id="profileModal" hidden>
   <div class="modal" style="max-width:560px;">
     <div class="modal-head">
@@ -1644,7 +1644,6 @@ select option{
       <button class="icon-btn" id="profileModalClose" type="button">✕</button>
     </div>
     <form id="profileForm">
-      <!-- Foto de perfil -->
       <div class="photo-uploader">
         <div class="photo-preview" id="pPhotoPreview">?</div>
         <div class="photo-info">
@@ -1789,12 +1788,12 @@ select option{
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v11';
+const STORAGE_KEY = 'cronoplano.v12';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','dashboard','team'];
 const ALL_MEMBERS = '__all__';
-const PHOTO_SIZE = 200; // px (redimensionamento)
+const PHOTO_SIZE = 200;
 
 const USER_COLORS = [
   '#2563eb','#737373','#1e40af','#525252',
@@ -1819,15 +1818,18 @@ const PREDEFINED_USERS = [
   { id:'joao-miguel',     name:'João Miguel',     role:'member', color:'#737373', cargo:'', email:'', carteiras:[] }
 ];
 
+/* ============================================================
+   CATEGORIAS — cores exclusivas (fora do azul/cinza do layout)
+   ============================================================ */
 const CATEGORIES = {
-  'capacitacao-inicial':  { label:'Capacitação Inicial',  color:'#e5e5e5' },
-  'aperfeicoamento':      { label:'Aperfeiçoamento',      color:'#a3a3a3' },
-  'acompanhamento':       { label:'Acompanhamento',       color:'#737373' },
-  'hora-operacional':     { label:'Hora Operacional',     color:'#525252' },
-  'criacao-conteudo':     { label:'Criação de Conteúdo',  color:'#1e40af' },
-  'reuniao':              { label:'Reunião',              color:'#2563eb' },
-  'tempo-administrativo': { label:'Tempo Administrativo', color:'#8b8b8b' },
-  'campanha-acao':        { label:'Campanha/Ação',        color:'#60a5fa' }
+  'capacitacao-inicial':  { label:'Capacitação Inicial',  color:'#10b981' }, // verde esmeralda
+  'aperfeicoamento':      { label:'Aperfeiçoamento',      color:'#8b5cf6' }, // roxo
+  'acompanhamento':       { label:'Acompanhamento',       color:'#ec4899' }, // rosa
+  'hora-operacional':     { label:'Hora Operacional',     color:'#f97316' }, // laranja
+  'criacao-conteudo':     { label:'Criação de Conteúdo',  color:'#06b6d4' }, // ciano
+  'reuniao':              { label:'Reunião',              color:'#f59e0b' }, // âmbar
+  'tempo-administrativo': { label:'Tempo Administrativo', color:'#a855f7' }, // violeta
+  'campanha-acao':        { label:'Campanha/Ação',        color:'#84cc16' }  // verde limão
 };
 
 const LEGACY_CAT_MAP = {
@@ -1953,7 +1955,6 @@ function hashPassword(pwd){
   }
   return (h >>> 0).toString(16);
 }
-/* Avatar HTML helper (foto ou inicial) */
 function avatarHTML(user, cls){
   const u = user || {};
   const color = u.color || '#666';
@@ -1962,7 +1963,6 @@ function avatarHTML(user, cls){
   }
   return `<span class="avatar ${cls||''}" style="background:${color}">${initialOf(u.name)}</span>`;
 }
-/* Aplica foto/inicial num elemento .avatar existente */
 function applyAvatar(el, user){
   if(!el) return;
   const u = user || {};
@@ -1982,13 +1982,9 @@ function applyAvatar(el, user){
     el.style.backgroundPosition = '';
   }
 }
-/* Redimensiona imagem para base64 JPEG */
 function resizeImageFile(file, maxSize){
   return new Promise((resolve, reject) => {
-    if(!file || !/^image\//.test(file.type)){
-      reject(new Error('Arquivo não é imagem'));
-      return;
-    }
+    if(!file || !/^image\//.test(file.type)){ reject(new Error('Arquivo não é imagem')); return; }
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
@@ -1998,7 +1994,6 @@ function resizeImageFile(file, maxSize){
         canvas.width = Math.max(1, Math.round(img.width * scale));
         canvas.height = Math.max(1, Math.round(img.height * scale));
         const ctx = canvas.getContext('2d');
-        // fundo escuro (caso PNG transparente)
         ctx.fillStyle = '#151515';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -2063,6 +2058,17 @@ function canEditCurrentView(){
   if(!currentUser()) return false;
   if(isLeader()) return true;
   return ui.viewUserId === ui.currentUserId;
+}
+/* lista de usuários que o "viewer" atual pode visualizar
+   líder: todos os membros (exceto a si mesmo, que é convertido em ALL)
+   membro: si mesmo + outros membros (NUNCA líderes) */
+function visibleUsersForCurrentView(){
+  const me = currentUser();
+  if(!me) return [];
+  if(isLeader()){
+    return usersList().filter(u => u.id !== me.id);
+  }
+  return usersList().filter(u => u.id === me.id || u.role !== 'leader');
 }
 
 /* ============================================================
@@ -2215,11 +2221,8 @@ function carteirasForCurrentView(){
 }
 function ownerPillHTML(t){
   const owner = userById(t.ownerId);
-  const av = owner.photo
-    ? `<span class="avatar" style="background-color:${owner.color};background-image:url('${owner.photo}');background-size:cover;background-position:center;"></span>`
-    : `<span class="avatar" style="background:${owner.color}">${initialOf(owner.name)}</span>`;
   return `<span class="pill owner-pill" style="--c:${owner.color}">
-    ${av}
+    ${avatarHTML(owner)}
     ${esc(owner.name)}
   </span>`;
 }
@@ -2334,9 +2337,10 @@ function switchTab(tab){
 function buildViewUserOptions(selectEl, selectedId){
   if(!selectEl) return;
   const me = currentUser();
-  const leader = isLeader();
+  if(!me) return;
   let opts = '';
-  if(leader){
+
+  if(isLeader()){
     opts += `<option value="${ALL_MEMBERS}" ${selectedId === ALL_MEMBERS ? 'selected' : ''}>
       👥 Todos os membros
     </option>`;
@@ -2345,7 +2349,9 @@ function buildViewUserOptions(selectEl, selectedId){
       opts += `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>${esc(u.name)}</option>`;
     });
   } else {
-    opts = usersList().map(u => {
+    // Membro: vê a si mesmo + apenas outros MEMBROS (nunca líderes)
+    const visible = visibleUsersForCurrentView();
+    opts = visible.map(u => {
       const isMe = u.id === me.id;
       return `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>
         ${isMe ? 'Minha agenda' : esc(u.name)}
@@ -2360,7 +2366,7 @@ function buildCarteiraFilterOptions(selectEl){
   const opts = [];
   opts.push(`<option value="" ${ui.carteiraFilter === '' ? 'selected' : ''}>Todas as carteiras</option>`);
   carteiras.forEach(c => {
-    opts.push(`<option value="${esc(c)}" ${ui.carteiraFilter === c ? 'selected' : ''}>${esc(c)}</option>`);
+    opts.push(`<option value="${c}" ${ui.carteiraFilter === c ? 'selected' : ''}>${esc(c)}</option>`);
   });
   selectEl.innerHTML = opts.join('');
 }
@@ -3097,6 +3103,7 @@ function renderTeam(){
    ============================================================ */
 function render(){
   if(!ui.currentUserId || !data.users[ui.currentUserId]) return;
+
   if(!ui.viewUserId){
     ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
   }
@@ -3106,6 +3113,14 @@ function render(){
   if(isLeader() && ui.viewUserId === ui.currentUserId){
     ui.viewUserId = ALL_MEMBERS;
   }
+  // Membro NÃO pode ter líder como viewUserId — reset para própria agenda
+  if(!isLeader() && ui.viewUserId !== ALL_MEMBERS){
+    const vu = data.users[ui.viewUserId];
+    if(vu && vu.role === 'leader' && vu.id !== ui.currentUserId){
+      ui.viewUserId = ui.currentUserId;
+    }
+  }
+
   refreshLeaderVisibility();
   refreshViewSelects();
   refreshTopbarCarteiras();
@@ -3139,7 +3154,7 @@ function fillCarteiraSelect(selectEl, ownerId, selectedValue){
   usersList().forEach(u => carteirasOf(u).forEach(c => set.add(c)));
   Object.values(data.daily).forEach(arr => arr.forEach(t => { if(t.carteira) set.add(t.carteira); }));
   const carteiras = [...set].sort();
-  const opts = carteiras.map(c => `<option value="${esc(c)}" ${selectedValue===c?'selected':''}>${esc(c)}</option>`);
+  const opts = carteiras.map(c => `<option value="${c}" ${selectedValue===c?'selected':''}>${esc(c)}</option>`);
   selectEl.innerHTML = opts.join('');
   if(selectedValue && carteiras.includes(selectedValue)) selectEl.value = selectedValue;
   else if(carteiras.length) selectEl.value = carteiras[0];
@@ -3253,10 +3268,9 @@ function closeUserModal(){
 }
 
 /* ============================================================
-   MODAL: PERFIL (sem senha)
+   MODAL: PERFIL
    ============================================================ */
 let profileCtx = { carteiras: [], photo: '' };
-
 function openProfileModal(){
   const u = currentUser();
   if(!u) return;
@@ -3295,7 +3309,7 @@ function renderProfilePhotoPreview(){
 }
 
 /* ============================================================
-   MODAL: ALTERAR SENHA
+   MODAL: SENHA
    ============================================================ */
 function openPasswordModal(){
   $('#pwNew').value = '';
@@ -3304,9 +3318,7 @@ function openPasswordModal(){
   $('#passwordModal').hidden = false;
   setTimeout(() => $('#pwNew').focus(), 60);
 }
-function closePasswordModal(){
-  $('#passwordModal').hidden = true;
-}
+function closePasswordModal(){ $('#passwordModal').hidden = true; }
 function showPwError(msg){
   const el = $('#pwError');
   el.textContent = msg;
@@ -3532,7 +3544,6 @@ function handleImportFile(file){
         const desc = String(title || '').trim();
         const carteira = String(carRaw || '').trim();
 
-        // Obrigatórios: Data, Descrição, Carteira
         if(!iso || !desc || !carteira){ errors++; return; }
 
         parsed.push({
@@ -3794,7 +3805,6 @@ $$('.tab').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-/* ---------- SETTINGS MENU ---------- */
 $('#settingsBtn').addEventListener('click', e => {
   e.stopPropagation();
   toggleSettingsMenu();
@@ -3809,17 +3819,20 @@ $('#setChangePwd').addEventListener('click', () => { closeSettingsMenu(); openPa
 $('#setTheme').addEventListener('click', () => { toggleTheme(); });
 $('#setLogout').addEventListener('click', () => { closeSettingsMenu(); logout(); });
 
-/* ---------- USER CHIP → perfil (sem senha) ---------- */
 $('#userChip').addEventListener('click', () => {
   closeSettingsMenu();
   openProfileModal();
 });
 
-/* ---------- SELECTS DE VISUALIZAÇÃO / FILTRO ---------- */
 function onViewUserChange(e){
   const val = e.target.value;
   if(!val) return;
-  if(val !== ALL_MEMBERS && !data.users[val]) return;
+  if(val !== ALL_MEMBERS){
+    const u = data.users[val];
+    if(!u) return;
+    // Membro não pode visualizar líder
+    if(!isLeader() && u.role === 'leader' && u.id !== ui.currentUserId) return;
+  }
   ui.viewUserId = val;
   const cs = carteirasForCurrentView();
   if(ui.carteiraFilter && !cs.includes(ui.carteiraFilter)){
@@ -4080,7 +4093,6 @@ $('#userModal').addEventListener('click', e => {
   if(e.target.id === 'userModal') closeUserModal();
 });
 
-/* ---------- PERFIL: foto ---------- */
 $('#pPhotoBtn').addEventListener('click', () => $('#pPhotoInput').click());
 $('#pPhotoRemoveBtn').addEventListener('click', () => {
   profileCtx.photo = '';
@@ -4100,7 +4112,6 @@ $('#pPhotoInput').addEventListener('change', async e => {
   }
 });
 
-/* ---------- PERFIL: carteiras ---------- */
 $('#pCarteiraAdd').addEventListener('click', () => {
   const v = $('#pCarteiraCustom').value.trim();
   if(!v) return;
@@ -4135,7 +4146,6 @@ $('#profileModal').addEventListener('click', e => {
   if(e.target.id === 'profileModal') closeProfileModal();
 });
 
-/* ---------- SENHA ---------- */
 $('#passwordForm').addEventListener('submit', e => {
   e.preventDefault();
   const u = currentUser();
@@ -4155,7 +4165,6 @@ $('#passwordModal').addEventListener('click', e => {
   if(e.target.id === 'passwordModal') closePasswordModal();
 });
 
-/* ---------- IMPORT ---------- */
 $('#importFile').addEventListener('change', e => {
   const f = e.target.files[0];
   if(f) handleImportFile(f);
@@ -4168,7 +4177,6 @@ $('#importModal').addEventListener('click', e => {
   if(e.target.id === 'importModal') closeImportModal();
 });
 
-/* ---------- EXPORT ---------- */
 $$('.export-opt').forEach(o => {
   o.addEventListener('click', () => {
     $$('.export-opt').forEach(x => x.classList.remove('active'));
@@ -4225,7 +4233,9 @@ function init(){
         ui.viewUserId = ALL_MEMBERS;
       }
     } else {
-      if(!ui.viewUserId || !data.users[ui.viewUserId]){
+      // membro: reset para a própria agenda, ou valida se o viewUserId ainda é visível
+      const vu = ui.viewUserId ? data.users[ui.viewUserId] : null;
+      if(!vu || (vu.role === 'leader' && vu.id !== ui.currentUserId)){
         ui.viewUserId = ui.currentUserId;
       }
     }
