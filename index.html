@@ -1514,6 +1514,32 @@ select option{background-color: var(--surface); color: var(--text);}
 [data-theme="light"] .import-preview .ok{color:var(--accent-2);}
 .import-preview .err{color:#fca5a5;}
 
+.import-preview tr.row-error{background:rgba(239,68,68,.07);}
+.import-preview tr.row-error:hover{background:rgba(239,68,68,.11);}
+.import-preview td.cell-error{
+  color:#fca5a5;
+  background:rgba(239,68,68,.18);
+  font-weight:700;
+  position:relative;
+}
+[data-theme="light"] .import-preview td.cell-error{
+  color:#dc2626;
+  background:rgba(239,68,68,.14);
+}
+.import-preview td.cell-error::after{
+  content:'⚠';
+  margin-left:6px;
+  font-size:10px;
+  opacity:.85;
+}
+.import-error-legend{
+  display:flex;flex-direction:column;gap:4px;
+  margin-top:10px;font-size:11.5px;color:var(--muted);
+  line-height:1.5;
+}
+.import-error-legend b{color:#fca5a5;}
+[data-theme="light"] .import-error-legend b{color:#dc2626;}
+
 .import-stats{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
 .import-stats .st{
   flex:1; min-width:100px; padding:10px 12px; border-radius:10px;
@@ -2139,7 +2165,8 @@ select option{background-color: var(--surface); color: var(--text);}
     <div class="io-hint">
       A planilha deve ter <b>obrigatoriamente</b> as colunas:
       <code>Data</code>, <code>Hora Início</code>, <code>Hora Fim</code>, <code>Descrição</code>, <code>Categoria</code> e <code>Carteira</code>.<br>
-      Linhas sem <b>Carteira</b> preenchida serão ignoradas.
+      Linhas sem <b>Carteira</b> preenchida ou com <b>Categoria</b>/<b>Carteira</b> que <u>não existem no sistema</u> serão
+      <b style="color:#fca5a5;">destacadas em vermelho</b> e <u>não serão importadas</u>.
       <span id="importOwnerLine"> As tarefas serão importadas para <b id="importOwnerName">—</b>.</span>
     </div>
 
@@ -4362,17 +4389,23 @@ function parseTimeExcel(val){
   if(m) return `${String(m[1]).padStart(2,'0')}:${m[2]}`;
   return '';
 }
-function parseCategoryExcel(val){
+/* resolveCategoryExcel:
+   Retorna a chave da categoria (ex: 'reuniao') se reconhecida;
+   Retorna null se a categoria não é conhecida pelo sistema. */
+function resolveCategoryExcel(val){
   const s = String(val || '').trim();
-  if(!s) return 'capacitacao-inicial';
+  if(!s) return null;
   if(CATEGORIES[s]) return s;
   const norm = normalizeName(s);
   for(const [k,v] of Object.entries(CATEGORIES)){
     if(normalizeName(v.label) === norm) return k;
     if(normalizeName(k) === norm) return k;
   }
-  if(LEGACY_CAT_MAP[s]) return LEGACY_CAT_MAP[s];
-  return 'capacitacao-inicial';
+  // Aceita chaves legadas (ex: 'formacao-inicial' → 'capacitacao-inicial')
+  for(const [legacy, current] of Object.entries(LEGACY_CAT_MAP)){
+    if(normalizeName(legacy) === norm) return current;
+  }
+  return null;
 }
 function pickCol(row, names){
   for(const n of names){
@@ -4382,6 +4415,15 @@ function pickCol(row, names){
     }
   }
   return '';
+}
+/* Conjunto de carteiras conhecidas pelo sistema (default + usuários + tarefas) */
+function getSystemCarteirasSet(){
+  const set = new Set(DEFAULT_CARTEIRAS);
+  usersList().forEach(u => carteirasOf(u).forEach(c => { if(c) set.add(c); }));
+  Object.values(data.daily).forEach(arr => {
+    arr.forEach(t => { if(t.carteira) set.add(t.carteira); });
+  });
+  return set;
 }
 function renderImportMultiPicker(){
   const wrap = $('#importMultiPicker');
@@ -4397,7 +4439,7 @@ function renderImportMultiPicker(){
   }).join('');
 }
 function updateImportConfirmState(){
-  const hasRows = importCtx.rows.length > 0;
+  const hasValidRows = importCtx.rows.some(r => r.valid);
   let targetOk = false;
   if(!isLeader()){
     targetOk = true;
@@ -4406,7 +4448,7 @@ function updateImportConfirmState(){
   } else {
     targetOk = (importCtx.multi || []).length > 0;
   }
-  $('#importConfirmBtn').disabled = !hasRows || !targetOk;
+  $('#importConfirmBtn').disabled = !hasValidRows || !targetOk;
 }
 function openImportModal(){
   importCtx = { rows: [], errors: 0, valid: 0, mode: 'single', single: null, multi: [] };
@@ -4473,8 +4515,10 @@ function handleImportFile(file){
       const ws = wb.Sheets[sheetName];
       const rawRows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
 
+      const validCarteiras = getSystemCarteirasSet();
       const parsed = [];
       let errors = 0;
+
       rawRows.forEach(r => {
         const dateRaw = pickCol(r, ['Data','data','Date','dia']);
         const startRaw = pickCol(r, ['Hora Início','Hora Inicio','Início','Inicio','Hora','Start']);
@@ -4483,24 +4527,48 @@ function handleImportFile(file){
         const catRaw   = pickCol(r, ['Categoria','Category','Cat']);
         const carRaw   = pickCol(r, ['Carteira','Portfolio','Carteiras']);
 
+        // Ignora silenciosamente linhas totalmente vazias
+        const anyFilled =
+          String(dateRaw||'').trim() || String(startRaw||'').trim() ||
+          String(endRaw||'').trim()   || String(title||'').trim()   ||
+          String(catRaw||'').trim()   || String(carRaw||'').trim();
+        if(!anyFilled) return;
+
         const iso = parseDateExcel(dateRaw);
         const start = parseTimeExcel(startRaw);
         const end = parseTimeExcel(endRaw);
         const desc = String(title || '').trim();
         const carteira = String(carRaw || '').trim();
+        const catRawStr = String(catRaw || '').trim();
 
-        if(!iso || !desc || !carteira){ errors++; return; }
+        const carteiraValida = carteira !== '' && validCarteiras.has(carteira);
+        const catKey = resolveCategoryExcel(catRawStr);
+        const catValida = !!catKey;
+
+        const rowErrors = {};
+        if(!iso) rowErrors.data = true;
+        if(!desc) rowErrors.descricao = true;
+        if(!carteira) rowErrors.carteira = 'empty';
+        else if(!carteiraValida) rowErrors.carteira = 'invalid';
+        if(!catValida) rowErrors.categoria = catRawStr ? 'invalid' : 'empty';
+
+        const valid = Object.keys(rowErrors).length === 0;
+        if(!valid) errors++;
 
         parsed.push({
-          iso, start, end,
+          iso: iso || '',
+          start, end,
           title: desc.slice(0, 90),
-          cat: parseCategoryExcel(catRaw),
-          carteira
+          cat: catKey || '',
+          catRaw: catRawStr,
+          carteira,
+          valid,
+          errors: rowErrors
         });
       });
 
       importCtx.rows = parsed;
-      importCtx.valid = parsed.length;
+      importCtx.valid = parsed.filter(p => p.valid).length;
       importCtx.errors = errors;
       renderImportPreview();
       updateImportConfirmState();
@@ -4516,42 +4584,70 @@ function renderImportPreview(){
   const stats = $('#importStats');
   const prev = $('#importPreview');
   wrap.hidden = false;
+
+  const total   = importCtx.rows.length;
+  const valid   = importCtx.rows.filter(r => r.valid).length;
+  const invalid = total - valid;
+
   stats.innerHTML = `
-    <div class="st ok"><div class="v">${importCtx.valid}</div><div class="k">Válidas</div></div>
-    <div class="st err"><div class="v">${importCtx.errors}</div><div class="k">Ignoradas</div></div>
-    <div class="st"><div class="v">${importCtx.valid + importCtx.errors}</div><div class="k">Total lidas</div></div>
+    <div class="st ok"><div class="v">${valid}</div><div class="k">Válidas</div></div>
+    <div class="st err"><div class="v">${invalid}</div><div class="k">Com erro</div></div>
+    <div class="st"><div class="v">${total}</div><div class="k">Total lidas</div></div>
   `;
-  if(!importCtx.rows.length){
+
+  if(!total){
     prev.innerHTML = `<div class="empty" style="padding:22px 14px;">
-      <span class="big">🤔</span>Nenhuma linha válida encontrada.<br>
-      <span>Verifique se <b>Data</b>, <b>Descrição</b> e <b>Carteira</b> estão preenchidos.</span>
+      <span class="big">🤔</span>Nenhuma linha encontrada.<br>
+      <span>Verifique se a planilha possui dados.</span>
     </div>`;
     return;
   }
+
   const rows = importCtx.rows.slice(0, 40);
+
+  const titleFor = (k, state) => {
+    if(!state) return '';
+    if(k === 'carteira')  return state === 'empty' ? 'Carteira não preenchida' : 'Carteira não cadastrada no sistema';
+    if(k === 'categoria') return state === 'empty' ? 'Categoria não preenchida' : 'Categoria não reconhecida';
+    if(k === 'data')      return 'Data inválida ou vazia';
+    if(k === 'descricao') return 'Descrição vazia';
+    return '';
+  };
+
   prev.innerHTML = `
     <table>
       <thead><tr>
         <th>Data</th><th>Início</th><th>Fim</th><th>Descrição</th><th>Categoria</th><th>Carteira</th>
       </tr></thead>
       <tbody>
-        ${rows.map(r => `
-          <tr>
-            <td>${esc(r.iso)}</td>
-            <td>${esc(r.start || '—')}</td>
-            <td>${esc(r.end || '—')}</td>
-            <td title="${esc(r.title)}">${esc(r.title)}</td>
-            <td>${esc(catOf(r.cat).label)}</td>
-            <td>${esc(r.carteira || '—')}</td>
-          </tr>
-        `).join('')}
+        ${rows.map(r => {
+          const e = r.errors || {};
+          const cellCls = k => e[k] ? 'cell-error' : '';
+          const catDisplay = r.cat ? catOf(r.cat).label : (r.catRaw || '—');
+          return `
+            <tr class="${r.valid ? '' : 'row-error'}">
+              <td class="${cellCls('data')}"      title="${titleFor('data', e.data)}">${esc(r.iso || '—')}</td>
+              <td class="${cellCls('inicio')}">${esc(r.start || '—')}</td>
+              <td class="${cellCls('fim')}">${esc(r.end || '—')}</td>
+              <td class="${cellCls('descricao')}" title="${esc(r.title || '')}">${esc(r.title || '—')}</td>
+              <td class="${cellCls('categoria')}" title="${titleFor('categoria', e.categoria)}">${esc(catDisplay)}</td>
+              <td class="${cellCls('carteira')}"  title="${titleFor('carteira', e.carteira)}">${esc(r.carteira || '—')}</td>
+            </tr>`;
+        }).join('')}
       </tbody>
     </table>
-    ${importCtx.rows.length > rows.length ? `<div style="text-align:center;padding:8px;font-size:11px;color:var(--muted);">+ ${importCtx.rows.length - rows.length} linha(s) não exibidas</div>` : ''}
+    ${total > rows.length ? `<div style="text-align:center;padding:8px;font-size:11px;color:var(--muted);">+ ${total - rows.length} linha(s) não exibidas</div>` : ''}
+    ${invalid ? `
+      <div class="import-error-legend">
+        <span>⚠ Linhas com <b>fundo vermelho</b> contêm erros e serão <b>ignoradas</b>.</span>
+        <span>• <b>Células destacadas</b> indicam exatamente o campo com problema.</span>
+      </div>` : ''}
   `;
 }
 function confirmImport(){
-  if(!importCtx.rows.length) return;
+  const validRows = importCtx.rows.filter(r => r.valid);
+  if(!validRows.length) return;
+
   let owners = [];
   if(isLeader()){
     if(importCtx.mode === 'single'){
@@ -4569,7 +4665,8 @@ function confirmImport(){
   }
   if(!owners.length){ alert('Nenhum destinatário selecionado.'); return; }
 
-  const n = importCtx.rows.length;
+  const n = validRows.length;
+  const skipped = importCtx.rows.length - n;
   const totalTasks = n * owners.length;
 
   let msg;
@@ -4578,11 +4675,14 @@ function confirmImport(){
   } else {
     msg = `Importar ${n} tarefa(s) para ${owners.length} membros (total ${totalTasks} tarefas)?\n\nMembros: ${owners.map(u => u.name).join(', ')}`;
   }
+  if(skipped){
+    msg += `\n\n⚠ ${skipped} linha(s) com erro serão ignoradas.`;
+  }
   msg += '\n\nAs atividades serão adicionadas ao cronograma existente.';
   if(!confirm(msg)) return;
 
   owners.forEach(owner => {
-    importCtx.rows.forEach(r => {
+    validRows.forEach(r => {
       const iso = r.iso;
       if(!Array.isArray(data.daily[iso])) data.daily[iso] = [];
       data.daily[iso].push({
@@ -4603,7 +4703,8 @@ function confirmImport(){
   save();
   closeImportModal();
   render();
-  alert(`✅ ${totalTasks} tarefa(s) importada(s) com sucesso!`);
+  alert(`✅ ${totalTasks} tarefa(s) importada(s) com sucesso!` +
+        (skipped ? `\n\n⚠ ${skipped} linha(s) foram ignoradas por conter erros.` : ''));
 }
 
 let exportCtx = { mode: 'all' };
