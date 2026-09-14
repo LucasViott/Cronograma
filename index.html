@@ -284,7 +284,6 @@ body::before{
 .icon-chip-btn.icon-only{padding:0;width:32px;justify-content:center;}
 .icon-chip-btn.icon-only .ico{font-size:15px;line-height:1;display:inline-block;}
 
-/* ===== SETTINGS ===== */
 .settings-wrap{position:relative;}
 .settings-menu{
   position:absolute;top:calc(100% + 8px);right:0;
@@ -319,7 +318,6 @@ body::before{
 .settings-item.danger:hover{background:color-mix(in srgb,var(--accent) 15%,transparent);}
 .settings-divider{height:1px;background:var(--border-soft);margin:5px 4px;}
 
-/* ===== MAIN ===== */
 main{max-width:1400px;margin:0 auto;padding:26px 22px 90px;}
 .view{display:none;animation:fade .28s ease;}
 .view.active{display:block;}
@@ -441,8 +439,7 @@ select option{background-color: var(--surface); color: var(--text);}
 @media(max-width:560px){
   .quick-add{
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "start" "end" "cat" "car" "title" "btn";
+    grid-template-areas:"start" "end" "cat" "car" "title" "btn";
   }
 }
 
@@ -623,7 +620,6 @@ select option{background-color: var(--surface); color: var(--text);}
 .empty .big{font-size:30px;display:block;margin-bottom:10px;opacity:.55;}
 .empty span{font-size:12.5px;opacity:.75;}
 
-/* ===== CALENDAR ===== */
 .cal-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .cal-title{font-size:19px;font-weight:700;letter-spacing:-.3px;text-transform:capitalize;}
 .cal-nav{display:flex;gap:6px;align-items:center;margin-left:auto;}
@@ -719,7 +715,6 @@ select option{background-color: var(--surface); color: var(--text);}
 }
 [data-theme="light"] .cal-hint .legend-holiday i{background:var(--accent);box-shadow:none;}
 
-/* ===== WEEKLY ===== */
 .week-scroll{overflow-x:auto;padding-bottom:6px;}
 .week-grid{display:grid;grid-template-columns:repeat(7,minmax(168px,1fr));gap:11px;min-width:100%;}
 .day-col{
@@ -811,7 +806,6 @@ select option{background-color: var(--surface); color: var(--text);}
 [data-theme="light"] .wk-del:hover{color:var(--accent-2);}
 .wk-empty{font-size:11.5px;color:var(--muted);text-align:center;padding:14px 4px;opacity:.6;}
 
-/* ===== DASHBOARD ===== */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:18px;}
 .stat-card{
   background:linear-gradient(180deg,var(--overlay-2),transparent),var(--surface);
@@ -889,7 +883,6 @@ select option{background-color: var(--surface); color: var(--text);}
 .mini-item .mi-h{font-size:11.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto;}
 .mini-item .mi-t{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* ===== TEAM ===== */
 .filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .filter-group{
   display:flex;gap:5px;background:var(--surface);border:1px solid var(--border);
@@ -935,7 +928,7 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-card.is-me{border-left-color:var(--text);}
 .member-card.is-me::before{
   content:'VOCÊ';
-  position:absolute; top:10px; right:38px;
+  position:absolute; top:10px; right:10px;
   font-size:9px; font-weight:800; letter-spacing:.6px;
   padding:2px 6px; border-radius:6px;
   background:color-mix(in srgb, var(--text) 12%, transparent);
@@ -953,7 +946,9 @@ select option{background-color: var(--surface); color: var(--text);}
   flex:0 0 auto;
   line-height:1;
   filter: grayscale(.15);
+  margin-right: 56px; /* espaço pros botões ✎ ✕ */
 }
+.member-card.is-me .role-icon{margin-right: 0;}
 
 .member-carteiras{display:flex;gap:4px;flex-wrap:wrap;}
 .member-carteiras .carteira-chip{font-size:9.5px;padding:2px 7px;}
@@ -969,6 +964,23 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-stats .col.r .v{color:#f87171;}
 [data-theme="light"] .member-stats .col.r .v{color:#dc2626;}
 
+/* botão ✎ editar */
+.member-edit{
+  position:absolute; top:8px; right:38px;
+  width:24px; height:24px; border-radius:7px;
+  border:1px solid transparent; background:transparent;
+  color:var(--muted); cursor:pointer; font-size:12px;
+  opacity:0; transition:.15s; display:grid; place-items:center;
+  line-height:1;
+}
+.member-card:hover .member-edit{opacity:1;}
+.member-edit:hover{
+  background:color-mix(in srgb,var(--accent) 20%,transparent); color:#93c5fd;
+  border-color:color-mix(in srgb,var(--accent) 55%,transparent);
+}
+[data-theme="light"] .member-edit:hover{color:var(--accent-2);}
+
+/* botão ✕ excluir */
 .member-delete{
   position:absolute; top:8px; right:8px;
   width:24px; height:24px; border-radius:7px;
@@ -979,10 +991,10 @@ select option{background-color: var(--surface); color: var(--text);}
 }
 .member-card:hover .member-delete{opacity:1;}
 .member-delete:hover{
-  background:color-mix(in srgb,var(--accent) 20%,transparent); color:#93c5fd;
-  border-color:color-mix(in srgb,var(--accent) 55%,transparent);
+  background:rgba(239,68,68,.15); color:#f87171;
+  border-color:rgba(239,68,68,.4);
 }
-[data-theme="light"] .member-delete:hover{color:var(--accent-2);}
+[data-theme="light"] .member-delete:hover{color:#dc2626;}
 
 .team-task-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
 .team-task{
@@ -1004,7 +1016,6 @@ select option{background-color: var(--surface); color: var(--text);}
 .tt-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;align-items:center;font-size:11.5px;color:var(--muted);}
 .tt-meta .who{display:inline-flex;align-items:center;gap:5px;font-weight:700;color:var(--text);}
 
-/* ===== STATUS BADGES (novas cores) ===== */
 .status-badge{
   font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
   padding:4px 10px;border-radius:20px;white-space:nowrap;
@@ -1056,7 +1067,6 @@ select option{background-color: var(--surface); color: var(--text);}
   .tt-actions{grid-column:2;opacity:1;}
 }
 
-/* ===== MODAL ===== */
 .modal-backdrop{
   position:fixed;inset:0;z-index:200;
   background:var(--backdrop);
@@ -1680,6 +1690,75 @@ select option{background-color: var(--surface); color: var(--text);}
   </div>
 </div>
 
+<!-- MODAL: EDITAR MEMBRO (líder) -->
+<div class="modal-backdrop" id="editMemberModal" hidden>
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head">
+      <h3 id="editMemberTitle">Editar membro</h3>
+      <button class="icon-btn" id="editMemberClose" type="button">✕</button>
+    </div>
+    <form id="editMemberForm">
+      <div class="photo-uploader">
+        <div class="photo-preview" id="emPhotoPreview">?</div>
+        <div class="photo-info">
+          <div class="btns">
+            <button type="button" class="btn ghost" id="emPhotoBtn">📷 Escolher imagem</button>
+            <button type="button" class="btn ghost" id="emPhotoRemoveBtn">Remover</button>
+            <input type="file" id="emPhotoInput" accept="image/*" hidden>
+          </div>
+          <div class="photo-hint">
+            JPG, PNG ou WebP · redimensionada automaticamente para 200×200.
+          </div>
+        </div>
+      </div>
+
+      <label class="field"><span>Nome</span>
+        <input type="text" id="emName" placeholder="Nome e sobrenome" maxlength="40" required>
+      </label>
+
+      <label class="field"><span>Cargo na empresa</span>
+        <input type="text" id="emCargo" placeholder="Ex: Analista, Coordenadora, Estagiário" maxlength="40">
+      </label>
+
+      <label class="field"><span>E-mail</span>
+        <input type="email" id="emEmail" placeholder="email@exemplo.com" maxlength="80">
+      </label>
+
+      <label class="field"><span>Tipo de acesso</span></label>
+      <div class="role-picker" style="margin-bottom:14px;">
+        <button type="button" class="role-opt" data-em-role="member">
+          <div class="t">👤 Membro</div>
+          <div class="d">Vê apenas cronogramas de membros.</div>
+        </button>
+        <button type="button" class="role-opt" data-em-role="leader">
+          <div class="t">⭐ Líder</div>
+          <div class="d">Vê o painel da equipe e todos os cronogramas.</div>
+        </button>
+      </div>
+
+      <label class="field"><span>Carteiras</span></label>
+      <div class="carteiras-picker" id="emCarteirasPicker"></div>
+      <div class="custom-carteira-wrap">
+        <input type="text" id="emCarteiraCustom" placeholder="Adicionar carteira personalizada">
+        <button type="button" class="btn ghost" id="emCarteiraAdd">＋</button>
+      </div>
+
+      <div class="section-divider">🔑 Redefinir senha</div>
+      <div class="io-hint" style="margin-top:0;">
+        Deixe em branco para <b>não alterar</b> a senha atual do membro.
+      </div>
+      <label class="field"><span>Nova senha</span>
+        <input type="password" id="emNewPwd" placeholder="Mínimo 4 caracteres" autocomplete="new-password">
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="editMemberBtnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- MODAL: ALTERAR SENHA -->
 <div class="modal-backdrop" id="passwordModal" hidden>
   <div class="modal" style="max-width:440px;">
@@ -1723,7 +1802,6 @@ select option{background-color: var(--surface); color: var(--text);}
       </button>
     </div>
 
-    <!-- Seção exclusiva do líder: escolha dos destinatários -->
     <div id="importLeaderSection" hidden>
       <div class="section-divider">Destinatários</div>
 
@@ -1811,9 +1889,9 @@ select option{background-color: var(--surface); color: var(--text);}
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v13';
+const STORAGE_KEY = 'cronoplano.v14';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','dashboard','team'];
 const ALL_MEMBERS = '__all__';
 const PHOTO_SIZE = 200;
@@ -1939,10 +2017,9 @@ let ui = {
 let loginCtx = { step: 'name', userId: null };
 let importCtx = {
   rows: [], errors: 0, valid: 0,
-  mode: 'single',       // 'single' | 'multi'
-  single: null,         // id
-  multi: []             // [id, ...]
+  mode: 'single', single: null, multi: []
 };
+let editMemberCtx = { userId: null, carteiras: [], photo: '', role: 'member' };
 
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => [...r.querySelectorAll(s)];
@@ -3010,7 +3087,7 @@ function renderTeam(){
     <div class="panel">
       <div class="panel-head">
         <h3>👤 Resumo por membro</h3>
-        <span class="chip">clique para filtrar · ✕ para excluir</span>
+        <span class="chip">clique para filtrar · ✎ editar · ✕ excluir</span>
       </div>
       <div class="members-grid">
         ${usersList().map(u => {
@@ -3020,7 +3097,10 @@ function renderTeam(){
           const carteiras = carteirasOf(u);
           return `
             <div class="member-card ${isActive?'active':''} ${isMe?'is-me':''}" data-user-filter="${u.id}" style="--c:${u.color}">
-              ${!isMe ? `<button class="member-delete" data-act="delete-member" data-user-id="${u.id}" title="Remover ${esc(u.name)}">✕</button>` : ''}
+              ${!isMe ? `
+                <button class="member-edit" data-act="edit-member" data-user-id="${u.id}" title="Editar ${esc(u.name)}">✎</button>
+                <button class="member-delete" data-act="delete-member" data-user-id="${u.id}" title="Remover ${esc(u.name)}">✕</button>
+              ` : ''}
               <div class="member-top">
                 ${avatarHTML(u)}
                 <div class="info">
@@ -3152,7 +3232,7 @@ function render(){
 }
 
 /* ============================================================
-   SELECTS: CATEGORIAS / DONO / CARTEIRA
+   SELECTS
    ============================================================ */
 function fillCategorySelects(){
   const opts = Object.entries(CATEGORIES)
@@ -3318,6 +3398,59 @@ function renderProfilePhotoPreview(){
   if(profileCtx.photo){
     prev.innerHTML = `<img src="${profileCtx.photo}" alt="Foto de perfil">`;
     prev.style.background = `#000`;
+    prev.style.backgroundImage = '';
+  } else {
+    prev.innerHTML = initialOf(u.name);
+    prev.style.background = color;
+    prev.style.backgroundImage = '';
+  }
+}
+
+/* ============================================================
+   MODAL: EDITAR MEMBRO (líder)
+   ============================================================ */
+function openEditMemberModal(userId){
+  if(!isLeader()) return;
+  const u = data.users[userId];
+  if(!u) return;
+  if(userId === ui.currentUserId){
+    alert('Use "Meu perfil" (clicando no seu nome no topo) para editar suas próprias informações.');
+    return;
+  }
+
+  editMemberCtx = {
+    userId,
+    carteiras: carteirasOf(u).slice(),
+    photo: u.photo || '',
+    role: u.role
+  };
+
+  $('#editMemberTitle').textContent = `Editar ${u.name}`;
+  $('#emName').value = u.name;
+  $('#emCargo').value = u.cargo || '';
+  $('#emEmail').value = u.email || '';
+  $('#emCarteiraCustom').value = '';
+  $('#emNewPwd').value = '';
+  $('#emPhotoInput').value = '';
+
+  $$('.role-opt[data-em-role]').forEach(b =>
+    b.classList.toggle('active', b.dataset.emRole === editMemberCtx.role)
+  );
+
+  renderCarteiraPicker($('#emCarteirasPicker'), editMemberCtx.carteiras);
+  renderEditMemberPhotoPreview();
+  $('#editMemberModal').hidden = false;
+  setTimeout(() => $('#emName').focus(), 60);
+}
+function closeEditMemberModal(){ $('#editMemberModal').hidden = true; }
+function renderEditMemberPhotoPreview(){
+  const prev = $('#emPhotoPreview');
+  if(!prev) return;
+  const u = data.users[editMemberCtx.userId] || {};
+  const color = u.color || '#666';
+  if(editMemberCtx.photo){
+    prev.innerHTML = `<img src="${editMemberCtx.photo}" alt="Foto">`;
+    prev.style.background = '#000';
     prev.style.backgroundImage = '';
   } else {
     prev.innerHTML = initialOf(u.name);
@@ -3506,8 +3639,6 @@ function pickCol(row, names){
   }
   return '';
 }
-
-/* ------- Import multi picker ------- */
 function renderImportMultiPicker(){
   const wrap = $('#importMultiPicker');
   if(!wrap) return;
@@ -3534,10 +3665,7 @@ function updateImportConfirmState(){
   $('#importConfirmBtn').disabled = !hasRows || !targetOk;
 }
 function openImportModal(){
-  importCtx = {
-    rows: [], errors: 0, valid: 0,
-    mode: 'single', single: null, multi: []
-  };
+  importCtx = { rows: [], errors: 0, valid: 0, mode: 'single', single: null, multi: [] };
 
   const leaderSection = $('#importLeaderSection');
   const ownerLine = $('#importOwnerLine');
@@ -3546,7 +3674,6 @@ function openImportModal(){
     leaderSection.hidden = false;
     ownerLine.hidden = true;
 
-    // popula select "single"
     const members = usersList();
     const sel = $('#importSingleSelect');
     sel.innerHTML = members.map(u =>
@@ -3554,7 +3681,6 @@ function openImportModal(){
     ).join('');
     importCtx.single = members[0]?.id || null;
 
-    // modo single default
     importCtx.mode = 'single';
     $$('.role-opt[data-import-mode]').forEach(b =>
       b.classList.toggle('active', b.dataset.importMode === 'single')
@@ -3579,7 +3705,6 @@ function openImportModal(){
   $('#importModal').hidden = false;
 }
 function closeImportModal(){ $('#importModal').hidden = true; }
-
 function downloadImportTemplate(){
   const wb = XLSX.utils.book_new();
   const rows = [
@@ -3593,7 +3718,6 @@ function downloadImportTemplate(){
   XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
   XLSX.writeFile(wb, 'cronoplano-modelo-importacao.xlsx');
 }
-
 function handleImportFile(file){
   if(!file) return;
   const reader = new FileReader();
@@ -3684,8 +3808,6 @@ function renderImportPreview(){
 }
 function confirmImport(){
   if(!importCtx.rows.length) return;
-
-  // resolve destinatários
   let owners = [];
   if(isLeader()){
     if(importCtx.mode === 'single'){
@@ -4065,6 +4187,14 @@ $('#dailyList').addEventListener('click', e => {
 });
 
 $('#view-team').addEventListener('click', e => {
+  /* editar membro */
+  const editBtn = e.target.closest('[data-act="edit-member"]');
+  if(editBtn){
+    e.stopPropagation();
+    openEditMemberModal(editBtn.dataset.userId);
+    return;
+  }
+  /* excluir membro */
   const delMember = e.target.closest('[data-act="delete-member"]');
   if(delMember){
     e.stopPropagation();
@@ -4199,6 +4329,7 @@ $('#userModal').addEventListener('click', e => {
   if(e.target.id === 'userModal') closeUserModal();
 });
 
+/* perfil */
 $('#pPhotoBtn').addEventListener('click', () => $('#pPhotoInput').click());
 $('#pPhotoRemoveBtn').addEventListener('click', () => {
   profileCtx.photo = '';
@@ -4217,7 +4348,6 @@ $('#pPhotoInput').addEventListener('change', async e => {
     e.target.value = '';
   }
 });
-
 $('#pCarteiraAdd').addEventListener('click', () => {
   const v = $('#pCarteiraCustom').value.trim();
   if(!v) return;
@@ -4252,6 +4382,81 @@ $('#profileModal').addEventListener('click', e => {
   if(e.target.id === 'profileModal') closeProfileModal();
 });
 
+/* editar membro (líder) */
+$$('.role-opt[data-em-role]').forEach(b => {
+  b.addEventListener('click', () => {
+    editMemberCtx.role = b.dataset.emRole;
+    $$('.role-opt[data-em-role]').forEach(x =>
+      x.classList.toggle('active', x === b)
+    );
+  });
+});
+$('#emPhotoBtn').addEventListener('click', () => $('#emPhotoInput').click());
+$('#emPhotoRemoveBtn').addEventListener('click', () => {
+  editMemberCtx.photo = '';
+  renderEditMemberPhotoPreview();
+});
+$('#emPhotoInput').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  try{
+    const dataUrl = await resizeImageFile(f, PHOTO_SIZE);
+    editMemberCtx.photo = dataUrl;
+    renderEditMemberPhotoPreview();
+  }catch(err){
+    alert('Não foi possível processar a imagem: ' + err.message);
+  }finally{
+    e.target.value = '';
+  }
+});
+$('#emCarteiraAdd').addEventListener('click', () => {
+  const v = $('#emCarteiraCustom').value.trim();
+  if(!v) return;
+  if(!editMemberCtx.carteiras.includes(v)) editMemberCtx.carteiras.push(v);
+  $('#emCarteiraCustom').value = '';
+  renderCarteiraPicker($('#emCarteirasPicker'), editMemberCtx.carteiras);
+});
+$('#emCarteiraCustom').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); $('#emCarteiraAdd').click(); }
+});
+$('#editMemberForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if(!isLeader()) return;
+  const u = data.users[editMemberCtx.userId];
+  if(!u){ alert('Membro não encontrado.'); return; }
+
+  const name = $('#emName').value.trim();
+  if(!name){ alert('O nome não pode ficar vazio.'); return; }
+  const nrm = normalizeName(name);
+  const dup = usersList().find(x => x.id !== u.id && normalizeName(x.name) === nrm);
+  if(dup){ alert('Já existe outro usuário com esse nome.'); return; }
+
+  const newPwd = $('#emNewPwd').value;
+  if(newPwd && newPwd.length < 4){
+    alert('A nova senha precisa ter ao menos 4 caracteres.');
+    return;
+  }
+
+  u.name = name;
+  u.cargo = $('#emCargo').value.trim().slice(0, 40);
+  u.email = $('#emEmail').value.trim();
+  u.role = editMemberCtx.role;
+  u.carteiras = editMemberCtx.carteiras.slice();
+  u.photo = editMemberCtx.photo || '';
+
+  if(newPwd) u.passwordHash = hashPassword(newPwd);
+
+  save();
+  closeEditMemberModal();
+  render();
+  alert(`✅ Informações de ${u.name} atualizadas com sucesso.`);
+});
+$('#editMemberBtnCancel').addEventListener('click', closeEditMemberModal);
+$('#editMemberClose').addEventListener('click', closeEditMemberModal);
+$('#editMemberModal').addEventListener('click', e => {
+  if(e.target.id === 'editMemberModal') closeEditMemberModal();
+});
+
 $('#passwordForm').addEventListener('submit', e => {
   e.preventDefault();
   const u = currentUser();
@@ -4271,14 +4476,12 @@ $('#passwordModal').addEventListener('click', e => {
   if(e.target.id === 'passwordModal') closePasswordModal();
 });
 
-/* ---------- IMPORT ---------- */
+/* import */
 $('#importFile').addEventListener('change', e => {
   const f = e.target.files[0];
   if(f) handleImportFile(f);
 });
 $('#importDownloadTemplate').addEventListener('click', downloadImportTemplate);
-
-/* modo de import (single/multi) */
 $$('.role-opt[data-import-mode]').forEach(b => {
   b.addEventListener('click', () => {
     importCtx.mode = b.dataset.importMode;
@@ -4305,7 +4508,6 @@ $('#importMultiPicker').addEventListener('click', e => {
   renderImportMultiPicker();
   updateImportConfirmState();
 });
-
 $('#importConfirmBtn').addEventListener('click', confirmImport);
 $('#importBtnCancel').addEventListener('click', closeImportModal);
 $('#importModalClose').addEventListener('click', closeImportModal);
@@ -4313,7 +4515,7 @@ $('#importModal').addEventListener('click', e => {
   if(e.target.id === 'importModal') closeImportModal();
 });
 
-/* ---------- EXPORT ---------- */
+/* export */
 $$('.export-opt').forEach(o => {
   o.addEventListener('click', () => {
     $$('.export-opt').forEach(x => x.classList.remove('active'));
@@ -4335,6 +4537,7 @@ document.addEventListener('keydown', e => {
   if(!$('#modal').hidden) closeModal();
   if(!$('#userModal').hidden) closeUserModal();
   if(!$('#profileModal').hidden) closeProfileModal();
+  if(!$('#editMemberModal').hidden) closeEditMemberModal();
   if(!$('#passwordModal').hidden) closePasswordModal();
   if(!$('#importModal').hidden) closeImportModal();
   if(!$('#exportModal').hidden) closeExportModal();
@@ -4350,6 +4553,7 @@ function init(){
 
   bindCarteiraPicker($('#pCarteirasPicker'), () => profileCtx);
   bindCarteiraPicker($('#uCarteirasPicker'), () => userModalCtx);
+  bindCarteiraPicker($('#emCarteirasPicker'), () => editMemberCtx);
 
   fillCategorySelects();
   load();
