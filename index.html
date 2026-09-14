@@ -531,6 +531,79 @@ select option{background-color: var(--surface); color: var(--text);}
   box-shadow:0 0 14px rgba(30,64,175,.55);
 }
 
+/* ===== Hora Operacional banner ===== */
+.hora-op-banner{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px; margin-bottom:14px;
+  border-radius:12px;
+  border:1px solid;
+  font-size:13px;
+  animation:fade .22s ease;
+  flex-wrap:wrap;
+}
+.hora-op-banner .ico{font-size:16px;flex:0 0 auto;}
+.hora-op-banner .txt{flex:1;min-width:180px;line-height:1.4;}
+.hora-op-banner .txt b{font-weight:700;}
+.hora-op-banner .value{
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.2px;
+}
+.hora-op-banner .prog{
+  display:inline-block;
+  width:80px;height:6px;border-radius:20px;
+  background:rgba(0,0,0,.28);
+  overflow:hidden;
+  vertical-align:middle;
+  margin:0 8px;
+  position:relative;
+}
+[data-theme="light"] .hora-op-banner .prog{background:rgba(0,0,0,.1);}
+.hora-op-banner .prog i{
+  display:block;height:100%;border-radius:20px;
+  transition:width .4s ease;
+}
+.hora-op-banner .status-chip{
+  font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;white-space:nowrap;
+}
+.hora-op-banner.ok{
+  background:linear-gradient(90deg, rgba(16,185,129,.14), transparent);
+  border-color: rgba(16,185,129,.4);
+  border-left:3px solid #10b981;
+  color:#6ee7b7;
+}
+[data-theme="light"] .hora-op-banner.ok{color:#047857;}
+.hora-op-banner.ok .status-chip{background:rgba(16,185,129,.18); color:#34d399;}
+[data-theme="light"] .hora-op-banner.ok .status-chip{color:#059669;}
+.hora-op-banner.ok .prog i{background:#10b981;}
+.hora-op-banner.warn{
+  background:linear-gradient(90deg, rgba(245,158,11,.14), transparent);
+  border-color: rgba(245,158,11,.4);
+  border-left:3px solid #f59e0b;
+  color:#fcd34d;
+}
+[data-theme="light"] .hora-op-banner.warn{color:#b45309;}
+.hora-op-banner.warn .status-chip{background:rgba(245,158,11,.18); color:#fbbf24;}
+[data-theme="light"] .hora-op-banner.warn .status-chip{color:#b45309;}
+.hora-op-banner.warn .prog i{background:#f59e0b;}
+.hora-op-banner.bad{
+  background:linear-gradient(90deg, rgba(239,68,68,.14), transparent);
+  border-color: rgba(239,68,68,.4);
+  border-left:3px solid #ef4444;
+  color:#fca5a5;
+}
+[data-theme="light"] .hora-op-banner.bad{color:#b91c1c;}
+.hora-op-banner.bad .status-chip{background:rgba(239,68,68,.18); color:#f87171;}
+[data-theme="light"] .hora-op-banner.bad .status-chip{color:#dc2626;}
+.hora-op-banner.bad .prog i{background:#ef4444;}
+.hora-op-banner .legend-hint{
+  font-size:11px; opacity:.75;
+  font-weight:500;
+  flex-basis:100%;
+  margin-top:-2px;
+}
+
 .task-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
 .task{
   display:grid;
@@ -946,7 +1019,7 @@ select option{background-color: var(--surface); color: var(--text);}
   flex:0 0 auto;
   line-height:1;
   filter: grayscale(.15);
-  margin-right: 56px; /* espaço pros botões ✎ ✕ */
+  margin-right: 56px;
 }
 .member-card.is-me .role-icon{margin-right: 0;}
 
@@ -964,7 +1037,6 @@ select option{background-color: var(--surface); color: var(--text);}
 .member-stats .col.r .v{color:#f87171;}
 [data-theme="light"] .member-stats .col.r .v{color:#dc2626;}
 
-/* botão ✎ editar */
 .member-edit{
   position:absolute; top:8px; right:38px;
   width:24px; height:24px; border-radius:7px;
@@ -980,7 +1052,6 @@ select option{background-color: var(--surface); color: var(--text);}
 }
 [data-theme="light"] .member-edit:hover{color:var(--accent-2);}
 
-/* botão ✕ excluir */
 .member-delete{
   position:absolute; top:8px; right:8px;
   width:24px; height:24px; border-radius:7px;
@@ -1020,36 +1091,12 @@ select option{background-color: var(--surface); color: var(--text);}
   font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
   padding:4px 10px;border-radius:20px;white-space:nowrap;
 }
-.status-badge.done{
-  background:rgba(16,185,129,.16);
-  color:#34d399;
-  border:1px solid rgba(16,185,129,.38);
-}
-.status-badge.pending{
-  background:rgba(163,163,163,.14);
-  color:#a3a3a3;
-  border:1px solid rgba(163,163,163,.32);
-}
-.status-badge.late{
-  background:rgba(239,68,68,.16);
-  color:#f87171;
-  border:1px solid rgba(239,68,68,.38);
-}
-[data-theme="light"] .status-badge.done{
-  background:rgba(16,185,129,.12);
-  color:#059669;
-  border-color:rgba(16,185,129,.4);
-}
-[data-theme="light"] .status-badge.pending{
-  background:rgba(115,115,115,.12);
-  color:#71717a;
-  border-color:rgba(115,115,115,.32);
-}
-[data-theme="light"] .status-badge.late{
-  background:rgba(239,68,68,.12);
-  color:#dc2626;
-  border-color:rgba(239,68,68,.4);
-}
+.status-badge.done{background:rgba(16,185,129,.16);color:#34d399;border:1px solid rgba(16,185,129,.38);}
+.status-badge.pending{background:rgba(163,163,163,.14);color:#a3a3a3;border:1px solid rgba(163,163,163,.32);}
+.status-badge.late{background:rgba(239,68,68,.16);color:#f87171;border:1px solid rgba(239,68,68,.38);}
+[data-theme="light"] .status-badge.done{background:rgba(16,185,129,.12);color:#059669;border-color:rgba(16,185,129,.4);}
+[data-theme="light"] .status-badge.pending{background:rgba(115,115,115,.12);color:#71717a;border-color:rgba(115,115,115,.32);}
+[data-theme="light"] .status-badge.late{background:rgba(239,68,68,.12);color:#dc2626;border-color:rgba(239,68,68,.4);}
 .tt-actions{display:flex;gap:4px;opacity:0;transition:.16s;}
 .team-task:hover .tt-actions{opacity:1;}
 .tt-actions button{
@@ -1889,12 +1936,13 @@ select option{background-color: var(--surface); color: var(--text);}
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v14';
+const STORAGE_KEY = 'cronoplano.v15';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','dashboard','team'];
 const ALL_MEMBERS = '__all__';
 const PHOTO_SIZE = 200;
+const HORA_OPERACIONAL_MIN = 120; // 2 horas
 
 const USER_COLORS = [
   '#2563eb','#737373','#1e40af','#525252',
@@ -2269,6 +2317,13 @@ function fmtDuration(min){
   const h = Math.floor(min/60), m = min%60;
   return m ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
 }
+function fmtDurationShort(min){
+  if(!min) return '0h';
+  const h = Math.floor(min/60), m = min%60;
+  if(h && m) return `${h}h${String(m).padStart(2,'0')}`;
+  if(h) return `${h}h`;
+  return `${m}min`;
+}
 function catOf(key){
   return CATEGORIES[key] || { label:'Sem categoria', color:'#7a7a7a' };
 }
@@ -2324,6 +2379,84 @@ function ownerPillHTML(t){
     ${avatarHTML(owner)}
     ${esc(owner.name)}
   </span>`;
+}
+
+/* ============================================================
+   CONFLITO DE HORÁRIO + HORA OPERACIONAL
+   ============================================================ */
+/* Retorna lista de tarefas do mesmo dono/dia que colidem com o intervalo dado.
+   Ignora a própria tarefa (útil em edição). Só considera tarefas com start+end. */
+function detectTimeConflicts(ownerId, dateIso, newStart, newEnd, ignoreTaskId){
+  if(!ownerId || !dateIso || !newStart || !newEnd) return [];
+  const ns = timeToMin(newStart);
+  const ne = timeToMin(newEnd);
+  if(ns === null || ne === null || ne <= ns) return [];
+  const arr = data.daily[dateIso] || [];
+  return arr.filter(t => {
+    if(t.ownerId !== ownerId) return false;
+    if(t.id === ignoreTaskId) return false;
+    if(!t.start || !t.end) return false;
+    const es = timeToMin(t.start);
+    const ee = timeToMin(t.end);
+    if(es === null || ee === null || ee <= es) return false;
+    // Overlap: [ns,ne) ∩ [es,ee)
+    return ns < ee && ne > es;
+  });
+}
+function formatConflictMsg(conflicts){
+  const lines = conflicts.map(t => {
+    const cat = catOf(t.cat);
+    return `• ${t.start} – ${t.end} — ${t.title}  (${cat.label})`;
+  });
+  return lines.join('\n');
+}
+/* Contabiliza minutos de "Hora Operacional" de um usuário num dia */
+function horaOperacionalMinutes(ownerId, dateIso){
+  if(!ownerId || !dateIso) return 0;
+  const arr = data.daily[dateIso] || [];
+  return arr
+    .filter(t => t.ownerId === ownerId && t.cat === 'hora-operacional')
+    .reduce((sum, t) => sum + durationMin(t), 0);
+}
+/* Renderiza o banner de Hora Operacional (apenas no contexto do Diário).
+   `owner` = user cuja agenda está visível. */
+function renderHoraOpBanner(owner){
+  const wrap = $('#dailyProgress');
+  if(!wrap) return '';
+  if(!owner) return '';
+
+  const mins = horaOperacionalMinutes(owner.id, ui.date);
+  const target = HORA_OPERACIONAL_MIN;
+  const pct = Math.min(100, Math.round((mins / target) * 100));
+
+  let cls, chipLabel, chipMsg;
+  if(mins >= target){
+    cls = 'ok';
+    chipLabel = '✓ Meta atingida';
+    chipMsg = `<b>${esc(owner.name)}</b> já tem <span class="value">${fmtDurationShort(mins)}</span> de Hora Operacional hoje.`;
+  } else if(mins > 0){
+    const falta = target - mins;
+    cls = 'warn';
+    chipLabel = `Faltam ${fmtDurationShort(falta)}`;
+    chipMsg = `<b>${esc(owner.name)}</b> tem <span class="value">${fmtDurationShort(mins)}</span> de Hora Operacional — faltam <span class="value">${fmtDurationShort(falta)}</span> para a meta de 2h.`;
+  } else {
+    cls = 'bad';
+    chipLabel = 'Meta não iniciada';
+    chipMsg = `<b>${esc(owner.name)}</b> ainda não possui Hora Operacional hoje — meta de <span class="value">2h</span>.`;
+  }
+
+  return `
+    <div class="hora-op-banner ${cls}">
+      <span class="ico">🕒</span>
+      <span class="txt">
+        ${chipMsg}
+        <span class="prog"><i style="width:${pct}%"></i></span>
+        <span class="value">${fmtDurationShort(mins)}</span>
+        <span style="opacity:.7;">/ 2h</span>
+      </span>
+      <span class="status-chip">${chipLabel}</span>
+      <span class="legend-hint">💡 Todo agente deve registrar <b>2 horas</b> de Hora Operacional por dia.</span>
+    </div>`;
 }
 
 /* ============================================================
@@ -2552,14 +2685,18 @@ function renderDaily(){
   const total = tasks.length;
   const done  = tasks.filter(t => t.done).length;
   const mins  = tasks.reduce((a,t) => a + durationMin(t), 0);
-  const pct   = total ? Math.round((done/total)*100) : 0;
+  const pct   = total ? Math.round((done/total) * 100) : 0;
   const holidayName = holidayNameOf(date);
 
   const holidayBanner = holidayName
     ? `<div class="holiday-tag" style="margin-bottom:12px;">🎉 Feriado: ${esc(holidayName)}</div>`
     : '';
 
-  $('#dailyProgress').innerHTML = holidayBanner + (total ? `
+  // banner Hora Operacional — só para o dono da agenda (na view "todos" mostra apenas se um usuário estiver isolado)
+  const bannerOwner = (!allView && viewed) ? viewed : (!allView ? currentUser() : null);
+  const horaOpBanner = renderHoraOpBanner(bannerOwner);
+
+  $('#dailyProgress').innerHTML = holidayBanner + horaOpBanner + (total ? `
     <div class="progress-top">
       <strong>${done} de ${total} concluída${total>1?'s':''}</strong>
       <span>${pct}% · ${fmtDuration(mins)} planejadas</span>
@@ -4143,21 +4280,41 @@ $('#weekGrid').addEventListener('click', e => {
   if(item) openModal({ mode:'edit', date, item });
 });
 
+/* ---------- QUICK ADD com trava de conflito ---------- */
 $('#dailyForm').addEventListener('submit', e => {
   e.preventDefault();
   if(!canEditCurrentView() || viewingAll()) return;
   const title = $('#qTitle').value.trim();
   if(!title) return;
+
   const date = ui.date;
-  if(!Array.isArray(data.daily[date])) data.daily[date] = [];
   const owner = isLeader() ? (ui.viewUserId || ui.currentUserId) : ui.currentUserId;
   if(owner === ALL_MEMBERS) return;
+
+  const start = $('#qTime').value || '';
+  const end   = $('#qEnd').value   || '';
+
+  // trava de conflito — só vale quando ambos os horários estão preenchidos
+  if(start && end){
+    const conflicts = detectTimeConflicts(owner, date, start, end, null);
+    if(conflicts.length){
+      const ownerName = userById(owner).name;
+      const msg =
+        `⚠️ Conflito de horário!\n\n` +
+        `Já existe(m) tarefa(s) de ${ownerName} neste intervalo em ${fmtDateLong(date)}:\n\n` +
+        formatConflictMsg(conflicts) +
+        `\n\nDeseja adicionar mesmo assim?`;
+      if(!confirm(msg)) return;
+    }
+  }
+
+  if(!Array.isArray(data.daily[date])) data.daily[date] = [];
   data.daily[date].push({
     id: uid(),
     ownerId: owner,
     title,
-    start: $('#qTime').value || '',
-    end:   $('#qEnd').value || '',
+    start,
+    end,
     cat:   $('#qCat').value,
     carteira: $('#qCarteira').value || '',
     prio:  'media',
@@ -4187,14 +4344,12 @@ $('#dailyList').addEventListener('click', e => {
 });
 
 $('#view-team').addEventListener('click', e => {
-  /* editar membro */
   const editBtn = e.target.closest('[data-act="edit-member"]');
   if(editBtn){
     e.stopPropagation();
     openEditMemberModal(editBtn.dataset.userId);
     return;
   }
-  /* excluir membro */
   const delMember = e.target.closest('[data-act="delete-member"]');
   if(delMember){
     e.stopPropagation();
@@ -4233,26 +4388,49 @@ $('#fOwner').addEventListener('change', e => {
   fillCarteiraSelect($('#fCarteira'), e.target.value, '');
 });
 
+/* ---------- MODAL de tarefa com trava de conflito ---------- */
 $('#modalForm').addEventListener('submit', e => {
   e.preventDefault();
   if(!modalCtx) return;
   if(!canEditCurrentView()){ closeModal(); return; }
   const title = $('#fTitle').value.trim();
   if(!title) return;
+
+  const newDate = $('#fDate').value || ui.date || todayISO();
+  const newStart = $('#fStart').value || '';
+  const newEnd   = $('#fEnd').value   || '';
+
+  let newOwner = isLeader()
+    ? ($('#fOwner').value || ui.currentUserId)
+    : ui.currentUserId;
+  if(!newOwner || newOwner === ALL_MEMBERS) newOwner = ui.currentUserId;
+
+  const ignoreId = modalCtx.mode === 'edit' ? modalCtx.item.id : null;
+
+  // trava de conflito
+  if(newStart && newEnd){
+    const conflicts = detectTimeConflicts(newOwner, newDate, newStart, newEnd, ignoreId);
+    if(conflicts.length){
+      const ownerName = userById(newOwner).name;
+      const msg =
+        `⚠️ Conflito de horário!\n\n` +
+        `Já existe(m) tarefa(s) de ${ownerName} neste intervalo em ${fmtDateLong(newDate)}:\n\n` +
+        formatConflictMsg(conflicts) +
+        `\n\nDeseja salvar mesmo assim?`;
+      if(!confirm(msg)) return;
+    }
+  }
+
   const base = {
     title,
-    start: $('#fStart').value || '',
-    end:   $('#fEnd').value || '',
+    start: newStart,
+    end:   newEnd,
     cat:   $('#fCat').value,
     carteira: $('#fCarteira').value || '',
     prio:  $('#fPrio').value,
     notes: $('#fNotes').value.trim()
   };
-  const newDate = $('#fDate').value || ui.date || todayISO();
-  let newOwner = isLeader()
-    ? ($('#fOwner').value || ui.currentUserId)
-    : ui.currentUserId;
-  if(!newOwner || newOwner === ALL_MEMBERS) newOwner = ui.currentUserId;
+
   if(modalCtx.mode === 'new'){
     if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
     data.daily[newDate].push({ id: uid(), ownerId:newOwner, done:false, ...base });
@@ -4329,7 +4507,6 @@ $('#userModal').addEventListener('click', e => {
   if(e.target.id === 'userModal') closeUserModal();
 });
 
-/* perfil */
 $('#pPhotoBtn').addEventListener('click', () => $('#pPhotoInput').click());
 $('#pPhotoRemoveBtn').addEventListener('click', () => {
   profileCtx.photo = '';
@@ -4382,7 +4559,6 @@ $('#profileModal').addEventListener('click', e => {
   if(e.target.id === 'profileModal') closeProfileModal();
 });
 
-/* editar membro (líder) */
 $$('.role-opt[data-em-role]').forEach(b => {
   b.addEventListener('click', () => {
     editMemberCtx.role = b.dataset.emRole;
@@ -4476,7 +4652,6 @@ $('#passwordModal').addEventListener('click', e => {
   if(e.target.id === 'passwordModal') closePasswordModal();
 });
 
-/* import */
 $('#importFile').addEventListener('change', e => {
   const f = e.target.files[0];
   if(f) handleImportFile(f);
@@ -4515,7 +4690,6 @@ $('#importModal').addEventListener('click', e => {
   if(e.target.id === 'importModal') closeImportModal();
 });
 
-/* export */
 $$('.export-opt').forEach(o => {
   o.addEventListener('click', () => {
     $$('.export-opt').forEach(x => x.classList.remove('active'));
