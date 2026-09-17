@@ -46,7 +46,6 @@ body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans
 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(900px 520px at 10% -12%, var(--body-glow-1), transparent 62%),radial-gradient(820px 520px at 92% -4%, var(--body-glow-2), transparent 58%);transition:background .25s ease;}
 [hidden]{display:none !important;}
 
-/* ============ LOGIN ============ */
 .login-screen{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:20px;background:radial-gradient(700px 500px at 20% 10%, var(--body-glow-1), transparent 60%),radial-gradient(700px 500px at 85% 90%, var(--body-glow-2), transparent 60%),var(--bg);animation:fade .28s ease;}
 .login-card{width:100%;max-width:440px;background:linear-gradient(180deg,var(--overlay-3),transparent),var(--surface);border:1px solid var(--border);border-radius:20px;padding:34px 30px 26px;box-shadow:var(--shadow-login);animation:pop .32s cubic-bezier(.4,0,.2,1);}
 .login-brand{display:flex;align-items:center;gap:14px;margin-bottom:26px;}
@@ -72,7 +71,6 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .login-hint{margin-top:12px;text-align:center;font-size:11px;color:var(--muted);}
 .login-hint b{color:var(--text);font-weight:600;}
 
-/* ============ TOPBAR ============ */
 .topbar{position:sticky;top:0;z-index:60;background:var(--topbar-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-soft);transition:background-color .22s ease, border-color .22s ease;}
 .topbar-inner{max-width:1400px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
 .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:16px;letter-spacing:-.3px;flex:0 0 auto;}
@@ -126,12 +124,7 @@ main{max-width:1400px;margin:0 auto;padding:26px 22px 90px;}
 .panel-head h3{margin:0;font-size:15.5px;letter-spacing:-.2px;display:flex;align-items:center;gap:8px;}
 .panel-head .chip{font-size:11.5px;font-weight:600;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);padding:4px 11px;border-radius:20px;}
 
-/* ============ INPUTS / SELECTS ============ */
-input,select,textarea{
-  width:100%;background:var(--bg-2);border:1.5px solid var(--border);color:var(--text);
-  border-radius:11px;padding:11px 13px;font:inherit;font-size:14px;font-weight:500;outline:none;
-  transition:border-color .15s, box-shadow .15s, background-color .15s, color .15s;
-}
+input,select,textarea{width:100%;background:var(--bg-2);border:1.5px solid var(--border);color:var(--text);border-radius:11px;padding:11px 13px;font:inherit;font-size:14px;font-weight:500;outline:none;transition:border-color .15s, box-shadow .15s, background-color .15s, color .15s;}
 input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb, var(--accent) 50%, var(--border));background-color:color-mix(in srgb, var(--accent) 5%, var(--bg-2));}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);background-color:var(--bg-2);box-shadow:0 0 0 3px rgba(30,64,175,.22);}
 input:disabled,select:disabled{opacity:.55;cursor:not-allowed;}
@@ -193,6 +186,10 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 [data-theme="light"] .readonly-banner.all-banner{color:var(--accent-2);}
 .readonly-banner.all-banner b{color:#bfdbfe;}
 [data-theme="light"] .readonly-banner.all-banner b{color:var(--accent-2);}
+.readonly-banner.compact-banner{background:linear-gradient(90deg, rgba(139,92,246,.10), transparent);border-color:rgba(139,92,246,.35);border-left-color:#8b5cf6;color:#c4b5fd;}
+[data-theme="light"] .readonly-banner.compact-banner{color:#6d28d9;}
+.readonly-banner.compact-banner b{color:#ddd6fe;}
+[data-theme="light"] .readonly-banner.compact-banner b{color:#5b21b6;}
 
 .daily-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start;}
 .daily-main{min-width:0;}
@@ -342,7 +339,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .cal-hint .legend-holiday i{width:8px;height:8px;border-radius:50%;background:#3b82f6;box-shadow:0 0 6px rgba(59,130,246,.7);display:inline-block;}
 [data-theme="light"] .cal-hint .legend-holiday i{background:var(--accent);box-shadow:none;}
 
-/* ============ MONTH VIEW ============ */
 .month-panel{padding:14px;}
 .month-panel .month-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px;}
 .month-panel .month-weekdays span{text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;padding:6px 0;}
@@ -385,42 +381,20 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .month-task .mt-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--text);}
 .month-more{font-size:9.5px;font-weight:700;letter-spacing:.3px;color:var(--muted);text-align:center;padding:2px 0;}
 
-/* Bloco de membro (líder) */
 .month-member-block{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;background:var(--surface);border:1px solid var(--border-soft);border-left:3px solid var(--mc,var(--accent));font-size:11px;cursor:pointer;transition:.13s;min-width:0;text-align:left;width:100%;font-family:inherit;color:var(--text);}
 .month-member-block:hover{background:color-mix(in srgb,var(--surface) 78%,var(--text) 8%);transform:translateX(1px);border-color:#3a3a3a;border-left-color:var(--mc);}
 .month-member-block .avatar{width:16px;height:16px;border-radius:5px;font-size:9px;flex:0 0 auto;}
 .month-member-block .mb-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;letter-spacing:.1px;font-size:11px;}
 .month-member-block .mb-count{font-size:10px;font-weight:800;padding:2px 7px;border-radius:9px;background:color-mix(in srgb, var(--mc) 22%, transparent);color:var(--mc);border:1px solid color-mix(in srgb, var(--mc) 42%, transparent);flex:0 0 auto;min-width:20px;text-align:center;}
 
-/* Bloco compacto (membro) — apenas carteira + categoria */
-.month-task-compact{
-  display:flex;align-items:center;gap:4px;flex-wrap:wrap;
-  padding:4px 6px;border-radius:7px;
-  background:var(--surface);
-  border-left:2px solid var(--c,var(--accent));
-  cursor:pointer;transition:.13s;min-width:0;
-}
+.month-task-compact{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:4px 6px;border-radius:7px;background:var(--surface);border-left:2px solid var(--c,var(--accent));cursor:pointer;transition:.13s;min-width:0;}
 .month-task-compact:hover{background:color-mix(in srgb,var(--surface) 78%,var(--text) 8%);transform:translateX(1px);}
 .month-task-compact.done{opacity:.45;}
 .month-task-compact.late{border-left-color:#ef4444 !important;}
-.month-task-compact .mt-cat{
-  font-size:9px;font-weight:800;letter-spacing:.25px;text-transform:uppercase;
-  padding:2px 6px;border-radius:5px;
-  background:color-mix(in srgb, var(--c) 22%, transparent);
-  color:var(--c);border:1px solid color-mix(in srgb, var(--c) 42%, transparent);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
-}
-.month-task-compact .mt-car{
-  font-size:9px;font-weight:700;letter-spacing:.15px;
-  padding:2px 6px;border-radius:5px;
-  background:color-mix(in srgb, var(--accent) 18%, transparent);
-  color:#93c5fd;border:1px solid color-mix(in srgb, var(--accent) 38%, transparent);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+.month-task-compact .mt-cat{font-size:9px;font-weight:800;letter-spacing:.25px;text-transform:uppercase;padding:2px 6px;border-radius:5px;background:color-mix(in srgb, var(--c) 22%, transparent);color:var(--c);border:1px solid color-mix(in srgb, var(--c) 42%, transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.month-task-compact .mt-car{font-size:9px;font-weight:700;letter-spacing:.15px;padding:2px 6px;border-radius:5px;background:color-mix(in srgb, var(--accent) 18%, transparent);color:#93c5fd;border:1px solid color-mix(in srgb, var(--accent) 38%, transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 [data-theme="light"] .month-task-compact .mt-car{color:var(--accent-2);}
-.month-task-compact .mt-nodata{
-  font-size:9px;font-weight:600;color:var(--muted);font-style:italic;
-}
+.month-task-compact .mt-nodata{font-size:9px;font-weight:600;color:var(--muted);font-style:italic;}
 
 @media(max-width:1200px){.month-day{min-height:145px;}}
 @media(max-width:1100px){.month-day{min-height:130px;}}
@@ -428,7 +402,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 @media(max-width:640px){.month-grid{grid-template-columns:repeat(3,1fr);}.month-panel .month-weekdays{display:none;}.month-day{min-height:100px;}}
 @media(max-width:400px){.month-grid{grid-template-columns:repeat(2,1fr);}}
 
-/* ============ DAY DETAIL ============ */
 .day-detail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
 .day-detail-item{display:grid;grid-template-columns:66px 1fr auto;gap:12px;align-items:flex-start;background:var(--bg-2);border:1px solid var(--border-soft);border-left:3px solid var(--c,var(--accent));border-radius:11px;padding:11px 14px;transition:.15s;}
 .day-detail-item:hover{background:color-mix(in srgb,var(--bg-2) 92%,var(--text) 4%);border-color:#3a3a3a;}
@@ -448,7 +421,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .day-detail-item .dd-actions button[data-act="del"]:hover{color:#f87171;border-color:rgba(239,68,68,.35);}
 @media(max-width:560px){.day-detail-item{grid-template-columns:56px 1fr;}.day-detail-item .dd-actions{grid-column:2;opacity:1;}}
 
-/* ============ WEEKLY ============ */
 .week-scroll{overflow-x:auto;padding-bottom:6px;}
 .week-grid{display:grid;grid-template-columns:repeat(7,minmax(180px,1fr));gap:11px;min-width:100%;}
 .day-col{background:linear-gradient(180deg,var(--overlay),transparent),var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:9px;min-height:190px;transition:.16s;}
@@ -492,35 +464,15 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .wk-member-block .mb-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600;letter-spacing:-.1px;}
 .wk-member-block .mb-count{font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;background:color-mix(in srgb, var(--mc) 20%, transparent);color:var(--mc);border:1px solid color-mix(in srgb, var(--mc) 40%, transparent);flex:0 0 auto;}
 
-/* Bloco compacto (membro) — semana */
-.wk-item-compact{
-  background:var(--bg-2);border:1px solid var(--border-soft);
-  border-left:3px solid var(--c,var(--accent));
-  border-radius:9px;padding:9px 10px;
-  cursor:pointer;transition:.15s;
-  display:flex;gap:5px;flex-wrap:wrap;align-items:center;
-}
+.wk-item-compact{background:var(--bg-2);border:1px solid var(--border-soft);border-left:3px solid var(--c,var(--accent));border-radius:9px;padding:9px 10px;cursor:pointer;transition:.15s;display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .wk-item-compact:hover{background:color-mix(in srgb,var(--bg-2) 82%,var(--text) 8%);border-color:#3a3a3a;transform:translateX(2px);}
 .wk-item-compact.done{opacity:.45;}
 .wk-item-compact.late{border-left-color:#ef4444 !important;}
-.wk-item-compact .wk-cat{
-  font-size:9.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;
-  padding:3px 8px;border-radius:6px;
-  background:color-mix(in srgb, var(--c) 22%, transparent);
-  color:var(--c);border:1px solid color-mix(in srgb, var(--c) 42%, transparent);
-  white-space:nowrap;
-}
-.wk-item-compact .wk-car{
-  font-size:9.5px;font-weight:700;letter-spacing:.2px;
-  padding:3px 8px;border-radius:6px;
-  background:color-mix(in srgb, var(--accent) 18%, transparent);
-  color:#93c5fd;border:1px solid color-mix(in srgb, var(--accent) 38%, transparent);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
-}
+.wk-item-compact .wk-cat{font-size:9.5px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:color-mix(in srgb, var(--c) 22%, transparent);color:var(--c);border:1px solid color-mix(in srgb, var(--c) 42%, transparent);white-space:nowrap;}
+.wk-item-compact .wk-car{font-size:9.5px;font-weight:700;letter-spacing:.2px;padding:3px 8px;border-radius:6px;background:color-mix(in srgb, var(--accent) 18%, transparent);color:#93c5fd;border:1px solid color-mix(in srgb, var(--accent) 38%, transparent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 [data-theme="light"] .wk-item-compact .wk-car{color:var(--accent-2);}
 .wk-item-compact .wk-nodata{font-size:10px;font-weight:600;color:var(--muted);font-style:italic;}
 
-/* ============ STATS ============ */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:18px;}
 .stat-card{background:linear-gradient(180deg,var(--overlay-2),transparent),var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 17px;position:relative;overflow:hidden;}
 .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));opacity:.9;}
@@ -923,13 +875,17 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
           </div>
         </div>
         <div class="date-nav">
-          <div class="filter-wrap" title="Ver agenda de">
+          <div class="filter-wrap" title="Ver agenda de" data-leader-only hidden>
             <span class="ico">👁</span>
             <select class="filter-select" id="viewUserSelectDaily"></select>
           </div>
           <div class="filter-wrap" title="Filtrar por carteira">
             <span class="ico">🏷️</span>
             <select class="filter-select" id="carteiraFilterDaily"></select>
+          </div>
+          <div class="filter-wrap" title="Filtrar por categoria" data-leader-only hidden>
+            <span class="ico">📂</span>
+            <select class="filter-select" id="categoriaFilterDaily"></select>
           </div>
           <div class="spacer"></div>
           <button class="nav-btn" id="prevDay" title="Dia anterior">‹</button>
@@ -990,13 +946,17 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
       <div class="label" id="wkLabel"></div>
       <button class="nav-btn" id="wkNext" title="Próxima semana">›</button>
       <div class="spacer"></div>
+      <div class="filter-wrap" title="Ver agenda de" data-leader-only hidden>
+        <span class="ico">👁</span>
+        <select class="filter-select" id="viewUserSelectWeekly"></select>
+      </div>
       <div class="filter-wrap" title="Filtrar por carteira">
         <span class="ico">🏷️</span>
         <select class="filter-select" id="carteiraFilterWeekly"></select>
       </div>
-      <div class="filter-wrap" title="Ver agenda de">
-        <span class="ico">👁</span>
-        <select class="filter-select" id="viewUserSelectWeekly"></select>
+      <div class="filter-wrap" title="Filtrar por categoria" data-leader-only hidden>
+        <span class="ico">📂</span>
+        <select class="filter-select" id="categoriaFilterWeekly"></select>
       </div>
       <button class="btn ghost" id="wkToday">Esta semana</button>
     </div>
@@ -1022,13 +982,17 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
       <div class="label" id="moLabel"></div>
       <button class="nav-btn" id="moNext" title="Próximo mês">›</button>
       <div class="spacer"></div>
+      <div class="filter-wrap" title="Ver agenda de" data-leader-only hidden>
+        <span class="ico">👁</span>
+        <select class="filter-select" id="viewUserSelectMonth"></select>
+      </div>
       <div class="filter-wrap" title="Filtrar por carteira">
         <span class="ico">🏷️</span>
         <select class="filter-select" id="carteiraFilterMonth"></select>
       </div>
-      <div class="filter-wrap" title="Ver agenda de">
-        <span class="ico">👁</span>
-        <select class="filter-select" id="viewUserSelectMonth"></select>
+      <div class="filter-wrap" title="Filtrar por categoria" data-leader-only hidden>
+        <span class="ico">📂</span>
+        <select class="filter-select" id="categoriaFilterMonth"></select>
       </div>
       <button class="btn ghost" id="moToday">Este mês</button>
     </div>
@@ -1059,7 +1023,11 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
         <span class="ico">🏷️</span>
         <select class="filter-select" id="carteiraFilterDash"></select>
       </div>
-      <div class="filter-wrap" title="Ver painel de">
+      <div class="filter-wrap" title="Filtrar por categoria" data-leader-only hidden>
+        <span class="ico">📂</span>
+        <select class="filter-select" id="categoriaFilterDash"></select>
+      </div>
+      <div class="filter-wrap" title="Ver painel de" data-leader-only hidden>
         <span class="ico">👁</span>
         <select class="filter-select" id="viewUserSelectDash"></select>
       </div>
@@ -1183,7 +1151,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
       <div class="role-picker" style="margin-bottom:14px;">
         <button type="button" class="role-opt active" data-role="member">
           <div class="t">👤 Membro</div>
-          <div class="d">Vê apenas cronogramas de membros.</div>
+          <div class="d">Vê apenas seu próprio cronograma.</div>
         </button>
         <button type="button" class="role-opt" data-role="leader">
           <div class="t">⭐ Líder</div>
@@ -1281,7 +1249,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
       <div class="role-picker" style="margin-bottom:14px;">
         <button type="button" class="role-opt" data-em-role="member">
           <div class="t">👤 Membro</div>
-          <div class="d">Vê apenas cronogramas de membros.</div>
+          <div class="d">Vê apenas seu próprio cronograma.</div>
         </button>
         <button type="button" class="role-opt" data-em-role="leader">
           <div class="t">⭐ Líder</div>
@@ -1470,9 +1438,9 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v24';
+const STORAGE_KEY = 'cronoplano.v25';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v24','cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','month','dashboard','team'];
 const ALL_MEMBERS = '__all__';
 const PHOTO_SIZE = 200;
@@ -1556,7 +1524,8 @@ let ui = {
   tab:'daily', date:todayISO(),
   calMonth:{year:new Date().getFullYear(), month:new Date().getMonth()},
   currentUserId:null, viewUserId:null,
-  teamFilter:'all', teamUserFilter:'', carteiraFilter:'',
+  teamFilter:'all', teamUserFilter:'',
+  carteiraFilter:'', categoriaFilter:'',
   teamPage:1, teamPageSize:10,
   teamSubTab:'overview', teamProofsFilter:'all'
 };
@@ -1747,11 +1716,12 @@ function canEditCurrentView(){
   if(isLeader()) return true;
   return ui.viewUserId === ui.currentUserId;
 }
+/* Membros só podem ver o próprio cronograma; líderes veem todos menos a si mesmos no seletor */
 function visibleUsersForCurrentView(){
   const me = currentUser();
   if(!me) return [];
   if(isLeader()) return usersList().filter(u => u.id !== me.id);
-  return usersList().filter(u => u.id === me.id || u.role !== 'leader');
+  return [me];
 }
 function touchUser(userId){
   if(!userId) return;
@@ -1838,6 +1808,7 @@ function load(){
         ui.teamFilter = parsed.ui.teamFilter || 'all';
         ui.teamUserFilter = parsed.ui.teamUserFilter || '';
         ui.carteiraFilter = parsed.ui.carteiraFilter || '';
+        ui.categoriaFilter = parsed.ui.categoriaFilter || '';
         ui.teamPage = parsed.ui.teamPage || 1;
         ui.teamPageSize = parsed.ui.teamPageSize || 10;
         ui.teamSubTab = parsed.ui.teamSubTab || 'overview';
@@ -1860,7 +1831,7 @@ function save(){
         tab: ui.tab, date: ui.date, calMonth: ui.calMonth,
         currentUserId: ui.currentUserId, viewUserId: ui.viewUserId,
         teamFilter: ui.teamFilter, teamUserFilter: ui.teamUserFilter,
-        carteiraFilter: ui.carteiraFilter,
+        carteiraFilter: ui.carteiraFilter, categoriaFilter: ui.categoriaFilter,
         teamPage: ui.teamPage, teamPageSize: ui.teamPageSize,
         teamSubTab: ui.teamSubTab, teamProofsFilter: ui.teamProofsFilter
       }
@@ -1936,11 +1907,14 @@ function taskStatus(task, dateIso){
   if(dateIso < todayISO()) return 'late';
   return 'pending';
 }
-function tasksOfDate(dateIso, ownerId, carteiraFilter){
+/* Aplica filtros de carteira e categoria automaticamente */
+function tasksOfDate(dateIso, ownerId, carteiraFilter, categoriaFilter){
   let arr = data.daily[dateIso] || [];
   if(ownerId && ownerId !== ALL_MEMBERS) arr = arr.filter(t => t.ownerId === ownerId);
   const cf = carteiraFilter !== undefined ? carteiraFilter : ui.carteiraFilter;
   if(cf) arr = arr.filter(t => t.carteira === cf);
+  const catf = categoriaFilter !== undefined ? categoriaFilter : ui.categoriaFilter;
+  if(catf) arr = arr.filter(t => t.cat === catf);
   return arr.slice();
 }
 function carteirasForCurrentView(){
@@ -2126,6 +2100,7 @@ function completeLogin(user){
   ui.currentUserId = user.id;
   ui.date = todayISO();
   ui.carteiraFilter = '';
+  ui.categoriaFilter = '';
   ui.viewUserId = user.role === 'leader' ? ALL_MEMBERS : user.id;
   ui.tab = user.role === 'leader' ? 'month' : 'daily';
   save();
@@ -2145,6 +2120,7 @@ async function logout(){
   ui.teamFilter = 'all';
   ui.teamUserFilter = '';
   ui.carteiraFilter = '';
+  ui.categoriaFilter = '';
   ui.teamPage = 1;
   ui.teamSubTab = 'overview';
   save();
@@ -2182,11 +2158,8 @@ function buildViewUserOptions(selectEl, selectedId){
       opts += `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>${esc(u.name)}</option>`;
     });
   } else {
-    const visible = visibleUsersForCurrentView();
-    opts = visible.map(u => {
-      const isMe = u.id === me.id;
-      return `<option value="${u.id}" ${u.id === selectedId ? 'selected' : ''}>${isMe ? 'Minha agenda' : esc(u.name)}</option>`;
-    }).join('');
+    /* Membro: apenas "Minha agenda" */
+    opts = `<option value="${me.id}" selected>Minha agenda</option>`;
   }
   selectEl.innerHTML = opts;
 }
@@ -2199,6 +2172,14 @@ function buildCarteiraFilterOptions(selectEl){
   });
   selectEl.innerHTML = opts.join('');
 }
+function buildCategoriaFilterOptions(selectEl){
+  if(!selectEl) return;
+  const opts = [`<option value="" ${ui.categoriaFilter === '' ? 'selected' : ''}>Todas as categorias</option>`];
+  Object.entries(CATEGORIES).forEach(([k, v]) => {
+    opts.push(`<option value="${k}" ${ui.categoriaFilter === k ? 'selected' : ''}>${esc(v.label)}</option>`);
+  });
+  selectEl.innerHTML = opts.join('');
+}
 function refreshViewSelects(){
   buildViewUserOptions($('#viewUserSelectDaily'), ui.viewUserId);
   buildViewUserOptions($('#viewUserSelectWeekly'), ui.viewUserId);
@@ -2208,6 +2189,10 @@ function refreshViewSelects(){
   buildCarteiraFilterOptions($('#carteiraFilterWeekly'));
   buildCarteiraFilterOptions($('#carteiraFilterMonth'));
   buildCarteiraFilterOptions($('#carteiraFilterDash'));
+  buildCategoriaFilterOptions($('#categoriaFilterDaily'));
+  buildCategoriaFilterOptions($('#categoriaFilterWeekly'));
+  buildCategoriaFilterOptions($('#categoriaFilterMonth'));
+  buildCategoriaFilterOptions($('#categoriaFilterDash'));
 }
 function refreshTopbarCarteiras(){
   const el = $('#topbarCarteiras');
@@ -2253,16 +2238,19 @@ function renderDaily(){
   if(allView){
     banner.hidden = false;
     banner.classList.add('all-banner');
+    banner.classList.remove('compact-banner');
     $('#dailyReadonlyText').innerHTML = '👥 Você está visualizando o cronograma de <b>todos os membros</b>.';
-    $('#dailyReadonlyHint').textContent = 'Use o seletor para filtrar por membro ou carteira';
+    $('#dailyReadonlyHint').textContent = 'Use o seletor para filtrar por membro, carteira ou categoria';
   } else if(other && !canEdit && viewed){
     banner.hidden = false;
     banner.classList.remove('all-banner');
+    banner.classList.remove('compact-banner');
     $('#dailyReadonlyText').innerHTML = `Você está visualizando a agenda de <b>${esc(viewed.name)}</b> em modo somente leitura.`;
     $('#dailyReadonlyHint').textContent = 'Sem edição, conclusão ou exclusão';
   } else {
     banner.hidden = true;
     banner.classList.remove('all-banner');
+    banner.classList.remove('compact-banner');
   }
   $('#dailyForm').hidden = !canEdit || allView;
   const carteiras = carteirasForCurrentView();
@@ -2425,8 +2413,7 @@ function renderCalendar(){
 /* ============================================================
    RENDER: SEMANAL
    - Líder (allView): blocos de membro
-   - Membro: blocos compactos (carteira + categoria)
-   - Líder vendo um membro específico: detalhes completos
+   - Qualquer visão filtrada (líder vendo 1 membro, ou membro vendo a si): compacta (categoria + carteira)
    ============================================================ */
 function renderWeekly(){
   const monday = mondayOf(ui.date);
@@ -2436,7 +2423,8 @@ function renderWeekly(){
   const allView = viewingAll();
   const viewed = viewedUser();
   const other = !!viewed && viewed.id !== ui.currentUserId;
-  const memberMode = isMember();
+  const compactMode = !allView; // todo não-allView é compacto
+
   const weekDates = [];
   for(let i = 0; i < 7; i++){
     const dt = new Date(monday);
@@ -2450,36 +2438,29 @@ function renderWeekly(){
   if(allView){
     $('#weeklyTitle').textContent = 'Semana da Equipe';
     $('#weeklySubtitle').textContent = 'Clique no bloco do membro para abrir no Diário.';
-  } else if(memberMode){
-    $('#weeklyTitle').textContent = 'Visão Semanal';
-    $('#weeklySubtitle').textContent = 'Carteiras e categorias por dia. Abra o Diário para ver os detalhes.';
-  } else if(other && viewed){
+  } else if(compactMode && viewed){
     $('#weeklyTitle').textContent = `Semana de ${viewed.name}`;
-    $('#weeklySubtitle').textContent = 'Visualização do cronograma do colaborador.';
+    $('#weeklySubtitle').textContent = 'Visualização compacta — carteira e categoria por dia.';
   } else {
     $('#weeklyTitle').textContent = 'Visão Semanal';
-    $('#weeklySubtitle').textContent = 'Suas atividades agrupadas por dia da semana.';
+    $('#weeklySubtitle').textContent = 'Carteiras e categorias por dia. Abra o Diário para ver os detalhes.';
   }
 
   const banner = $('#weeklyReadonly');
+  banner.classList.remove('all-banner', 'compact-banner');
   if(allView){
     banner.hidden = false;
     banner.classList.add('all-banner');
     $('#weeklyReadonlyText').innerHTML = '👥 Você está visualizando a semana de <b>todos os membros</b>.';
     $('#weeklyReadonlyHint').textContent = 'Clique no membro para ver o dia completo';
-  } else if(memberMode){
+  } else if(compactMode){
     banner.hidden = false;
-    banner.classList.remove('all-banner');
-    $('#weeklyReadonlyText').innerHTML = '🎨 Visualização compacta — mostrando <b>carteira e categoria</b> de cada tarefa.';
+    banner.classList.add('compact-banner');
+    const nameTxt = viewed && viewed.id !== ui.currentUserId ? ` de <b>${esc(viewed.name)}</b>` : '';
+    $('#weeklyReadonlyText').innerHTML = `🎨 Visualização compacta${nameTxt} — mostrando <b>carteira e categoria</b> de cada tarefa.`;
     $('#weeklyReadonlyHint').textContent = 'Abra o Diário para ver os detalhes completos';
-  } else if(other && !canEdit && viewed){
-    banner.hidden = false;
-    banner.classList.remove('all-banner');
-    $('#weeklyReadonlyText').innerHTML = `Visualizando <b>${esc(viewed.name)}</b> em modo somente leitura.`;
-    $('#weeklyReadonlyHint').textContent = 'Sem edição';
   } else {
     banner.hidden = true;
-    banner.classList.remove('all-banner');
   }
 
   const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2497,7 +2478,6 @@ function renderWeekly(){
     if(!tasks.length){
       bodyHTML = `<div class="wk-empty">livre</div>`;
     } else if(allView){
-      /* Blocos de membro (líder vendo todos) */
       const byOwner = {};
       tasks.forEach(t => {
         if(!byOwner[t.ownerId]) byOwner[t.ownerId] = [];
@@ -2513,8 +2493,8 @@ function renderWeekly(){
           <span class="mb-count">${cnt}</span>
         </button>`;
       }).join('');
-    } else if(memberMode){
-      /* Modo compacto para o membro: apenas carteira + categoria */
+    } else {
+      /* Compacto: apenas categoria + carteira */
       bodyHTML = tasks.map(t => {
         const cat = catOf(t.cat);
         const lateCls = taskStatus(t, iso) === 'late' ? 'late' : '';
@@ -2523,22 +2503,6 @@ function renderWeekly(){
         return `<div class="wk-item-compact ${doneCls} ${lateCls}" data-goto-daily="${iso}" style="--c:${cat.color}" title="Ver detalhes no Diário">
           <span class="wk-cat">${esc(cat.label)}</span>
           ${hasCar ? `<span class="wk-car">🏷️ ${esc(t.carteira)}</span>` : `<span class="wk-nodata">sem carteira</span>`}
-        </div>`;
-      }).join('');
-    } else {
-      /* Detalhado (líder vendo um membro específico) */
-      bodyHTML = tasks.map(t => {
-        const cat = catOf(t.cat);
-        const lateCls = taskStatus(t, iso) === 'late' ? 'late' : '';
-        const roCls = canEdit ? '' : 'readonly';
-        const timeRange = t.end ? `${esc(t.start || '--:--')} – ${esc(t.end)}` : (t.start ? esc(t.start) : 'sem horário');
-        return `<div class="wk-item ${t.done?'done':''} ${lateCls} ${roCls}" data-id="${t.id}" data-date="${iso}" style="--c:${cat.color}">
-          <button class="wk-check" data-act="toggle" title="${canEdit ? 'Concluir' : 'Somente leitura'}">${t.done?'✓':''}</button>
-          ${canEdit ? `<button class="wk-del" data-act="del" title="Excluir">✕</button>` : ''}
-          <div class="wk-body">
-            <div class="wk-time">${timeRange}${t.carteira ? ` · ${esc(t.carteira)}` : ''}</div>
-            <div class="wk-title">${esc(t.title)}</div>
-          </div>
         </div>`;
       }).join('');
     }
@@ -2550,7 +2514,7 @@ function renderWeekly(){
           <div class="day-count">${tasks.length} ${tasks.length===1?'item':'itens'}</div>
           ${isHoliday ? `<div class="holiday-tag">🎉 ${esc(holidayName)}</div>` : ''}
         </div>
-        ${canEdit && !allView && !memberMode ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
+        ${canEdit && !allView && !compactMode ? `<button class="add" data-add-date="${iso}" title="Adicionar em ${iso}">+</button>` : ''}
       </div>
       ${bodyHTML}
     </div>`;
@@ -2559,9 +2523,8 @@ function renderWeekly(){
 
 /* ============================================================
    RENDER: MÊS
-   - Líder (allView): blocos de membro
-   - Membro: blocos compactos (carteira + categoria)
-   - Líder vendo um membro específico: tarefas detalhadas
+   - Líder (allView): blocos de membro (sem truncar)
+   - Qualquer visão filtrada (líder vendo 1 membro, ou membro vendo a si): compacta (categoria + carteira)
    ============================================================ */
 function renderMonth(){
   const { year, month } = ui.calMonth;
@@ -2573,42 +2536,35 @@ function renderMonth(){
   const allView = viewingAll();
   const viewed = viewedUser();
   const other = !!viewed && viewed.id !== ui.currentUserId;
-  const memberMode = isMember();
+  const compactMode = !allView;
 
   if(allView){
     $('#monthTitle').textContent = 'Mês da Equipe';
     $('#monthSubtitle').textContent = 'Todos os membros com tarefas no dia. Clique em um membro para abrir o dia no Diário.';
-  } else if(memberMode){
-    $('#monthTitle').textContent = 'Visão Mensal';
-    $('#monthSubtitle').textContent = 'Carteiras e categorias por dia. Abra o Diário para ver os detalhes completos.';
-  } else if(other && viewed){
+  } else if(compactMode && viewed){
     $('#monthTitle').textContent = `Mês de ${viewed.name}`;
-    $('#monthSubtitle').textContent = 'Visualização do cronograma do colaborador.';
+    $('#monthSubtitle').textContent = 'Visualização compacta — carteira e categoria por dia.';
   } else {
     $('#monthTitle').textContent = 'Visão Mensal';
-    $('#monthSubtitle').textContent = 'Todos os dias do mês. Clique em "+" ou no dia para ver detalhes.';
+    $('#monthSubtitle').textContent = 'Carteiras e categorias por dia. Abra o Diário para ver os detalhes.';
   }
   $('#moLabel').textContent = first.toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
 
   const banner = $('#monthReadonly');
+  banner.classList.remove('all-banner', 'compact-banner');
   if(allView){
     banner.hidden = false;
     banner.classList.add('all-banner');
     $('#monthReadonlyText').innerHTML = '👥 Você está visualizando o mês de <b>todos os membros</b>.';
     $('#monthReadonlyHint').textContent = 'Clique no membro para ver o dia completo';
-  } else if(memberMode){
+  } else if(compactMode){
     banner.hidden = false;
-    banner.classList.remove('all-banner');
-    $('#monthReadonlyText').innerHTML = '🎨 Visualização compacta — mostrando <b>carteira e categoria</b> de cada tarefa.';
+    banner.classList.add('compact-banner');
+    const nameTxt = viewed && viewed.id !== ui.currentUserId ? ` de <b>${esc(viewed.name)}</b>` : '';
+    $('#monthReadonlyText').innerHTML = `🎨 Visualização compacta${nameTxt} — mostrando <b>carteira e categoria</b> de cada tarefa.`;
     $('#monthReadonlyHint').textContent = 'Abra o Diário para ver os detalhes completos';
-  } else if(other && !canEdit && viewed){
-    banner.hidden = false;
-    banner.classList.remove('all-banner');
-    $('#monthReadonlyText').innerHTML = `Visualizando <b>${esc(viewed.name)}</b> em modo somente leitura.`;
-    $('#monthReadonlyHint').textContent = 'Sem edição';
   } else {
     banner.hidden = true;
-    banner.classList.remove('all-banner');
   }
 
   const MAX_TASKS_INDIVIDUAL = 5;
@@ -2621,11 +2577,10 @@ function renderMonth(){
     const holidayName = holidayNameOf(iso);
     const isHoliday = !!holidayName;
     const isSunday = c.date.getDay() === 0;
-    const showAdd = !isHoliday && !c.other && canEdit && !allView && !memberMode;
+    const showAdd = !isHoliday && !c.other && canEdit && !allView && !compactMode;
 
     let tasksHTML = '';
     if(allView){
-      /* Blocos de membro (líder vendo todos) */
       const byOwner = {};
       tasks.forEach(t => {
         if(!byOwner[t.ownerId]) byOwner[t.ownerId] = [];
@@ -2641,8 +2596,8 @@ function renderMonth(){
           <span class="mb-count">${cnt}</span>
         </button>`;
       }).join('');
-    } else if(memberMode){
-      /* Modo compacto para o membro: apenas carteira + categoria */
+    } else {
+      /* Compacto: apenas categoria + carteira */
       const visibleTasks = tasks.slice(0, MAX_TASKS_INDIVIDUAL);
       const extraCount = Math.max(0, tasks.length - MAX_TASKS_INDIVIDUAL);
       tasksHTML = visibleTasks.map(t => {
@@ -2654,20 +2609,6 @@ function renderMonth(){
         return `<div class="month-task-compact ${doneCls} ${lateCls}" data-goto-daily="${iso}" style="--c:${cat.color}" title="Ver detalhes no Diário">
           <span class="mt-cat">${esc(cat.label)}</span>
           ${hasCar ? `<span class="mt-car">🏷️ ${esc(t.carteira)}</span>` : `<span class="mt-nodata">sem carteira</span>`}
-        </div>`;
-      }).join('') + (extraCount ? `<div class="month-more">+${extraCount} mais</div>` : '');
-    } else {
-      /* Detalhado (líder vendo um membro específico) */
-      const visibleTasks = tasks.slice(0, MAX_TASKS_INDIVIDUAL);
-      const extraCount = Math.max(0, tasks.length - MAX_TASKS_INDIVIDUAL);
-      tasksHTML = visibleTasks.map(t => {
-        const cat = catOf(t.cat);
-        const status = taskStatus(t, iso);
-        const doneCls = t.done ? 'done' : '';
-        const lateCls = status === 'late' ? 'late' : '';
-        return `<div class="month-task ${doneCls} ${lateCls}" data-mo-task="${t.id}" data-mo-date="${iso}" style="--c:${cat.color}" title="${esc(t.title)}${t.carteira ? ' · ' + esc(t.carteira) : ''}">
-          <span class="mt-time">${t.start ? esc(t.start) : '--:--'}</span>
-          <span class="mt-title">${esc(t.title)}</span>
         </div>`;
       }).join('') + (extraCount ? `<div class="month-more">+${extraCount} mais</div>` : '');
     }
@@ -2760,6 +2701,7 @@ function collectStatsFor(userId){
     arr.forEach(t => {
       if(userId !== ALL_MEMBERS && t.ownerId !== userId) return;
       if(ui.carteiraFilter && t.carteira !== ui.carteiraFilter) return;
+      if(ui.categoriaFilter && t.cat !== ui.categoriaFilter) return;
       total++;
       if(t.done) done++;
       else if(iso < todayISO()) late++;
@@ -3188,12 +3130,14 @@ function renderTeam(){
    ============================================================ */
 function render(){
   if(!ui.currentUserId || !data.users[ui.currentUserId]) return;
-  if(!ui.viewUserId) ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
-  if(ui.viewUserId !== ALL_MEMBERS && !data.users[ui.viewUserId]) ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
-  if(isLeader() && ui.viewUserId === ui.currentUserId) ui.viewUserId = ALL_MEMBERS;
-  if(!isLeader() && ui.viewUserId !== ALL_MEMBERS){
-    const vu = data.users[ui.viewUserId];
-    if(vu && vu.role === 'leader' && vu.id !== ui.currentUserId) ui.viewUserId = ui.currentUserId;
+  /* Regras de visibilidade do viewUserId */
+  if(isLeader()){
+    /* Líder: garante viewUserId válido (ALL_MEMBERS ou um membro existente) */
+    if(ui.viewUserId !== ALL_MEMBERS && !data.users[ui.viewUserId]) ui.viewUserId = ALL_MEMBERS;
+    if(ui.viewUserId === ui.currentUserId) ui.viewUserId = ALL_MEMBERS;
+  } else {
+    /* Membro: força sempre o próprio usuário */
+    ui.viewUserId = ui.currentUserId;
   }
   refreshLeaderVisibility();
   refreshViewSelects();
@@ -4031,10 +3975,14 @@ $('#userChip').addEventListener('click', () => { closeSettingsMenu(); openProfil
 function onViewUserChange(e){
   const val = e.target.value;
   if(!val) return;
+  /* Apenas líderes podem alterar o usuário visualizado */
+  if(!isLeader()){
+    ui.viewUserId = ui.currentUserId;
+    return;
+  }
   if(val !== ALL_MEMBERS){
     const u = data.users[val];
     if(!u) return;
-    if(!isLeader() && u.role === 'leader' && u.id !== ui.currentUserId) return;
   }
   ui.viewUserId = val;
   const cs = carteirasForCurrentView();
@@ -4045,6 +3993,10 @@ function onCarteiraFilterChange(e){
   ui.carteiraFilter = e.target.value || '';
   save(); render();
 }
+function onCategoriaFilterChange(e){
+  ui.categoriaFilter = e.target.value || '';
+  save(); render();
+}
 ['viewUserSelectDaily','viewUserSelectWeekly','viewUserSelectMonth','viewUserSelectDash'].forEach(id => {
   const el = $('#' + id);
   if(el) el.addEventListener('change', onViewUserChange);
@@ -4052,6 +4004,10 @@ function onCarteiraFilterChange(e){
 ['carteiraFilterDaily','carteiraFilterWeekly','carteiraFilterMonth','carteiraFilterDash'].forEach(id => {
   const el = $('#' + id);
   if(el) el.addEventListener('change', onCarteiraFilterChange);
+});
+['categoriaFilterDaily','categoriaFilterWeekly','categoriaFilterMonth','categoriaFilterDash'].forEach(id => {
+  const el = $('#' + id);
+  if(el) el.addEventListener('change', onCategoriaFilterChange);
 });
 
 $('#prevDay').addEventListener('click', () => shiftDay(-1));
@@ -4089,7 +4045,6 @@ $('#wkPrev').addEventListener('click', () => shiftDay(-7));
 $('#wkNext').addEventListener('click', () => shiftDay(7));
 $('#wkToday').addEventListener('click', () => { setDate(todayISO()); render(); });
 $('#weekGrid').addEventListener('click', e => {
-  /* Bloco compacto (membro) → abrir Diário */
   const compactGo = e.target.closest('[data-goto-daily]');
   if(compactGo){
     e.stopPropagation();
@@ -4097,7 +4052,6 @@ $('#weekGrid').addEventListener('click', e => {
     switchTab('daily');
     return;
   }
-  /* Bloco de membro (líder vendo todos) → abrir Diário do membro */
   const memberBtn = e.target.closest('[data-mo-member]');
   if(memberBtn){
     e.stopPropagation();
@@ -4130,7 +4084,6 @@ $('#moToday').addEventListener('click', () => {
   save(); render();
 });
 $('#monthGrid').addEventListener('click', e => {
-  /* Bloco compacto (membro) → abrir Diário */
   const compactGo = e.target.closest('[data-goto-daily]');
   if(compactGo){
     e.stopPropagation();
@@ -4138,7 +4091,6 @@ $('#monthGrid').addEventListener('click', e => {
     switchTab('daily');
     return;
   }
-  /* Bloco de membro (líder vendo todos) → abrir Diário do membro */
   const memberBtn = e.target.closest('[data-mo-member]');
   if(memberBtn){
     e.stopPropagation();
@@ -4704,8 +4656,8 @@ function init(){
       if(!ui.viewUserId || ui.viewUserId === ui.currentUserId || !data.users[ui.viewUserId]) ui.viewUserId = ALL_MEMBERS;
       if(ui.tab === 'daily' || !VALID_TABS.includes(ui.tab)) ui.tab = 'month';
     } else {
-      const vu = ui.viewUserId ? data.users[ui.viewUserId] : null;
-      if(!vu || (vu.role === 'leader' && vu.id !== ui.currentUserId)) ui.viewUserId = ui.currentUserId;
+      /* Membro: força sempre o próprio usuário */
+      ui.viewUserId = ui.currentUserId;
     }
     if(!isLeader() && ui.tab === 'team') ui.tab = 'daily';
     $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
