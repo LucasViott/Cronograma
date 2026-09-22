@@ -1527,6 +1527,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
    ============================================================ */
 const STORAGE_KEY = 'cronoplano.v28';
 const THEME_KEY = 'cronoplano.theme';
+const FRIDAY_REMINDER_KEY = 'cronoplano.fridayReminder';
 const LEGACY_KEYS = ['cronoplano.v27','cronoplano.v26','cronoplano.v25','cronoplano.v24','cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','month','dashboard','team'];
 const ALL_MEMBERS = '__all__';
@@ -2079,11 +2080,89 @@ async function checkHoraOpWarning(){
   await showAlert(msg, '⚠️ Meta diária não atingida', { icon:'⚠️', iconVariant:'warn' });
 }
 
+/* ============================================================
+   LEMBRETE DE SEXTA-FEIRA (apenas membros, 1x por dia)
+   ============================================================ */
+async function checkFridayReminder(){
+  const me = currentUser();
+  if(!me) return;
+  if(me.role !== 'member') return; // apenas membros
+
+  const today = new Date();
+  if(today.getDay() !== 5) return; // 5 = sexta-feira
+
+  const todayIso = todayISO();
+
+  /* Só mostra uma vez por dia (por sexta) */
+  try{
+    if(localStorage.getItem(FRIDAY_REMINDER_KEY) === todayIso) return;
+  }catch(e){}
+
+  /* Aguarda qualquer dialog aberto fechar (até 30s) */
+  let waited = 0;
+  while(!$('#appDialog').hidden && waited < 30000){
+    await new Promise(r => setTimeout(r, 300));
+    waited += 300;
+  }
+
+  /* Marca como mostrado ANTES de exibir (evita duplicidade em re-renders) */
+  try{ localStorage.setItem(FRIDAY_REMINDER_KEY, todayIso); }catch(e){}
+
+  /* Calcula o range da próxima semana (segunda a sábado) */
+  const nextMonday = mondayOf(todayIso);
+  nextMonday.setDate(nextMonday.getDate() + 7);
+  const nextSaturday = new Date(nextMonday);
+  nextSaturday.setDate(nextMonday.getDate() + 5);
+  const nextWeekStart = isoOf(nextMonday);
+  const nextWeekEnd   = isoOf(nextSaturday);
+
+  /* Verifica se já existe cronograma na próxima semana */
+  let hasNextWeekTasks = false;
+  for(const iso in data.daily){
+    if(iso < nextWeekStart || iso > nextWeekEnd) continue;
+    if((data.daily[iso] || []).some(t => t.ownerId === me.id)){
+      hasNextWeekTasks = true;
+      break;
+    }
+  }
+
+  const fmtDia = dt => dt.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+  const rangeTxt = `${fmtDia(nextMonday)} a ${fmtDia(nextSaturday)}`;
+
+  let msg;
+  if(hasNextWeekTasks){
+    msg = `
+      <div>Hoje é <b>sexta-feira</b> — você já começou o cronograma da próxima semana. 📅</div>
+      <div style="margin-top:12px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;line-height:1.7;">
+        <b>Semana:</b> ${esc(rangeTxt)}<br>
+        Revise se todos os dias úteis estão completos e ajuste o que faltar.
+      </div>
+      <div style="margin-top:14px;">Confira também carteiras e categorias antes de finalizar. ✅</div>
+    `;
+  } else {
+    msg = `
+      <div>Hoje é <b>sexta-feira</b> — hora de montar o cronograma da <b>próxima semana</b>. 📅</div>
+      <div style="margin-top:12px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;line-height:1.7;">
+        <b>Semana:</b> ${esc(rangeTxt)}<br>
+        Use a aba <b>Mês</b> ou <b>Diário</b> para planejar suas atividades.
+      </div>
+      <div style="margin-top:14px;">
+        Não deixe para a última hora — o líder precisa da sua agenda atualizada. ⏰
+      </div>
+    `;
+  }
+
+  await showAlert(msg, '📅 Lembrete: cronograma da próxima semana', {
+    icon:'📅', iconVariant:'notify'
+  });
+}
+
 async function runPostRenderChecks(){
   if(postRenderLock) return;
   postRenderLock = true;
   try{
     await checkNotifications();
+    await checkFridayReminder();
     await checkHoraOpWarning();
   }catch(e){ console.warn('[postRender]', e); }
   finally{ postRenderLock = false; }
