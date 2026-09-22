@@ -801,6 +801,31 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--text) 15%, transparent);border-radius:20px;border:2px solid var(--bg);}
 ::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb, var(--text) 25%, transparent);}
+
+/* Tooltip de resumo do membro (Mês) */
+.member-tooltip{
+  position:fixed;z-index:400;pointer-events:none;
+  background:linear-gradient(180deg,var(--overlay-2),transparent),var(--surface);
+  border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;box-shadow:var(--shadow-menu);
+  min-width:230px;max-width:330px;font-size:12.5px;
+  animation:fade .12s ease;
+}
+.member-tooltip .mt-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border-soft);}
+.member-tooltip .mt-head .avatar{width:26px;height:26px;border-radius:8px;font-size:12px;flex:0 0 auto;}
+.member-tooltip .mt-name{font-size:13px;font-weight:700;letter-spacing:-.2px;}
+.member-tooltip .mt-date{font-size:10.5px;color:var(--muted);margin-top:1px;text-transform:capitalize;}
+.member-tooltip .mt-summary{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.member-tooltip .mt-empty{font-size:12px;color:var(--muted);font-style:italic;padding:4px 0;}
+.member-tooltip .mt-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:280px;overflow:hidden;}
+.member-tooltip .mt-list li{display:flex;flex-direction:column;gap:3px;padding:6px 8px;border-radius:8px;background:var(--bg-2);border-left:2px solid var(--c,var(--accent));}
+.member-tooltip .mt-list li.done{opacity:.5;}
+.member-tooltip .mt-list li.done .mt-title{text-decoration:line-through;}
+.member-tooltip .mt-time{font-size:10px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--c,var(--accent));letter-spacing:.2px;}
+.member-tooltip .mt-title{font-size:11.5px;font-weight:600;line-height:1.35;word-break:break-word;}
+.member-tooltip .mt-car{font-size:9.5px;font-weight:700;color:#93c5fd;}
+[data-theme="light"] .member-tooltip .mt-car{color:var(--accent-2);}
+.member-tooltip .mt-more{font-size:10.5px;color:var(--muted);text-align:center;padding:3px 0;background:none !important;border-left:0 !important;}
 </style>
 </head>
 <body>
@@ -1265,7 +1290,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
         <input type="text" id="pCarteiraCustom" placeholder="Adicionar carteira personalizada">
         <button type="button" class="btn ghost" id="pCarteiraAdd">＋</button>
       </div>
-      <div class="io-hint" style="margin-top:6px;margin-bottom:0;">
+      <div class="io-hint" id="profileHoHint" style="margin-top:6px;margin-bottom:0;">
         Toque nas carteiras acima para selecionar/desselecionar. Meta diária: <b>2h mínimas</b> somando <b>Hora Operacional</b> + <b>Acompanhamento</b>.
       </div>
       <div class="modal-actions">
@@ -1476,6 +1501,9 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
     </div>
   </div>
 </div>
+
+<!-- TOOLTIP: RESUMO DO MEMBRO (MÊS) -->
+<div class="member-tooltip" id="memberTooltip" hidden></div>
 
 <!-- MODAL: DIÁLOGO CUSTOMIZADO -->
 <div class="modal-backdrop" id="appDialog" hidden>
@@ -2010,6 +2038,7 @@ async function checkHoraOpWarning(){
   if(horaOpWarnedThisSession) return;
   const me = currentUser();
   if(!me) return;
+  if(me.role === 'leader') return; // líder não possui meta de HO
   const info = calcHoraOp(me.id, todayISO());
   if(info.totalMins >= HORA_OPERACIONAL_MIN) return;
 
@@ -2272,6 +2301,7 @@ function calcHoraOp(ownerId, dateIso){
 
 function renderHoraOpBanner(owner){
   if(!owner) return '';
+  if(owner.role === 'leader') return ''; // líder não possui meta de HO
   const info = calcHoraOp(owner.id, ui.date);
   const { totalMins, targetMins, allOk, none, hoMins, acMins } = info;
   const pct = Math.min(100, Math.round((totalMins/targetMins)*100));
@@ -2919,6 +2949,66 @@ function renderMonth(){
 }
 
 /* ============================================================
+   TOOLTIP: RESUMO DO MEMBRO NA ABA MÊS
+   ============================================================ */
+const memberTooltipEl = document.getElementById('memberTooltip');
+let currentTipBlock = null;
+
+function buildMemberTooltipHTML(ownerId, dateIso){
+  const owner = userById(ownerId);
+  const tasks = sortByTime((data.daily[dateIso] || []).filter(t => t.ownerId === ownerId));
+  const holidayName = holidayNameOf(dateIso);
+  let html = `<div class="mt-head">
+    ${avatarHTML(owner)}
+    <div>
+      <div class="mt-name">${esc(owner.name)}</div>
+      <div class="mt-date">${esc(fmtDateLong(dateIso))}${holidayName ? ` · 🎉 ${esc(holidayName)}` : ''}</div>
+    </div>
+  </div>`;
+  if(!tasks.length){
+    html += `<div class="mt-empty">Nenhuma atividade neste dia.</div>`;
+  } else {
+    const done = tasks.filter(t => t.done).length;
+    const mins = tasks.reduce((a,t) => a + durationMin(t), 0);
+    html += `<div class="mt-summary">${tasks.length} atividade${tasks.length>1?'s':''} · ${done} concluída${done===1?'':'s'} · ${fmtDuration(mins)}</div>`;
+    html += `<ul class="mt-list">` + tasks.slice(0, 8).map(t => {
+      const cat = catOf(t.cat);
+      const timeStr = t.end ? `${t.start || '--:--'}–${t.end}` : (t.start || '--:--');
+      return `<li class="${t.done?'done':''}" style="--c:${cat.color}">
+        <span class="mt-time">${esc(timeStr)} · ${esc(cat.label)}</span>
+        <span class="mt-title">${esc(t.title)}</span>
+        ${t.carteira ? `<span class="mt-car">🏷️ ${esc(t.carteira)}</span>` : ''}
+      </li>`;
+    }).join('') + (tasks.length > 8 ? `<li class="mt-more">+${tasks.length - 8} mais</li>` : '') + `</ul>`;
+  }
+  return html;
+}
+function showMemberTooltip(block){
+  if(!memberTooltipEl) return;
+  const oid = block.dataset.moMember;
+  const iso = block.dataset.moMemberDate;
+  if(!oid || !iso) return;
+  memberTooltipEl.innerHTML = buildMemberTooltipHTML(oid, iso);
+  memberTooltipEl.hidden = false;
+  const r  = block.getBoundingClientRect();
+  const tr = memberTooltipEl.getBoundingClientRect();
+  let left = r.right + 10;
+  let top  = r.top;
+  if(left + tr.width > window.innerWidth - 8) left = r.left - tr.width - 10;
+  if(left < 8) left = 8;
+  if(top + tr.height > window.innerHeight - 8) top = Math.max(8, window.innerHeight - tr.height - 8);
+  if(top < 8) top = 8;
+  memberTooltipEl.style.left = left + 'px';
+  memberTooltipEl.style.top  = top  + 'px';
+}
+function hideMemberTooltip(){
+  if(!memberTooltipEl) return;
+  memberTooltipEl.hidden = true;
+  memberTooltipEl.innerHTML = '';
+  currentTipBlock = null;
+}
+
+/* ============================================================
    DETALHES DO DIA
    ============================================================ */
 function openDayDetail(dateIso){
@@ -3250,7 +3340,7 @@ function renderTeamOverview(){
               <span class="flag-badge neutral" title="${esc(lastLabel)}">🕐 ${esc(lastLabel)}</span>
             </div>
             ${carteiras.length ? `<div class="member-carteiras">${carteiras.map(c => `<span class="carteira-chip">${esc(c)}</span>`).join('')}</div>` : ''}
-            ${horaOpCardHTML(u.id)}
+            ${u.role === 'leader' ? '' : horaOpCardHTML(u.id)}
             <div class="member-stats">
               <div class="col g"><div class="v">${b.done}</div><div class="k">Feitas</div></div>
               <div class="col y"><div class="v">${b.pending}</div><div class="k">Pend.</div></div>
@@ -3599,6 +3689,7 @@ function openProfileModal(){
   $('#pPhotoInput').value = '';
   renderCarteiraPicker($('#pCarteirasPicker'), profileCtx.carteiras);
   renderProfilePhotoPreview();
+  $('#profileHoHint').hidden = u.role === 'leader';
   $('#profileModal').hidden = false;
   setTimeout(() => $('#pName').focus(), 60);
 }
@@ -4367,6 +4458,7 @@ $('#moToday').addEventListener('click', () => {
   save(); render();
 });
 $('#monthGrid').addEventListener('click', e => {
+  hideMemberTooltip();
   const compactGo = e.target.closest('[data-goto-daily]');
   if(compactGo){
     e.stopPropagation();
@@ -4407,6 +4499,22 @@ $('#monthGrid').addEventListener('click', e => {
   if(!dayEl) return;
   openDayDetail(dayEl.dataset.moDay);
 });
+
+/* Tooltip de resumo do membro na aba Mês */
+$('#monthGrid').addEventListener('mouseover', e => {
+  const block = e.target.closest('[data-mo-member]');
+  if(!block || block === currentTipBlock) return;
+  currentTipBlock = block;
+  showMemberTooltip(block);
+});
+$('#monthGrid').addEventListener('mouseout', e => {
+  const block = e.target.closest('[data-mo-member]');
+  if(!block || block !== currentTipBlock) return;
+  if(block.contains(e.relatedTarget)) return;
+  hideMemberTooltip();
+});
+$('#monthGrid').addEventListener('click', () => hideMemberTooltip());
+window.addEventListener('scroll', hideMemberTooltip, true);
 
 $('#dayDetailClose').addEventListener('click', closeDayDetail);
 $('#dayDetailBtnClose').addEventListener('click', closeDayDetail);
@@ -4900,6 +5008,7 @@ $('#exportModal').addEventListener('click', e => { if(e.target.id === 'exportMod
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
   closeSettingsMenu();
+  hideMemberTooltip();
   if(!$('#appDialog').hidden) return;
   if(!$('#trainingProofModal').hidden){ closeTrainingProofPrompt(); return; }
   if(!$('#modal').hidden) closeModal();
