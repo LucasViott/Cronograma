@@ -29,7 +29,6 @@
     try{
       const app = initializeApp(firebaseConfig);
 
-      /* Analytics é opcional — falha silenciosa se bloqueado */
       try{
         const mod = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js");
         const ok = await mod.isSupported().catch(() => false);
@@ -308,7 +307,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 [data-theme="light"] .hora-op-banner .carteiras-list{border-top-color:rgba(0,0,0,.08);}
 .hora-op-banner .carteira-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);font-size:11.5px;}
 [data-theme="light"] .hora-op-banner .carteira-row{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.06);}
-.hora-op-banner .carteira-row .nm{font-weight:700;letter-spacing:.2px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);text-transform:uppercase;font-size:10.5px;}
+.hora-op-banner .carteira-row .nm{font-weight:700;letter-spacing:.2px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:11px;}
 .hora-op-banner .carteira-row .prog-mini{flex:0 0 auto;width:46px;height:5px;border-radius:20px;background:rgba(0,0,0,.28);overflow:hidden;display:inline-block;}
 [data-theme="light"] .hora-op-banner .carteira-row .prog-mini{background:rgba(0,0,0,.12);}
 .hora-op-banner .carteira-row .prog-mini i{display:block;height:100%;border-radius:20px;transition:width .35s ease;}
@@ -1267,7 +1266,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
         <button type="button" class="btn ghost" id="pCarteiraAdd">＋</button>
       </div>
       <div class="io-hint" style="margin-top:6px;margin-bottom:0;">
-        Toque nas carteiras acima para selecionar/desselecionar. Cada carteira exige <b>2h</b> de Hora Operacional por dia.
+        Toque nas carteiras acima para selecionar/desselecionar. Meta diária: <b>2h mínimas</b> somando <b>Hora Operacional</b> + <b>Acompanhamento</b>.
       </div>
       <div class="modal-actions">
         <button type="button" class="btn ghost" id="profileBtnCancel">Cancelar</button>
@@ -1498,9 +1497,9 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 /* ============================================================
    CONSTANTES
    ============================================================ */
-const STORAGE_KEY = 'cronoplano.v27';
+const STORAGE_KEY = 'cronoplano.v28';
 const THEME_KEY = 'cronoplano.theme';
-const LEGACY_KEYS = ['cronoplano.v26','cronoplano.v25','cronoplano.v24','cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
+const LEGACY_KEYS = ['cronoplano.v27','cronoplano.v26','cronoplano.v25','cronoplano.v24','cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','month','dashboard','team'];
 const ALL_MEMBERS = '__all__';
 const PHOTO_SIZE = 200;
@@ -1601,6 +1600,10 @@ let saveDebounceTimer = null;
 let suppressRemoteRender = false;
 let fbConnected = false;
 
+/* Novo: controle dos pop-ups pós-render */
+let horaOpWarnedThisSession = false;
+let postRenderLock = false;
+
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
@@ -1688,7 +1691,7 @@ function resizeImageFile(file, maxSize){
 }
 
 /* ============================================================
-   FIREBASE — helpers de sincronização
+   FIREBASE — helpers
    ============================================================ */
 function setSyncStatus(status){
   const el = document.getElementById('syncIndicator');
@@ -1799,7 +1802,24 @@ async function loadFromFirestore(){
     return false;
   }catch(e){
     console.warn('[Firestore] load error:', e);
-    setSyncStatus('error');
+    const code = e && e.code ? e.code : '';
+    const msg = e && e.message ? e.message : String(e);
+    if(code === 'unavailable' || /offline/i.test(msg)){
+      console.warn(
+        '[Firebase] Não foi possível falar com o Firestore.\n' +
+        'Checklist:\n' +
+        '  1) Firestore criado em https://console.firebase.google.com/project/cronoplano/firestore\n' +
+        '  2) Regras em "Modo de teste" ou liberando leitura/escrita\n' +
+        '  3) Sem proxy/adblock bloqueando firestore.googleapis.com\n' +
+        '  4) Rodando via http:// (não file://)'
+      );
+      setSyncStatus('offline');
+    } else if(code === 'permission-denied'){
+      console.warn('[Firebase] Regras do Firestore negaram a leitura.');
+      setSyncStatus('error');
+    } else {
+      setSyncStatus('error');
+    }
     return false;
   }
 }
@@ -1952,7 +1972,7 @@ function hasTasksThisWeek(userId){
 }
 
 /* ============================================================
-   NOTIFICAÇÕES
+   NOTIFICAÇÕES (tarefas atribuídas) + AVISO HORA OPERACIONAL
    ============================================================ */
 function pushNotification(recipientId, action, task){
   if(!recipientId) return;
@@ -1964,7 +1984,8 @@ function pushNotification(recipientId, action, task){
     byUserId: ui.currentUserId, at: new Date().toISOString(), seen: false
   });
 }
-function checkNotifications(){
+
+async function checkNotifications(){
   const me = currentUser();
   if(!me) return;
   const unseen = (data.notifications || []).filter(n => n.userId === me.id && !n.seen);
@@ -1982,7 +2003,61 @@ function checkNotifications(){
   const more = unseen.length > 8 ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;">+ ${unseen.length - 8} outra(s) alteração(ões)</div>` : '';
   const html = `<div>O líder fez alterações no seu cronograma:</div>
     <ul style="margin:12px 0 0 18px;padding:0;">${listItems}</ul>${more}`;
-  showAlert(html, '📬 Novas tarefas atribuídas', { icon:'📬', iconVariant:'notify' });
+  await showAlert(html, '📬 Novas tarefas atribuídas', { icon:'📬', iconVariant:'notify' });
+}
+
+async function checkHoraOpWarning(){
+  if(horaOpWarnedThisSession) return;
+  const me = currentUser();
+  if(!me) return;
+  const info = calcHoraOp(me.id, todayISO());
+  if(info.totalMins >= HORA_OPERACIONAL_MIN) return;
+
+  /* Se houver outro dialog aberto, aguarda ele fechar (até 30s) */
+  let waited = 0;
+  while(!$('#appDialog').hidden && waited < 30000){
+    await new Promise(r => setTimeout(r, 300));
+    waited += 300;
+  }
+  if(horaOpWarnedThisSession) return;
+  horaOpWarnedThisSession = true;
+
+  const falta = HORA_OPERACIONAL_MIN - info.totalMins;
+  const pct = Math.min(100, Math.round((info.totalMins/HORA_OPERACIONAL_MIN)*100));
+  const barColor = info.totalMins === 0 ? '#ef4444' : '#f59e0b';
+
+  const msg = `
+    <div>Você ainda não atingiu o mínimo de <b>2h</b> de <b>Hora Operacional + Acompanhamento</b> hoje.</div>
+    <div style="margin-top:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;">
+        <span>Progresso de hoje</span>
+        <span><b>${fmtDurationShort(info.totalMins)}</b> / 2h</span>
+      </div>
+      <div style="height:8px;background:var(--surface-2);border-radius:20px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${barColor};border-radius:20px;transition:width .3s;"></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;line-height:1.7;">
+      🕒 Hora Operacional: <b>${fmtDurationShort(info.hoMins)}</b><br>
+      👥 Acompanhamento: <b>${fmtDurationShort(info.acMins)}</b>
+    </div>
+    <div style="margin-top:14px;font-size:13px;">
+      ${info.totalMins === 0
+        ? 'Você ainda não registrou nenhuma atividade que conta para a meta.'
+        : `Faltam <b>${fmtDurationShort(falta)}</b> para atingir a meta diária.`}
+    </div>
+  `;
+  await showAlert(msg, '⚠️ Meta diária não atingida', { icon:'⚠️', iconVariant:'warn' });
+}
+
+async function runPostRenderChecks(){
+  if(postRenderLock) return;
+  postRenderLock = true;
+  try{
+    await checkNotifications();
+    await checkHoraOpWarning();
+  }catch(e){ console.warn('[postRender]', e); }
+  finally{ postRenderLock = false; }
 }
 
 /* ============================================================
@@ -2161,87 +2236,103 @@ function formatConflictMsg(conflicts){
 }
 
 /* ============================================================
-   HORA OPERACIONAL
+   HORA OPERACIONAL + ACOMPANHAMENTO (meta fixa de 2h/dia)
    ============================================================ */
 function calcHoraOp(ownerId, dateIso){
   const owner = userById(ownerId);
   const carteiras = carteirasOf(owner);
-  const dayTasks = (data.daily[dateIso] || []).filter(t => t.ownerId === ownerId && t.cat === 'hora-operacional');
+  const dayTasks = (data.daily[dateIso] || []).filter(t =>
+    t.ownerId === ownerId &&
+    (t.cat === 'hora-operacional' || t.cat === 'acompanhamento')
+  );
+
+  let hoMins = 0, acMins = 0;
   const perCarteira = {};
   carteiras.forEach(c => { perCarteira[c] = 0; });
-  dayTasks.forEach(t => { if(t.carteira && (t.carteira in perCarteira)) perCarteira[t.carteira] += durationMin(t); });
-  const totalMins = carteiras.reduce((s,c) => s + perCarteira[c], 0);
-  const targetMins = HORA_OPERACIONAL_MIN * carteiras.length;
-  const carteirasOk = carteiras.filter(c => perCarteira[c] >= HORA_OPERACIONAL_MIN).length;
-  const allOk = carteiras.length > 0 && carteirasOk === carteiras.length;
+
+  dayTasks.forEach(t => {
+    const mins = durationMin(t);
+    if(t.cat === 'hora-operacional'){
+      hoMins += mins;
+      if(t.carteira && (t.carteira in perCarteira)) perCarteira[t.carteira] += mins;
+    } else if(t.cat === 'acompanhamento'){
+      acMins += mins;
+    }
+  });
+
+  const totalMins = hoMins + acMins;
+  const targetMins = HORA_OPERACIONAL_MIN; // 120 min fixo por dia
+  const allOk = totalMins >= targetMins;
   const none = totalMins === 0;
-  return { owner, carteiras, perCarteira, totalMins, targetMins, carteirasOk, allOk, none };
+  const carteirasOk = allOk ? carteiras.length : 0;
+
+  return { owner, carteiras, perCarteira, totalMins, targetMins,
+           carteirasOk, allOk, none, hoMins, acMins };
 }
+
 function renderHoraOpBanner(owner){
   if(!owner) return '';
   const info = calcHoraOp(owner.id, ui.date);
-  const { carteiras, perCarteira, totalMins, targetMins, carteirasOk, allOk, none } = info;
-  if(!carteiras.length){
-    return `<div class="hora-op-banner neutral">
-      <span class="ico">🕒</span>
-      <span class="txt"><b>${esc(owner.name)}</b> — Hora Operacional
-        <span style="display:block;font-size:11.5px;opacity:.85;margin-top:3px;">Cadastre carteiras no perfil para ativar a meta diária.</span>
-      </span>
-      <span class="status-chip">Sem carteiras</span>
-      <span class="legend-hint">💡 Cada carteira exige <b>2h</b> de Hora Operacional por dia.</span>
-    </div>`;
-  }
-  const pct = targetMins > 0 ? Math.min(100, Math.round((totalMins/targetMins)*100)) : 0;
+  const { totalMins, targetMins, allOk, none, hoMins, acMins } = info;
+  const pct = Math.min(100, Math.round((totalMins/targetMins)*100));
+
   let cls, chipLabel;
-  if(allOk){ cls='ok'; chipLabel = `✓ ${carteirasOk}/${carteiras.length} ok`; }
-  else if(none){ cls='bad'; chipLabel = 'Meta não iniciada'; }
+  if(allOk){ cls='ok'; chipLabel = `✓ Meta atingida`; }
+  else if(none){ cls='bad'; chipLabel = `Faltam ${fmtDurationShort(targetMins)}`; }
   else { cls='warn'; const falta = Math.max(0, targetMins - totalMins); chipLabel = `Faltam ${fmtDurationShort(falta)}`; }
-  const sorted = [...carteiras].sort((a,b) => {
-    const aOk = perCarteira[a] >= HORA_OPERACIONAL_MIN ? 1 : 0;
-    const bOk = perCarteira[b] >= HORA_OPERACIONAL_MIN ? 1 : 0;
-    return aOk - bOk;
-  });
-  const rowsHTML = sorted.map(c => {
-    const mins = perCarteira[c] || 0;
-    const cPct = Math.min(100, Math.round((mins/HORA_OPERACIONAL_MIN)*100));
-    const state = mins >= HORA_OPERACIONAL_MIN ? 'ok' : (mins > 0 ? 'warn' : 'bad');
-    const check = mins >= HORA_OPERACIONAL_MIN ? ' ✓' : '';
-    return `<span class="carteira-row ${state}">
-      <span class="nm" title="${esc(c)}">${esc(c)}</span>
-      <span class="prog-mini"><i style="width:${cPct}%"></i></span>
-      <span class="vl">${fmtDurationShort(mins)} / 2h${check}</span>
-    </span>`;
-  }).join('');
+
+  const hoPct = Math.min(100, Math.round((hoMins/targetMins)*100));
+  const acPct = Math.min(100, Math.round((acMins/targetMins)*100));
+  const hoState = hoMins >= targetMins ? 'ok' : (hoMins > 0 ? 'warn' : 'bad');
+  const acState = acMins > 0 ? 'warn' : 'bad';
+
   return `<div class="hora-op-banner ${cls}">
     <span class="ico">🕒</span>
     <span class="txt"><b>${esc(owner.name)}</b> — Hora Operacional hoje
       <span class="prog"><i style="width:${pct}%"></i></span>
       <span class="value">${fmtDurationShort(totalMins)}</span> / ${fmtDurationShort(targetMins)}
-      <span style="opacity:.7;font-size:11px;"> (${carteirasOk}/${carteiras.length} carteiras ok)</span>
     </span>
     <span class="status-chip">${chipLabel}</span>
-    <div class="carteiras-list">${rowsHTML}</div>
-    <span class="legend-hint">💡 Cada carteira exige <b>2h</b> de Hora Operacional por dia.</span>
+    <div class="carteiras-list">
+      <span class="carteira-row ${hoState}">
+        <span class="nm" title="Hora Operacional">🕒 Hora Operacional</span>
+        <span class="prog-mini"><i style="width:${hoPct}%"></i></span>
+        <span class="vl">${fmtDurationShort(hoMins)}</span>
+      </span>
+      <span class="carteira-row ${acState}">
+        <span class="nm" title="Acompanhamento">👥 Acompanhamento</span>
+        <span class="prog-mini"><i style="width:${acPct}%"></i></span>
+        <span class="vl">${fmtDurationShort(acMins)}</span>
+      </span>
+    </div>
+    <span class="legend-hint">💡 Mínimo de <b>2h por dia</b> somando Hora Operacional + Acompanhamento.</span>
   </div>`;
 }
+
 function horaOpCardHTML(userId){
   const info = calcHoraOp(userId, todayISO());
-  const { carteiras, totalMins, targetMins, carteirasOk, allOk, none } = info;
-  if(!carteiras.length){
-    return `<div class="member-hora-op neutral" title="Sem carteiras atribuídas">
-      <span class="ico">🕒</span><span class="lbl">HO hoje</span><span class="vl">—</span>
-      <span class="chip">Sem carteiras</span></div>`;
-  }
-  const pct = targetMins > 0 ? Math.min(100, Math.round((totalMins/targetMins)*100)) : 0;
+  const { totalMins, targetMins, allOk, none } = info;
+  const pct = Math.min(100, Math.round((totalMins/targetMins)*100));
+
   let cls, chipLabel, tooltip;
-  if(allOk){ cls='ok'; chipLabel = `✓ Completo`; tooltip = `Completo (${carteirasOk}/${carteiras.length})`; }
-  else if(none){ cls='bad'; chipLabel = `Faltam ${fmtDurationShort(targetMins)}`; tooltip = `Sem HO hoje — faltam ${fmtDurationShort(targetMins)}`; }
-  else { cls='warn'; const falta = Math.max(0, targetMins - totalMins); chipLabel = `Faltam ${fmtDurationShort(falta)}`; tooltip = `Progresso ${carteirasOk}/${carteiras.length} · faltam ${fmtDurationShort(falta)}`; }
+  if(allOk){
+    cls='ok'; chipLabel = `✓ Completo`;
+    tooltip = `Meta de 2h atingida (${fmtDurationShort(totalMins)})`;
+  } else if(none){
+    cls='bad'; chipLabel = `Faltam 2h`;
+    tooltip = `Sem HO/Acompanhamento hoje — faltam 2h`;
+  } else {
+    cls='warn';
+    const falta = targetMins - totalMins;
+    chipLabel = `Faltam ${fmtDurationShort(falta)}`;
+    tooltip = `${fmtDurationShort(totalMins)} de 2h · faltam ${fmtDurationShort(falta)}`;
+  }
+
   return `<div class="member-hora-op ${cls}" title="${esc(tooltip)}">
     <span class="ico">🕒</span>
     <span class="lbl">HO hoje</span>
     <span class="prog"><i style="width:${pct}%"></i></span>
-    <span class="vl">${fmtDurationShort(totalMins)}/${fmtDurationShort(targetMins)}</span>
+    <span class="vl">${fmtDurationShort(totalMins)}/2h</span>
     <span class="chip">${chipLabel}</span>
   </div>`;
 }
@@ -2307,6 +2398,7 @@ function completeLogin(user){
   ui.categoriaFilter = '';
   ui.viewUserId = user.role === 'leader' ? ALL_MEMBERS : user.id;
   ui.tab = user.role === 'leader' ? 'month' : 'daily';
+  horaOpWarnedThisSession = false; // reset ao logar
   save();
   hideLogin();
   $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
@@ -2327,6 +2419,7 @@ async function logout(){
   ui.categoriaFilter = '';
   ui.teamPage = 1;
   ui.teamSubTab = 'overview';
+  horaOpWarnedThisSession = false;
   save();
   showLogin();
 }
@@ -3342,7 +3435,7 @@ function render(){
   else if(ui.tab === 'team') renderTeam();
   else renderDashboard();
   renderUserChip();
-  checkNotifications();
+  runPostRenderChecks();
 }
 
 /* ============================================================
@@ -4831,18 +4924,15 @@ async function init(){
   bindCarteiraPicker($('#emCarteirasPicker'), () => editMemberCtx);
   fillCategorySelects();
 
-  /* 1) Cache local primeiro (render rápido) */
   load();
   seedPredefinedUsers();
   migrateLegacyData();
 
-  /* 2) Aguarda Firebase (flag OU evento com timeout) */
   setSyncStatus('offline');
   await waitForFirebaseReady(6000);
   initFirebaseBridge();
   await loadFromFirestore();
 
-  /* 3) Aplica estado de UI */
   if(!ui.date) ui.date = todayISO();
   if(!ui.calMonth){
     const now = new Date();
