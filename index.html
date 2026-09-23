@@ -1435,6 +1435,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 const STORAGE_KEY = 'cronoplano.v28';
 const THEME_KEY = 'cronoplano.theme';
 const FRIDAY_REMINDER_KEY = 'cronoplano.fridayReminder';
+const AUTO_SAVE_INTERVAL_MS = 60 * 60 * 1000; // 1 hora
 const LEGACY_KEYS = ['cronoplano.v27','cronoplano.v26','cronoplano.v25','cronoplano.v24','cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','month','dashboard','team'];
 const ALL_MEMBERS = '__all__';
@@ -1532,6 +1533,9 @@ let firestoreUnsubscribe = null;
 let saveDebounceTimer = null;
 let suppressRemoteRender = false;
 let fbConnected = false;
+
+/* Auto-save periódico */
+let autoSaveTimer = null;
 
 let horaOpWarnedThisSession = false;
 let postRenderLock = false;
@@ -1777,6 +1781,51 @@ function saveToFirestoreDebounced(){
     }
   }, 800);
 }
+
+/* ============================================================
+   AUTO-SAVE PERIÓDICO (a cada 1 hora)
+   ============================================================ */
+async function forceSaveToServer(reason){
+  if(!firebaseBridge){ console.warn('[Auto-save] bridge indisponível'); return; }
+  try{
+    console.log('[Auto-save] Enviando dados para o servidor...' + (reason ? ` (${reason})` : ''));
+    setSyncStatus('syncing');
+    suppressRemoteRender = true;
+    await firebaseBridge.save({
+      users: data.users,
+      daily: data.daily,
+      deletedUserIds: data.deletedUserIds,
+      notifications: data.notifications
+    });
+    setSyncStatus('ok');
+    console.log('[Auto-save] ✅ Dados salvos com sucesso às', new Date().toLocaleTimeString('pt-BR'));
+  }catch(e){
+    console.warn('[Auto-save] Erro ao salvar:', e);
+    setSyncStatus('error');
+  }finally{
+    setTimeout(() => { suppressRemoteRender = false; }, 900);
+  }
+}
+function startAutoSaveTimer(){
+  if(autoSaveTimer) clearInterval(autoSaveTimer);
+  autoSaveTimer = setInterval(() => {
+    /* Só salva se houver usuário logado */
+    if(!ui.currentUserId) return;
+    forceSaveToServer('auto-horário');
+  }, AUTO_SAVE_INTERVAL_MS);
+  console.log('[Auto-save] Timer iniciado — salvamento a cada 1 hora');
+}
+/* Ao fechar a aba, tenta salvar antes de sair */
+window.addEventListener('beforeunload', () => {
+  if(fbConnected && ui.currentUserId){
+    try{
+      firebaseBridge.save({
+        users: data.users, daily: data.daily,
+        deletedUserIds: data.deletedUserIds, notifications: data.notifications
+      });
+    }catch(e){}
+  }
+});
 
 /* ============================================================
    DIÁLOGO CUSTOMIZADO
@@ -2126,7 +2175,6 @@ function migrateLegacyData(){
       if(t.cat && LEGACY_CAT_MAP[t.cat]) t.cat = LEGACY_CAT_MAP[t.cat];
       if(t.cat && !CATEGORIES[t.cat]) t.cat = 'capacitacao-inicial';
       if(typeof t.carteira !== 'string') t.carteira = '';
-      // Campos legados de comprovante podem existir; ignoramos.
       delete t.trainingProof;
       delete t.proofVerified;
       delete t.proofVerifiedAt;
@@ -3678,7 +3726,6 @@ function toggleSettingsMenu(){ if($('#settingsMenu').hidden) openSettingsMenu();
 function parseDateExcel(val){
   if(val === null || val === undefined || val === '') return null;
 
-  /* Prioridade 1: string em DD/MM/AAAA (formato brasileiro) */
   if(typeof val === 'string'){
     const s = val.trim();
     const mBR = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
@@ -3689,9 +3736,7 @@ function parseDateExcel(val){
         return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
       }
     }
-    /* ISO YYYY-MM-DD */
     if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-    /* YYYY/MM/DD */
     const mISO = s.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
     if(mISO){
       const yy = parseInt(mISO[1],10), mm = parseInt(mISO[2],10), dd = parseInt(mISO[3],10);
@@ -3701,7 +3746,6 @@ function parseDateExcel(val){
     }
   }
 
-  /* Date object vindo do Excel (cellDates:true) */
   if(val instanceof Date){
     if(isNaN(val)) return null;
     const y = val.getFullYear();
@@ -3710,13 +3754,11 @@ function parseDateExcel(val){
     return `${y}-${m}-${d}`;
   }
 
-  /* Serial number do Excel */
   if(typeof val === 'number' && val > 0){
     const d = new Date(Date.UTC(1899, 11, 30) + val * 86400000);
     if(!isNaN(d)) return d.toLocaleDateString('sv-SE', { timeZone:'UTC' });
   }
 
-  /* Fallback */
   const s = String(val).trim();
   const d = new Date(s);
   if(!isNaN(d)){
@@ -4779,6 +4821,9 @@ async function init(){
   await waitForFirebaseReady(6000);
   initFirebaseBridge();
   await loadFromFirestore();
+
+  /* Inicia o timer de auto-save (1 hora) */
+  startAutoSaveTimer();
 
   if(!ui.date) ui.date = todayISO();
   if(!ui.calMonth){
