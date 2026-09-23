@@ -133,6 +133,10 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .login-btn{width:100%;padding:12px 20px;font-size:14px;margin-top:4px;}
 .login-link-btn{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;cursor:pointer;padding:8px 6px;margin-top:8px;width:100%;text-align:center;transition:.15s;}
 .login-link-btn:hover{color:var(--text);}
+.login-link-btn.forgot{color:#93c5fd;font-weight:600;}
+[data-theme="light"] .login-link-btn.forgot{color:var(--accent-2);}
+.login-link-btn.forgot:hover{color:#bfdbfe;text-decoration:underline;}
+[data-theme="light"] .login-link-btn.forgot:hover{color:var(--accent);}
 .login-error{background:rgba(30,64,175,.14);border:1px solid rgba(30,64,175,.35);color:#93c5fd;border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500;margin-bottom:14px;animation:shake .3s ease;}
 [data-theme="light"] .login-error{color:#1e3a8a;}
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
@@ -342,12 +346,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .pill.prio-alta{--c:#2563eb;}
 .pill.prio-baixa{--c:#a3a3a3;}
 [data-theme="light"] .pill.prio-baixa{--c:#71717a;}
-.pill.training-pill{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.4);text-transform:none;}
-[data-theme="light"] .pill.training-pill{color:#6d28d9;}
-.pill.training-pending{background:rgba(245,158,11,.15);color:#fbbf24;border-color:rgba(245,158,11,.4);text-transform:none;}
-[data-theme="light"] .pill.training-pending{color:#b45309;}
-.pill.verified-pill{background:rgba(16,185,129,.15);color:#34d399;border-color:rgba(16,185,129,.4);text-transform:none;}
-[data-theme="light"] .pill.verified-pill{color:#059669;}
 .note{font-size:11.5px;color:var(--muted);font-style:italic;}
 .t-actions{display:flex;gap:4px;opacity:0;transition:.16s;}
 .task:hover .t-actions{opacity:1;}
@@ -441,13 +439,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .month-day-tasks::-webkit-scrollbar-track{background:transparent;}
 .month-day-tasks::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--text) 22%, transparent);border-radius:20px;}
 .month-day-tasks::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb, var(--text) 35%, transparent);}
-.month-task{display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:6px;background:var(--surface);border-left:2px solid var(--c,var(--accent));font-size:10.5px;cursor:pointer;transition:.13s;min-width:0;}
-.month-task:hover{background:color-mix(in srgb,var(--surface) 80%,var(--text) 6%);transform:translateX(1px);}
-.month-task.done{opacity:.42;}
-.month-task.done .mt-title{text-decoration:line-through;text-decoration-color:var(--muted);}
-.month-task.late{border-left-color:#ef4444 !important;}
-.month-task .mt-time{font-size:9.5px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--c,var(--accent));flex:0 0 auto;}
-.month-task .mt-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--text);}
 .month-more{font-size:9.5px;font-weight:700;letter-spacing:.3px;color:var(--muted);text-align:center;padding:2px 0;}
 .month-member-block{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;background:var(--surface);border:1px solid var(--border-soft);border-left:3px solid var(--mc,var(--accent));font-size:11px;cursor:pointer;transition:.13s;min-width:0;text-align:left;width:100%;font-family:inherit;color:var(--text);}
 .month-member-block:hover{background:color-mix(in srgb,var(--surface) 78%,var(--text) 8%);transform:translateX(1px);border-color:#3a3a3a;border-left-color:var(--mc);}
@@ -464,7 +455,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .month-task-compact .mt-nodata{font-size:9px;font-weight:600;color:var(--muted);font-style:italic;}
 @media(max-width:1200px){.month-day{min-height:145px;}}
 @media(max-width:1100px){.month-day{min-height:130px;}}
-@media(max-width:820px){.month-day{min-height:110px;padding:6px;}.month-day-num{font-size:12px;}.month-task{font-size:9.5px;padding:2px 5px;gap:3px;}.month-task .mt-time{display:none;}.month-day-holiday{font-size:8px;}.month-member-block{font-size:10px;padding:4px 6px;}.month-task-compact{padding:3px 5px;}.month-task-compact .mt-cat,.month-task-compact .mt-car{font-size:8.5px;padding:1px 5px;}}
+@media(max-width:820px){.month-day{min-height:110px;padding:6px;}.month-day-num{font-size:12px;}.month-member-block{font-size:10px;padding:4px 6px;}.month-task-compact{padding:3px 5px;}.month-task-compact .mt-cat,.month-task-compact .mt-car{font-size:8.5px;padding:1px 5px;}}
 @media(max-width:640px){.month-grid{grid-template-columns:repeat(3,1fr);}.month-panel .month-weekdays{display:none;}.month-day{min-height:100px;}}
 @media(max-width:400px){.month-grid{grid-template-columns:repeat(2,1fr);}}
 .day-detail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
@@ -502,25 +493,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .day-count{font-size:10.5px;color:var(--muted);font-weight:600;}
 .holiday-tag{display:inline-block;margin-top:4px;font-size:9.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:20px;background:rgba(59,130,246,.18);color:#93c5fd;border:1px solid rgba(59,130,246,.4);text-transform:uppercase;}
 [data-theme="light"] .holiday-tag{background:rgba(30,64,175,.1);color:var(--accent-2);border-color:rgba(30,64,175,.3);}
-.wk-item{background:var(--bg-2);border:1px solid var(--border-soft);border-left:3px solid var(--c,var(--accent));border-radius:9px;padding:9px 10px;cursor:pointer;transition:.16s;position:relative;animation:fade .2s ease;display:flex;gap:8px;align-items:flex-start;}
-.wk-item:hover{background:color-mix(in srgb,var(--bg-2) 85%,var(--text) 6%);border-color:#3a3a3a;border-left-color:var(--c);}
-.wk-item.readonly{cursor:default;}
-.wk-item.readonly:hover{background:var(--bg-2);border-color:var(--border-soft);}
-.wk-item.done{opacity:.45;}
-.wk-item.done .wk-title{text-decoration:line-through;}
-.wk-item.late{border-left-color:var(--danger) !important;}
-.wk-check{width:16px;height:16px;border-radius:50%;flex:0 0 auto;border:2px solid #3d3d3d;background:transparent;color:#fff;cursor:pointer;transition:.15s;display:grid;place-items:center;font-size:9px;font-weight:900;line-height:1;margin-top:1px;}
-.wk-check:hover{border-color:var(--accent);}
-.wk-item.done .wk-check{background:var(--done-check);border-color:transparent;color:var(--done-check-color);}
-.wk-item.readonly .wk-check{cursor:not-allowed;opacity:.75;}
-.wk-item.readonly .wk-check:hover{border-color:#3d3d3d;}
-.wk-body{flex:1;min-width:0;}
-.wk-time{font-size:10.5px;font-weight:700;color:var(--c,var(--accent));font-variant-numeric:tabular-nums;letter-spacing:.2px;margin-bottom:3px;}
-.wk-title{font-size:12.5px;font-weight:600;line-height:1.35;word-break:break-word;}
-.wk-del{position:absolute;top:6px;right:6px;width:19px;height:19px;border-radius:6px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;opacity:0;transition:.15s;display:grid;place-items:center;line-height:1;}
-.wk-item:hover .wk-del{opacity:1;}
-.wk-del:hover{background:color-mix(in srgb,var(--accent) 20%,transparent);color:#93c5fd;}
-[data-theme="light"] .wk-del:hover{color:var(--accent-2);}
 .wk-empty{font-size:11.5px;color:var(--muted);text-align:center;padding:14px 4px;opacity:.6;}
 .wk-member-block{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:9px;background:var(--bg-2);border:1px solid var(--border-soft);border-left:3px solid var(--mc,var(--accent));cursor:pointer;transition:.15s;min-width:0;width:100%;font-family:inherit;color:var(--text);text-align:left;}
 .wk-member-block:hover{background:color-mix(in srgb,var(--bg-2) 85%,var(--text) 6%);border-color:#3a3a3a;border-left-color:var(--mc);transform:translateX(2px);}
@@ -588,36 +560,8 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
 .filter-chip.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 4px 14px rgba(30,64,175,.4);}
 .filter-chip .ct{background:rgba(0,0,0,.28);color:inherit;font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:2px;}
 .filter-chip.active .ct{background:rgba(255,255,255,.22);}
-.team-user-select{width:auto;min-width:220px;padding:11px 42px 11px 14px;font-size:13.5px;font-weight:600;}
-.team-subtabs{display:flex;gap:5px;background:var(--surface);padding:5px;border-radius:13px;border:1px solid var(--border);margin-bottom:18px;flex-wrap:wrap;width:fit-content;max-width:100%;}
-.team-subtab{appearance:none;border:0;background:transparent;color:var(--muted);padding:8px 15px;border-radius:9px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
-.team-subtab:hover{color:var(--text);}
-.team-subtab.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 4px 16px rgba(30,64,175,.45);}
-.team-subtab .ct{background:rgba(0,0,0,.28);font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:4px;}
-.team-subtab.active .ct{background:rgba(255,255,255,.22);}
-.proofs-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
-.proof-card{background:linear-gradient(180deg,var(--overlay),transparent),var(--surface);border:1px solid var(--border);border-left:3px solid var(--c,var(--accent));border-radius:12px;padding:14px 16px;transition:.16s;}
-.proof-card:hover{border-color:#3a3a3a;border-left-color:var(--c);}
-.proof-card.verified{border-left-color:#10b981;}
-.proof-card.missing{border-left-color:#f59e0b;background:linear-gradient(90deg, rgba(245,158,11,.06), transparent), var(--surface);}
-.proof-card-header{display:flex;align-items:flex-start;gap:12px;}
-.proof-card-header .avatar{width:32px;height:32px;border-radius:9px;font-size:13px;flex:0 0 auto;}
-.proof-card-head-main{flex:1;min-width:0;}
-.proof-card-title{font-size:14.5px;font-weight:700;letter-spacing:-.15px;line-height:1.35;word-break:break-word;}
-.proof-card-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted);margin-top:6px;}
-.proof-card-meta .sep{opacity:.5;}
-.proof-card-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;}
-.proof-text{font-size:13px;line-height:1.55;background:var(--bg-2);border:1px solid var(--border-soft);border-radius:10px;padding:10px 12px;margin-top:10px;color:var(--text);white-space:pre-wrap;word-break:break-word;}
-.proof-text.empty{color:var(--muted);font-style:italic;text-align:center;}
-.proof-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-soft);}
-.proof-actions .btn{padding:7px 13px;font-size:12.5px;}
-.verify-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap;}
-.verify-badge.ok{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.38);}
-.verify-badge.pending{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.38);}
-.verify-badge.none{background:rgba(163,163,163,.14);color:#a3a3a3;border:1px solid rgba(163,163,163,.32);}
-[data-theme="light"] .verify-badge.ok{color:#059669;}
-[data-theme="light"] .verify-badge.pending{color:#b45309;}
-@media(max-width:640px){.proof-card-header{flex-wrap:wrap;}}
+.team-user-select{width:auto;min-width:200px;padding:11px 42px 11px 14px;font-size:13.5px;font-weight:600;}
+.team-cat-select{width:auto;min-width:190px;padding:11px 42px 11px 14px;font-size:13.5px;font-weight:600;}
 .members-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;}
 .member-card{background:linear-gradient(180deg,var(--overlay-2),transparent),var(--bg-2);border:1px solid var(--border-soft);border-left:3px solid var(--c);border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;transition:.16s;cursor:pointer;position:relative;}
 .member-card:hover{border-color:#3a3a3a;transform:translateY(-1px);}
@@ -862,6 +806,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
         </label>
         <div class="login-error" id="loginError2" hidden></div>
         <button type="submit" class="btn primary login-btn">Entrar →</button>
+        <button type="button" class="login-link-btn forgot" id="loginForgot">Esqueci minha senha</button>
         <button type="button" class="login-link-btn" id="loginBack2">← Voltar</button>
       </div>
       <div id="loginStepSetup" hidden>
@@ -1123,15 +1068,10 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
     <div class="section-head">
       <div>
         <h2>👥 Visão da Equipe</h2>
-        <p>Acompanhe pendências, conclusões, atrasos e validação de treinamento de todos os membros.</p>
+        <p>Acompanhe pendências, conclusões e atrasos dos membros da equipe.</p>
       </div>
     </div>
-    <div class="team-subtabs" id="teamSubtabs">
-      <button class="team-subtab active" data-team-sub="overview">👥 Resumo</button>
-      <button class="team-subtab" data-team-sub="proofs">✓ Validação <span class="ct" id="proofsTabCount">0</span></button>
-    </div>
     <div id="teamOverviewWrap"></div>
-    <div id="teamProofsWrap" hidden></div>
   </section>
 
 </main>
@@ -1167,16 +1107,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
         </label>
         <label class="field"><span>Carteira</span>
           <select id="fCarteira"></select>
-        </label>
-      </div>
-      <div id="trainingProofRow" hidden>
-        <div class="section-divider" style="margin-top:6px;">🎓 Comprovante de treinamento</div>
-        <div class="io-hint" style="margin-top:0;">
-          Opcional no cadastro — ao <b>concluir</b> a atividade será exigido um comprovante (texto).
-        </div>
-        <label class="field"><span>Descrição</span>
-          <textarea id="fTrainingProof" rows="3" maxlength="400"
-            placeholder="Como realizou o treinamento (certificado, link, instrutor, etc.)"></textarea>
         </label>
       </div>
       <div class="row">
@@ -1394,6 +1324,7 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
     <div class="io-hint">
       A planilha deve ter <b>obrigatoriamente</b> as colunas:
       <code>Data</code>, <code>Hora Início</code>, <code>Hora Fim</code>, <code>Descrição</code>, <code>Categoria</code> e <code>Carteira</code>.<br>
+      A coluna <b>Data</b> deve estar no formato <b>DD/MM/AAAA</b> (ex: <code>25/12/2026</code>).<br>
       Linhas sem <b>Carteira</b> preenchida ou com <b>Categoria</b>/<b>Carteira</b> que <u>não existem no sistema</u> serão
       <b style="color:#fca5a5;">destacadas em vermelho</b> e <u>não serão importadas</u>.
       <span id="importOwnerLine"> As tarefas serão importadas para <b id="importOwnerName">—</b>.</span>
@@ -1478,30 +1409,6 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
   </div>
 </div>
 
-<!-- MODAL: COMPROVANTE DE TREINAMENTO -->
-<div class="modal-backdrop" id="trainingProofModal" hidden>
-  <div class="modal" style="max-width:520px;">
-    <div class="modal-head">
-      <h3>🎓 Comprovante de treinamento</h3>
-      <button class="icon-btn" id="trainingProofClose" type="button">✕</button>
-    </div>
-    <div class="io-hint" style="margin-bottom:14px;">
-      Esta atividade é de <b>treinamento</b>. Para concluí-la, descreva como você a realizou.
-    </div>
-    <div id="trainingProofTaskInfo" style="margin-bottom:14px;"></div>
-    <label class="field">
-      <span>Como realizou o treinamento?</span>
-      <textarea id="tpProofText" rows="4" maxlength="400"
-        placeholder="Ex.: Curso X concluído em DD/MM · certificado nº ... · link ... · instrutor ..."></textarea>
-    </label>
-    <div class="login-error" id="tpError" hidden></div>
-    <div class="modal-actions">
-      <button type="button" class="btn ghost" id="trainingProofCancel">Cancelar</button>
-      <button type="button" class="btn primary" id="trainingProofSave">Salvar e concluir ✓</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOOLTIP: RESUMO DO MEMBRO (MÊS) -->
 <div class="member-tooltip" id="memberTooltip" hidden></div>
 
@@ -1555,7 +1462,6 @@ const CATEGORIES = {
   'tempo-administrativo': { label:'Tempo Administrativo', color:'#a855f7' },
   'campanha-acao':        { label:'Campanha/Ação',        color:'#84cc16' }
 };
-const TRAINING_CATEGORIES = ['capacitacao-inicial','aperfeicoamento','campanha-acao'];
 const LEGACY_CAT_MAP = {'formacao-inicial':'capacitacao-inicial','formacao-continuada':'aperfeicoamento','acompanhamento-operacional':'acompanhamento','hora-operacional':'hora-operacional','criacao-conteudo':'criacao-conteudo'};
 const PRIO = { alta:{label:'Alta'}, media:{label:'Média'}, baixa:{label:'Baixa'} };
 
@@ -1612,16 +1518,14 @@ let ui = {
   tab:'daily', date:todayISO(),
   calMonth:{year:new Date().getFullYear(), month:new Date().getMonth()},
   currentUserId:null, viewUserId:null,
-  teamFilter:'all', teamUserFilter:'',
+  teamFilter:'all', teamUserFilter:'', teamCategoriaFilter:'',
   carteiraFilter:'', categoriaFilter:'',
-  teamPage:1, teamPageSize:10,
-  teamSubTab:'overview', teamProofsFilter:'all'
+  teamPage:1, teamPageSize:10
 };
 let loginCtx = { step:'name', userId:null };
 let importCtx = { rows:[], errors:0, valid:0, mode:'single', single:null, multi:[] };
 let editMemberCtx = { userId:null, carteiras:[], photo:'', role:'member' };
 let dayDetailCtx = { date:null };
-let trainingProofCtx = { date:null, id:null };
 
 let firebaseBridge = null;
 let firestoreUnsubscribe = null;
@@ -1629,7 +1533,6 @@ let saveDebounceTimer = null;
 let suppressRemoteRender = false;
 let fbConnected = false;
 
-/* Novo: controle dos pop-ups pós-render */
 let horaOpWarnedThisSession = false;
 let postRenderLock = false;
 
@@ -1792,9 +1695,9 @@ function applyRemoteData(remote){
       tab: ui.tab, date: ui.date, calMonth: ui.calMonth,
       currentUserId: ui.currentUserId, viewUserId: ui.viewUserId,
       teamFilter: ui.teamFilter, teamUserFilter: ui.teamUserFilter,
+      teamCategoriaFilter: ui.teamCategoriaFilter,
       carteiraFilter: ui.carteiraFilter, categoriaFilter: ui.categoriaFilter,
-      teamPage: ui.teamPage, teamPageSize: ui.teamPageSize,
-      teamSubTab: ui.teamSubTab, teamProofsFilter: ui.teamProofsFilter
+      teamPage: ui.teamPage, teamPageSize: ui.teamPageSize
     }
   })); }catch(e){}
 
@@ -2039,11 +1942,10 @@ async function checkHoraOpWarning(){
   if(horaOpWarnedThisSession) return;
   const me = currentUser();
   if(!me) return;
-  if(me.role === 'leader') return; // líder não possui meta de HO
+  if(me.role === 'leader') return;
   const info = calcHoraOp(me.id, todayISO());
   if(info.totalMins >= HORA_OPERACIONAL_MIN) return;
 
-  /* Se houver outro dialog aberto, aguarda ele fechar (até 30s) */
   let waited = 0;
   while(!$('#appDialog').hidden && waited < 30000){
     await new Promise(r => setTimeout(r, 300));
@@ -2086,29 +1988,24 @@ async function checkHoraOpWarning(){
 async function checkFridayReminder(){
   const me = currentUser();
   if(!me) return;
-  if(me.role !== 'member') return; // apenas membros
+  if(me.role !== 'member') return;
 
   const today = new Date();
-  if(today.getDay() !== 5) return; // 5 = sexta-feira
+  if(today.getDay() !== 5) return;
 
   const todayIso = todayISO();
-
-  /* Só mostra uma vez por dia (por sexta) */
   try{
     if(localStorage.getItem(FRIDAY_REMINDER_KEY) === todayIso) return;
   }catch(e){}
 
-  /* Aguarda qualquer dialog aberto fechar (até 30s) */
   let waited = 0;
   while(!$('#appDialog').hidden && waited < 30000){
     await new Promise(r => setTimeout(r, 300));
     waited += 300;
   }
 
-  /* Marca como mostrado ANTES de exibir (evita duplicidade em re-renders) */
   try{ localStorage.setItem(FRIDAY_REMINDER_KEY, todayIso); }catch(e){}
 
-  /* Calcula o range da próxima semana (segunda a sábado) */
   const nextMonday = mondayOf(todayIso);
   nextMonday.setDate(nextMonday.getDate() + 7);
   const nextSaturday = new Date(nextMonday);
@@ -2116,7 +2013,6 @@ async function checkFridayReminder(){
   const nextWeekStart = isoOf(nextMonday);
   const nextWeekEnd   = isoOf(nextSaturday);
 
-  /* Verifica se já existe cronograma na próxima semana */
   let hasNextWeekTasks = false;
   for(const iso in data.daily){
     if(iso < nextWeekStart || iso > nextWeekEnd) continue;
@@ -2194,19 +2090,17 @@ function load(){
         ui.viewUserId = parsed.ui.viewUserId || null;
         ui.teamFilter = parsed.ui.teamFilter || 'all';
         ui.teamUserFilter = parsed.ui.teamUserFilter || '';
+        ui.teamCategoriaFilter = parsed.ui.teamCategoriaFilter || '';
         ui.carteiraFilter = parsed.ui.carteiraFilter || '';
         ui.categoriaFilter = parsed.ui.categoriaFilter || '';
         ui.teamPage = parsed.ui.teamPage || 1;
         ui.teamPageSize = parsed.ui.teamPageSize || 10;
-        ui.teamSubTab = parsed.ui.teamSubTab || 'overview';
-        ui.teamProofsFilter = parsed.ui.teamProofsFilter || 'all';
       }
     }
   }catch(err){ console.warn('Falha ao carregar dados:', err); }
   if(!VALID_TABS.includes(ui.tab)) ui.tab = 'daily';
   if(ui.carteiraFilter === '__none__') ui.carteiraFilter = '';
   if(![5,10,20].includes(ui.teamPageSize)) ui.teamPageSize = 10;
-  if(!['overview','proofs'].includes(ui.teamSubTab)) ui.teamSubTab = 'overview';
   if(!Array.isArray(data.notifications)) data.notifications = [];
 }
 function save(){
@@ -2218,9 +2112,9 @@ function save(){
         tab: ui.tab, date: ui.date, calMonth: ui.calMonth,
         currentUserId: ui.currentUserId, viewUserId: ui.viewUserId,
         teamFilter: ui.teamFilter, teamUserFilter: ui.teamUserFilter,
+        teamCategoriaFilter: ui.teamCategoriaFilter,
         carteiraFilter: ui.carteiraFilter, categoriaFilter: ui.categoriaFilter,
-        teamPage: ui.teamPage, teamPageSize: ui.teamPageSize,
-        teamSubTab: ui.teamSubTab, teamProofsFilter: ui.teamProofsFilter
+        teamPage: ui.teamPage, teamPageSize: ui.teamPageSize
       }
     }));
   }catch(err){ console.warn('Falha ao salvar:', err); }
@@ -2232,10 +2126,11 @@ function migrateLegacyData(){
       if(t.cat && LEGACY_CAT_MAP[t.cat]) t.cat = LEGACY_CAT_MAP[t.cat];
       if(t.cat && !CATEGORIES[t.cat]) t.cat = 'capacitacao-inicial';
       if(typeof t.carteira !== 'string') t.carteira = '';
-      if(typeof t.trainingProof !== 'string') t.trainingProof = '';
-      if(typeof t.proofVerified !== 'boolean') t.proofVerified = false;
-      if(typeof t.proofVerifiedAt !== 'string') t.proofVerifiedAt = '';
-      if(typeof t.proofVerifiedBy !== 'string') t.proofVerifiedBy = '';
+      // Campos legados de comprovante podem existir; ignoramos.
+      delete t.trainingProof;
+      delete t.proofVerified;
+      delete t.proofVerifiedAt;
+      delete t.proofVerifiedBy;
     });
   });
 }
@@ -2369,7 +2264,7 @@ function calcHoraOp(ownerId, dateIso){
   });
 
   const totalMins = hoMins + acMins;
-  const targetMins = HORA_OPERACIONAL_MIN; // 120 min fixo por dia
+  const targetMins = HORA_OPERACIONAL_MIN;
   const allOk = totalMins >= targetMins;
   const none = totalMins === 0;
   const carteirasOk = allOk ? carteiras.length : 0;
@@ -2380,7 +2275,7 @@ function calcHoraOp(ownerId, dateIso){
 
 function renderHoraOpBanner(owner){
   if(!owner) return '';
-  if(owner.role === 'leader') return ''; // líder não possui meta de HO
+  if(owner.role === 'leader') return '';
   const info = calcHoraOp(owner.id, ui.date);
   const { totalMins, targetMins, allOk, none, hoMins, acMins } = info;
   const pct = Math.min(100, Math.round((totalMins/targetMins)*100));
@@ -2507,7 +2402,7 @@ function completeLogin(user){
   ui.categoriaFilter = '';
   ui.viewUserId = user.role === 'leader' ? ALL_MEMBERS : user.id;
   ui.tab = user.role === 'leader' ? 'month' : 'daily';
-  horaOpWarnedThisSession = false; // reset ao logar
+  horaOpWarnedThisSession = false;
   save();
   hideLogin();
   $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
@@ -2524,10 +2419,10 @@ async function logout(){
   ui.tab = 'daily';
   ui.teamFilter = 'all';
   ui.teamUserFilter = '';
+  ui.teamCategoriaFilter = '';
   ui.carteiraFilter = '';
   ui.categoriaFilter = '';
   ui.teamPage = 1;
-  ui.teamSubTab = 'overview';
   horaOpWarnedThisSession = false;
   save();
   showLogin();
@@ -2693,14 +2588,6 @@ function renderDaily(){
       const lateCls = status === 'late' ? 'late' : '';
       const roCls = canEdit ? '' : 'readonly';
       const timeRange = t.end ? `${esc(t.start || '--:--')} – ${esc(t.end)}` : (t.start ? esc(t.start) : '--:--');
-      const needsProof = TRAINING_CATEGORIES.includes(t.cat) && !t.trainingProof && !t.done;
-      let trainingPill = '';
-      if(t.trainingProof){
-        const verified = t.proofVerified ? ' ✓' : '';
-        trainingPill = `<span class="pill training-pill">🎓 Treinamento${verified}</span>`;
-      } else if(needsProof){
-        trainingPill = `<span class="pill training-pending">🎓 Comprovante pendente</span>`;
-      }
       return `<li class="task ${t.done?'done':''} ${lateCls} ${roCls}" data-id="${t.id}" data-date="${date}" style="--c:${cat.color}">
         <button class="check" data-act="toggle" title="${canEdit ? 'Marcar como concluída' : 'Somente leitura'}">${t.done?'✓':''}</button>
         <div class="t-time"><strong>${timeRange}</strong></div>
@@ -2710,8 +2597,6 @@ function renderDaily(){
             ${allView ? ownerPillHTML(t) : ''}
             <span class="pill" style="--c:${cat.color}">${cat.label}</span>
             ${t.carteira ? `<span class="pill carteira">🏷️ ${esc(t.carteira)}</span>` : ''}
-            ${trainingPill}
-            ${t.proofVerified ? `<span class="pill verified-pill">✓ Validado</span>` : ''}
             ${t.prio && t.prio !== 'media' ? `<span class="pill prio-${t.prio}">${prio.label}</span>` : ''}
             ${status === 'late' ? `<span class="pill" style="--c:#ef4444">Atrasada</span>` : ''}
             ${t.notes ? `<span class="note">${esc(t.notes)}</span>` : ''}
@@ -3128,12 +3013,9 @@ function openDayDetail(dateIso){
               ${showOwner ? `<span class="pill owner-pill" style="--c:${owner.color}">${avatarHTML(owner)}${esc(owner.name)}</span>` : ''}
               <span class="pill" style="--c:${cat.color}">${cat.label}</span>
               ${t.carteira ? `<span class="pill carteira">🏷️ ${esc(t.carteira)}</span>` : ''}
-              ${t.trainingProof ? `<span class="pill training-pill">🎓 Treinamento</span>` : ''}
-              ${t.proofVerified ? `<span class="pill verified-pill">✓ Validado</span>` : ''}
               ${t.prio && t.prio !== 'media' ? `<span class="pill prio-${t.prio}">${prio.label}</span>` : ''}
               ${statusBadge}
             </div>
-            ${t.trainingProof ? `<div class="dd-notes" style="border-left-color:rgba(139,92,246,.5);">🎓 <b>Comprovante:</b> ${esc(t.trainingProof)}</div>` : ''}
             ${t.notes ? `<div class="dd-notes">${esc(t.notes)}</div>` : ''}
           </div>
           ${actions}
@@ -3307,11 +3189,12 @@ function collectTeamStats(){
   });
   return { total, done, pending, late, byUser };
 }
-function collectTeamTasks(filterStatus, filterUser){
+function collectTeamTasks(filterStatus, filterUser, filterCategoria){
   const items = [];
   Object.entries(data.daily).forEach(([iso, arr]) => {
     arr.forEach(t => {
       if(filterUser && t.ownerId !== filterUser) return;
+      if(filterCategoria && t.cat !== filterCategoria) return;
       const st = taskStatus(t, iso);
       if(filterStatus === 'done' && st !== 'done') return;
       if(filterStatus === 'pending' && st !== 'pending') return;
@@ -3325,47 +3208,12 @@ function collectTeamTasks(filterStatus, filterUser){
   });
   return items;
 }
-function collectTrainingProofs(filter, filterUser){
-  const items = [];
-  Object.entries(data.daily).forEach(([iso, arr]) => {
-    arr.forEach(t => {
-      if(!TRAINING_CATEGORIES.includes(t.cat)) return;
-      if(filterUser && t.ownerId !== filterUser) return;
-      const hasText = !!(t.trainingProof || '').trim();
-      const verified = !!t.proofVerified;
-      if(filter === 'verified' && !verified) return;
-      if(filter === 'pending' && (verified || !hasText)) return;
-      if(filter === 'missing' && hasText) return;
-      items.push({ task:t, date:iso, hasText, verified });
-    });
-  });
-  items.sort((a,b) => {
-    const rank = x => { if(!x.hasText) return 0; if(!x.verified) return 1; return 2; };
-    const ra = rank(a), rb = rank(b);
-    if(ra !== rb) return ra - rb;
-    return b.date.localeCompare(a.date);
-  });
-  return items;
-}
-function countProofsByStatus(filterUser){
-  let missing=0, pending=0, verified=0;
-  Object.entries(data.daily).forEach(([iso, arr]) => {
-    arr.forEach(t => {
-      if(!TRAINING_CATEGORIES.includes(t.cat)) return;
-      if(filterUser && t.ownerId !== filterUser) return;
-      const hasText = !!(t.trainingProof || '').trim();
-      if(!hasText) missing++;
-      else if(t.proofVerified) verified++;
-      else pending++;
-    });
-  });
-  return { missing, pending, verified, total: missing + pending + verified };
-}
 function renderTeamOverview(){
   const S = collectTeamStats();
   const filterStatus = ui.teamFilter;
   const filterUser = ui.teamUserFilter;
-  const filteredTasks = collectTeamTasks(filterStatus, filterUser);
+  const filterCategoria = ui.teamCategoriaFilter;
+  const filteredTasks = collectTeamTasks(filterStatus, filterUser, filterCategoria);
   const counts = { all:S.total, pending:S.pending, done:S.done, late:S.late };
   const pageSize = ui.teamPageSize;
   const totalPages = Math.max(1, Math.ceil(filteredTasks.length / pageSize));
@@ -3375,6 +3223,12 @@ function renderTeamOverview(){
   const pageTasks = filteredTasks.slice(startIdx, startIdx + pageSize);
   const showingFrom = filteredTasks.length ? startIdx + 1 : 0;
   const showingTo = Math.min(startIdx + pageSize, filteredTasks.length);
+
+  const catOptions = [
+    `<option value="" ${filterCategoria === '' ? 'selected' : ''}>Todas as categorias</option>`
+  ].concat(Object.entries(CATEGORIES).map(([k,v]) =>
+    `<option value="${k}" ${filterCategoria === k ? 'selected' : ''}>${esc(v.label)}</option>`
+  )).join('');
 
   $('#teamOverviewWrap').innerHTML = `
     <div class="stat-grid">
@@ -3441,6 +3295,9 @@ function renderTeamOverview(){
           <button class="filter-chip ${filterStatus==='done'?'active':''}" data-status="done">Concluídas <span class="ct">${counts.done}</span></button>
           <button class="filter-chip ${filterStatus==='late'?'active':''}" data-status="late">Atrasadas <span class="ct">${counts.late}</span></button>
         </div>
+        <select class="team-cat-select" id="teamCatSelect">
+          ${catOptions}
+        </select>
         <select class="team-user-select" id="teamUserSelect">
           <option value="">Todos os membros</option>
           ${usersList().map(u => `<option value="${u.id}" ${filterUser===u.id?'selected':''}>${esc(u.name)}</option>`).join('')}
@@ -3463,8 +3320,6 @@ function renderTeamOverview(){
                   ${timeStr ? `<span>·</span><span>${esc(timeStr)}</span>` : ''}
                   <span>·</span><span style="color:${cat.color};">${cat.label}</span>
                   ${t.carteira ? `<span>·</span><span>🏷️ ${esc(t.carteira)}</span>` : ''}
-                  ${t.trainingProof ? `<span>·</span><span style="color:#c4b5fd;">🎓 Treinamento</span>` : ''}
-                  ${t.proofVerified ? `<span>·</span><span style="color:#34d399;">✓ Validado</span>` : ''}
                 </div>
               </div>
               <span class="status-badge ${status}">${statusLabel}</span>
@@ -3495,93 +3350,8 @@ function renderTeamOverview(){
     </div>
   `;
 }
-function renderTeamProofs(){
-  const filterUser = ui.teamUserFilter;
-  const filter = ui.teamProofsFilter || 'all';
-  const items = collectTrainingProofs(filter, filterUser);
-  const counts = countProofsByStatus(filterUser);
-  $('#teamProofsWrap').innerHTML = `
-    <div class="stat-grid">
-      <div class="stat-card blue"><div class="k">Total de treinamentos</div><div class="v">${counts.total}</div><div class="s">atividades de treinamento na equipe</div></div>
-      <div class="stat-card warn"><div class="k">Sem comprovante</div><div class="v">${counts.missing}</div><div class="s">aguardando envio pelo membro</div></div>
-      <div class="stat-card purple"><div class="k">Aguardando validação</div><div class="v">${counts.pending}</div><div class="s">comprovante enviado, não conferido</div></div>
-      <div class="stat-card green"><div class="k">Validados</div><div class="v">${counts.verified}</div><div class="s">comprovantes conferidos por líder</div></div>
-    </div>
-    <div class="panel">
-      <div class="panel-head">
-        <h3>✓ Validação de comprovantes</h3>
-        <span class="chip">${items.length} resultado(s)</span>
-      </div>
-      <div class="filters">
-        <div class="filter-group">
-          <button class="filter-chip ${filter==='all'?'active':''}" data-proof-filter="all">Todos <span class="ct">${counts.total}</span></button>
-          <button class="filter-chip ${filter==='missing'?'active':''}" data-proof-filter="missing">Sem comprovante <span class="ct">${counts.missing}</span></button>
-          <button class="filter-chip ${filter==='pending'?'active':''}" data-proof-filter="pending">Aguardando <span class="ct">${counts.pending}</span></button>
-          <button class="filter-chip ${filter==='verified'?'active':''}" data-proof-filter="verified">Validados <span class="ct">${counts.verified}</span></button>
-        </div>
-        <select class="team-user-select" id="teamProofsUserSelect">
-          <option value="">Todos os membros</option>
-          ${usersList().map(u => `<option value="${u.id}" ${filterUser===u.id?'selected':''}>${esc(u.name)}</option>`).join('')}
-        </select>
-      </div>
-      ${items.length ? `<ul class="proofs-list">
-        ${items.map(({ task:t, date, hasText, verified }) => {
-          const owner = userById(t.ownerId);
-          const cat = catOf(t.cat);
-          const cardCls = verified ? 'verified' : (!hasText ? 'missing' : '');
-          const verifyBadge = verified
-            ? `<span class="verify-badge ok">✓ Validado</span>`
-            : (hasText ? `<span class="verify-badge pending">⏳ Aguardando validação</span>` : `<span class="verify-badge none">— Sem comprovante</span>`);
-          const timeStr = t.end ? `${t.start || '--:--'}–${t.end}` : (t.start || '');
-          return `<li class="proof-card ${cardCls}" style="--c:${cat.color}">
-            <div class="proof-card-header">
-              ${avatarHTML(owner)}
-              <div class="proof-card-head-main">
-                <div class="proof-card-title">${esc(t.title)}</div>
-                <div class="proof-card-meta">
-                  <span class="who" style="font-weight:700;color:var(--text);">${esc(owner.name)}</span>
-                  <span class="sep">·</span>
-                  <span>${fmtDateFull(date)}</span>
-                  ${timeStr ? `<span class="sep">·</span><span>${esc(timeStr)}</span>` : ''}
-                  <span class="sep">·</span>
-                  <span style="color:${cat.color};">${cat.label}</span>
-                  ${t.carteira ? `<span class="sep">·</span><span>🏷️ ${esc(t.carteira)}</span>` : ''}
-                </div>
-                <div class="proof-card-badges">
-                  ${verifyBadge}
-                  ${t.done ? `<span class="status-badge done">Concluída</span>` : `<span class="status-badge pending">Pendente</span>`}
-                </div>
-              </div>
-            </div>
-            ${hasText ? `<div class="proof-text">${esc(t.trainingProof)}</div>` : `<div class="proof-text empty">O membro ainda não enviou o comprovante.</div>`}
-            ${verified ? `<div style="margin-top:10px;font-size:11.5px;color:var(--muted);">
-              ✓ Validado por <b>${esc((userById(t.proofVerifiedBy).name) || '—')}</b>
-              ${t.proofVerifiedAt ? ` em ${fmtDateTimeShort(t.proofVerifiedAt)}` : ''}
-            </div>` : ''}
-            ${hasText ? `<div class="proof-actions">
-              ${verified
-                ? `<button type="button" class="btn ghost small" data-proof-act="unverify" data-proof-date="${date}" data-proof-id="${t.id}">↺ Desfazer validação</button>`
-                : `<button type="button" class="btn primary success-btn small" data-proof-act="verify" data-proof-date="${date}" data-proof-id="${t.id}">✓ Marcar como validado</button>`}
-            </div>` : ''}
-          </li>`;
-        }).join('')}
-      </ul>` : `<div class="empty">
-        <span class="big">🎓</span>
-        Nenhum comprovante encontrado com esses filtros.
-      </div>`}
-    </div>
-  `;
-}
 function renderTeam(){
-  const showProofs = ui.teamSubTab === 'proofs';
-  $('#teamOverviewWrap').hidden = showProofs;
-  $('#teamProofsWrap').hidden = !showProofs;
-  $$('.team-subtab').forEach(b => b.classList.toggle('active', b.dataset.teamSub === ui.teamSubTab));
-  const counts = countProofsByStatus(ui.teamUserFilter);
-  const pending = counts.missing + counts.pending;
-  $('#proofsTabCount').textContent = pending;
-  if(showProofs) renderTeamProofs();
-  else renderTeamOverview();
+  renderTeamOverview();
 }
 
 /* ============================================================
@@ -3667,16 +3437,6 @@ function bindCarteiraPicker(wrapEl, getCtx){
 }
 
 /* ============================================================
-   VISIBILIDADE DO BLOCO DE TREINAMENTO
-   ============================================================ */
-function updateTrainingProofVisibility(){
-  const cat = $('#fCat').value;
-  const row = $('#trainingProofRow');
-  if(!row) return;
-  row.hidden = !TRAINING_CATEGORIES.includes(cat);
-}
-
-/* ============================================================
    MODAL: TAREFA
    ============================================================ */
 let modalCtx = null;
@@ -3703,40 +3463,12 @@ function openModal(opts){
   $('#fCat').value   = item.cat || 'capacitacao-inicial';
   $('#fPrio').value  = item.prio || 'media';
   $('#fNotes').value = item.notes || '';
-  $('#fTrainingProof').value = item.trainingProof || '';
-  updateTrainingProofVisibility();
   $('#modal').hidden = false;
   setTimeout(() => $('#fTitle').focus(), 60);
 }
 function closeModal(){
   $('#modal').hidden = true;
   modalCtx = null;
-}
-
-/* ============================================================
-   POP-UP: COMPROVANTE AO CONCLUIR
-   ============================================================ */
-function openTrainingProofPrompt(date, id){
-  const arr = data.daily[date] || [];
-  const t = arr.find(x => x.id === id);
-  if(!t) return;
-  trainingProofCtx = { date, id };
-  const cat = catOf(t.cat);
-  $('#trainingProofTaskInfo').innerHTML = `<div style="background:var(--bg-2);border:1px solid var(--border);border-left:3px solid ${cat.color};border-radius:10px;padding:10px 12px;font-size:13px;">
-    <div style="font-weight:700;margin-bottom:4px;">${esc(t.title)}</div>
-    <div style="color:var(--muted);font-size:11.5px;">
-      ${cat.label}${t.carteira ? ' · ' + esc(t.carteira) : ''}
-      ${t.start ? ` · ${esc(t.start)}${t.end ? '–' + esc(t.end) : ''}` : ''}
-    </div>
-  </div>`;
-  $('#tpProofText').value = t.trainingProof || '';
-  $('#tpError').hidden = true;
-  $('#trainingProofModal').hidden = false;
-  setTimeout(() => $('#tpProofText').focus(), 60);
-}
-function closeTrainingProofPrompt(){
-  $('#trainingProofModal').hidden = true;
-  trainingProofCtx = { date: null, id: null };
 }
 
 /* ============================================================
@@ -3855,18 +3587,7 @@ async function toggleTask(date, id){
   const t = arr.find(x => x.id === id);
   if(!t) return;
   if(!isLeader() && t.ownerId !== ui.currentUserId) return;
-  if(t.done){
-    t.done = false;
-    touchUser(t.ownerId);
-    save(); render();
-    return;
-  }
-  const hasProof = !!(t.trainingProof || '').trim();
-  if(TRAINING_CATEGORIES.includes(t.cat) && !hasProof){
-    openTrainingProofPrompt(date, id);
-    return;
-  }
-  t.done = true;
+  t.done = !t.done;
   touchUser(t.ownerId);
   save(); render();
 }
@@ -3910,30 +3631,6 @@ async function deleteMember(userId){
   if(ui.viewUserId === userId) ui.viewUserId = isLeader() ? ALL_MEMBERS : ui.currentUserId;
   if(ui.teamUserFilter === userId) ui.teamUserFilter = '';
   save(); render();
-}
-async function verifyProof(date, id){
-  if(!isLeader()) return;
-  const arr = data.daily[date] || [];
-  const t = arr.find(x => x.id === id);
-  if(!t) return;
-  t.proofVerified = true;
-  t.proofVerifiedAt = new Date().toISOString();
-  t.proofVerifiedBy = ui.currentUserId;
-  save(); renderTeam();
-}
-async function unverifyProof(date, id){
-  if(!isLeader()) return;
-  const arr = data.daily[date] || [];
-  const t = arr.find(x => x.id === id);
-  if(!t) return;
-  const ok = await showConfirm('Desfazer a validação deste comprovante?', 'Desfazer validação', {
-    icon:'↺', iconVariant:'warn', confirmText:'Desfazer'
-  });
-  if(!ok) return;
-  t.proofVerified = false;
-  t.proofVerifiedAt = '';
-  t.proofVerifiedBy = '';
-  save(); renderTeam();
 }
 
 /* ============================================================
@@ -3980,21 +3677,54 @@ function toggleSettingsMenu(){ if($('#settingsMenu').hidden) openSettingsMenu();
    ============================================================ */
 function parseDateExcel(val){
   if(val === null || val === undefined || val === '') return null;
-  if(val instanceof Date){ if(isNaN(val)) return null; return val.toLocaleDateString('sv-SE'); }
+
+  /* Prioridade 1: string em DD/MM/AAAA (formato brasileiro) */
+  if(typeof val === 'string'){
+    const s = val.trim();
+    const mBR = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+    if(mBR){
+      let dd = parseInt(mBR[1], 10), mm = parseInt(mBR[2], 10), yy = parseInt(mBR[3], 10);
+      if(yy < 100) yy += 2000;
+      if(mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31){
+        return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+      }
+    }
+    /* ISO YYYY-MM-DD */
+    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+    /* YYYY/MM/DD */
+    const mISO = s.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+    if(mISO){
+      const yy = parseInt(mISO[1],10), mm = parseInt(mISO[2],10), dd = parseInt(mISO[3],10);
+      if(mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31){
+        return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+      }
+    }
+  }
+
+  /* Date object vindo do Excel (cellDates:true) */
+  if(val instanceof Date){
+    if(isNaN(val)) return null;
+    const y = val.getFullYear();
+    const m = String(val.getMonth()+1).padStart(2,'0');
+    const d = String(val.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+
+  /* Serial number do Excel */
   if(typeof val === 'number' && val > 0){
     const d = new Date(Date.UTC(1899, 11, 30) + val * 86400000);
     if(!isNaN(d)) return d.toLocaleDateString('sv-SE', { timeZone:'UTC' });
   }
+
+  /* Fallback */
   const s = String(val).trim();
-  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-  const m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
-  if(m){
-    let dd = parseInt(m[1]), mm = parseInt(m[2]), yy = parseInt(m[3]);
-    if(yy < 100) yy += 2000;
-    if(mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31) return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-  }
   const d = new Date(s);
-  if(!isNaN(d)) return d.toLocaleDateString('sv-SE');
+  if(!isNaN(d)){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  }
   return null;
 }
 function parseTimeExcel(val){
@@ -4094,9 +3824,9 @@ function downloadImportTemplate(){
   const wb = XLSX.utils.book_new();
   const rows = [
     ['Data','Hora Início','Hora Fim','Descrição','Categoria','Carteira'],
-    ['2025-01-15','09:00','10:30','Exemplo: reunião de alinhamento semanal','Reunião','GM'],
-    ['2025-01-15','14:00','15:00','Exemplo: acompanhamento de obra','Acompanhamento','Safra'],
-    ['2025-01-16','08:30','09:15','Exemplo: criação de conteúdo para campanha','Criação de Conteúdo','BMW']
+    ['15/01/2026','09:00','10:30','Exemplo: reunião de alinhamento semanal','Reunião','GM'],
+    ['15/01/2026','14:00','15:00','Exemplo: acompanhamento de obra','Acompanhamento','Safra'],
+    ['16/01/2026','08:30','09:15','Exemplo: criação de conteúdo para campanha','Criação de Conteúdo','BMW']
   ];
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{wch:12},{wch:11},{wch:11},{wch:44},{wch:24},{wch:20}];
@@ -4109,9 +3839,9 @@ function handleImportFile(file){
   reader.onload = evt => {
     try{
       const buf = new Uint8Array(evt.target.result);
-      const wb = XLSX.read(buf, { type:'array', cellDates:true });
+      const wb = XLSX.read(buf, { type:'array', cellDates:false, raw:true });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      const rawRows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+      const rawRows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:true });
       const validCarteiras = getSystemCarteirasSet();
       const parsed = [];
       let errors = 0;
@@ -4177,9 +3907,14 @@ function renderImportPreview(){
     if(!state) return '';
     if(k === 'carteira') return state === 'empty' ? 'Carteira não preenchida' : 'Carteira não cadastrada';
     if(k === 'categoria') return state === 'empty' ? 'Categoria não preenchida' : 'Categoria não reconhecida';
-    if(k === 'data') return 'Data inválida ou vazia';
+    if(k === 'data') return 'Data inválida ou vazia (use DD/MM/AAAA)';
     if(k === 'descricao') return 'Descrição vazia';
     return '';
+  };
+  const fmtBR = iso => {
+    if(!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '—';
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y}`;
   };
   prev.innerHTML = `<table>
     <thead><tr><th>Data</th><th>Início</th><th>Fim</th><th>Descrição</th><th>Categoria</th><th>Carteira</th></tr></thead>
@@ -4188,7 +3923,7 @@ function renderImportPreview(){
       const cellCls = k => e[k] ? 'cell-error' : '';
       const catDisplay = r.cat ? catOf(r.cat).label : (r.catRaw || '—');
       return `<tr class="${r.valid ? '' : 'row-error'}">
-        <td class="${cellCls('data')}" title="${titleFor('data', e.data)}">${esc(r.iso || '—')}</td>
+        <td class="${cellCls('data')}" title="${titleFor('data', e.data)}">${esc(fmtBR(r.iso))}</td>
         <td class="${cellCls('inicio')}">${esc(r.start || '—')}</td>
         <td class="${cellCls('fim')}">${esc(r.end || '—')}</td>
         <td class="${cellCls('descricao')}" title="${esc(r.title || '')}">${esc(r.title || '—')}</td>
@@ -4237,9 +3972,7 @@ async function confirmImport(){
       if(!Array.isArray(data.daily[iso])) data.daily[iso] = [];
       data.daily[iso].push({
         id: uid(), ownerId: owner.id, title: r.title, start: r.start, end: r.end,
-        cat: r.cat, prio: 'media', notes: '', done: false, carteira: r.carteira || '',
-        trainingProof: '',
-        proofVerified: false, proofVerifiedAt: '', proofVerifiedBy: ''
+        cat: r.cat, prio: 'media', notes: '', done: false, carteira: r.carteira || ''
       });
     });
     touchUser(owner.id);
@@ -4270,16 +4003,16 @@ function closeExportModal(){ $('#exportModal').hidden = true; }
 function buildSheetRows(tasksOf){
   const rows = [[
     'Data','Carteira','Hora Início','Hora Fim','Duração (min)',
-    'Descrição','Categoria','Prioridade','Status','Comprovante Treinamento','Validado','Observações'
+    'Descrição','Categoria','Prioridade','Status','Observações'
   ]];
   tasksOf.forEach(({ t, iso }) => {
     const st = taskStatus(t, iso);
     const statusLabel = st === 'done' ? 'Concluída' : st === 'late' ? 'Atrasada' : 'Pendente';
+    const [y,m,d] = iso.split('-');
     rows.push([
-      iso, t.carteira || '', t.start || '', t.end || '', durationMin(t) || 0,
+      `${d}/${m}/${y}`, t.carteira || '', t.start || '', t.end || '', durationMin(t) || 0,
       t.title || '', catOf(t.cat).label, (PRIO[t.prio] || PRIO.media).label,
-      statusLabel, t.trainingProof || '',
-      t.proofVerified ? 'Sim' : 'Não', t.notes || ''
+      statusLabel, t.notes || ''
     ]);
   });
   return rows;
@@ -4287,18 +4020,18 @@ function buildSheetRows(tasksOf){
 function buildGeneralRows(){
   const rows = [[
     'Data','Colaborador','Carteira','Hora Início','Hora Fim','Duração (min)',
-    'Descrição','Categoria','Prioridade','Status','Comprovante Treinamento','Validado','Observações'
+    'Descrição','Categoria','Prioridade','Status','Observações'
   ]];
   Object.entries(data.daily).forEach(([iso, arr]) => {
     arr.forEach(t => {
       const owner = userById(t.ownerId);
       const st = taskStatus(t, iso);
       const statusLabel = st === 'done' ? 'Concluída' : st === 'late' ? 'Atrasada' : 'Pendente';
+      const [y,m,d] = iso.split('-');
       rows.push([
-        iso, owner.name, t.carteira || '', t.start || '', t.end || '', durationMin(t) || 0,
+        `${d}/${m}/${y}`, owner.name, t.carteira || '', t.start || '', t.end || '', durationMin(t) || 0,
         t.title || '', catOf(t.cat).label, (PRIO[t.prio] || PRIO.media).label,
-        statusLabel, t.trainingProof || '',
-        t.proofVerified ? 'Sim' : 'Não', t.notes || ''
+        statusLabel, t.notes || ''
       ]);
     });
   });
@@ -4313,8 +4046,8 @@ function doExport(){
   const mode = exportCtx.mode;
   const wb = XLSX.utils.book_new();
   const cols = [
-    {wch:11},{wch:20},{wch:16},{wch:11},{wch:11},{wch:12},
-    {wch:38},{wch:22},{wch:11},{wch:11},{wch:30},{wch:10},{wch:26}
+    {wch:12},{wch:20},{wch:12},{wch:10},{wch:12},
+    {wch:38},{wch:22},{wch:11},{wch:11},{wch:26}
   ];
   if(mode === 'all'){
     const generalRows = buildGeneralRows();
@@ -4402,16 +4135,22 @@ $('#loginForm').addEventListener('submit', e => {
 });
 $('#loginBack2').addEventListener('click', () => { loginCtx.userId = null; setLoginStep('name'); });
 $('#loginBack3').addEventListener('click', () => { loginCtx.userId = null; setLoginStep('name'); });
+$('#loginForgot').addEventListener('click', async () => {
+  const u = loginCtx.userId ? data.users[loginCtx.userId] : null;
+  const nomeTxt = u ? `<b>${esc(u.name)}</b>` : 'seu usuário';
+  await showAlert(
+    `<div>Não é possível redefinir a senha automaticamente por aqui.</div>
+     <div style="margin-top:12px;">Entre em contato com o <b>líder da sua equipe</b> e solicite a redefinição da senha de ${nomeTxt}.</div>
+     <div style="margin-top:12px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;line-height:1.6;">
+       💡 <b>Dica:</b> o líder pode redefinir sua senha acessando a aba <b>Equipe → clique no seu nome → ✎ editar</b> e preenchendo o campo "Nova senha".
+     </div>`,
+    '🔑 Esqueci minha senha',
+    { icon:'🔑', iconVariant:'notify' }
+  );
+});
 
 $$('.tab').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-$$('.team-subtab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    ui.teamSubTab = btn.dataset.teamSub;
-    save();
-    renderTeam();
-  });
 });
 
 $('#settingsBtn').addEventListener('click', e => {
@@ -4515,18 +4254,6 @@ $('#weekGrid').addEventListener('click', e => {
   }
   const gotoEl = e.target.closest('[data-goto]');
   if(gotoEl){ setDate(gotoEl.dataset.goto); switchTab('daily'); return; }
-  if(!canEditCurrentView()) return;
-  const addBtn = e.target.closest('[data-add-date]');
-  if(addBtn){ const iso = addBtn.dataset.addDate; setDate(iso); openModal({ mode:'new', date: iso }); return; }
-  const wk = e.target.closest('.wk-item');
-  if(!wk) return;
-  const id = wk.dataset.id;
-  const date = wk.dataset.date;
-  const act = e.target.closest('[data-act]')?.dataset.act;
-  if(act === 'toggle'){ toggleTask(date, id); return; }
-  if(act === 'del'){ deleteTask(date, id); return; }
-  const item = (data.daily[date] || []).find(t => t.id === id);
-  if(item) openModal({ mode:'edit', date, item });
 });
 
 $('#moPrev').addEventListener('click', () => shiftMonth(-1));
@@ -4560,18 +4287,6 @@ $('#monthGrid').addEventListener('click', e => {
     if(holidayNameOf(iso)) return;
     setDate(iso);
     openModal({ mode:'new', date: iso });
-    return;
-  }
-  const taskEl = e.target.closest('[data-mo-task]');
-  if(taskEl){
-    e.stopPropagation();
-    const date = taskEl.dataset.moDate;
-    const id = taskEl.dataset.moTask;
-    if(canEditCurrentView()){
-      const item = (data.daily[date] || []).find(t => t.id === id);
-      if(item){ openModal({ mode:'edit', date, item }); return; }
-    }
-    openDayDetail(date);
     return;
   }
   const dayEl = e.target.closest('[data-mo-day]');
@@ -4659,9 +4374,7 @@ $('#dailyForm').addEventListener('submit', async e => {
   const newTask = {
     id: uid(), ownerId: owner, title, start, end,
     cat: $('#qCat').value, carteira: $('#qCarteira').value || '',
-    prio: 'media', notes: '', done: false,
-    trainingProof: '',
-    proofVerified: false, proofVerifiedAt: '', proofVerifiedBy: ''
+    prio: 'media', notes: '', done: false
   };
   data.daily[date].push(newTask);
   touchUser(owner);
@@ -4702,26 +4415,12 @@ $('#view-team').addEventListener('click', e => {
     save(); renderTeamOverview();
     return;
   }
-  const pfChip = e.target.closest('[data-proof-filter]');
-  if(pfChip){
-    ui.teamProofsFilter = pfChip.dataset.proofFilter;
-    save(); renderTeamProofs();
-    return;
-  }
-  const proofAct = e.target.closest('[data-proof-act]');
-  if(proofAct){
-    const date = proofAct.dataset.proofDate;
-    const id = proofAct.dataset.proofId;
-    if(proofAct.dataset.proofAct === 'verify') verifyProof(date, id);
-    else if(proofAct.dataset.proofAct === 'unverify') unverifyProof(date, id);
-    return;
-  }
   const card = e.target.closest('[data-user-filter]');
   if(card){
     const uid = card.dataset.userFilter;
     ui.teamUserFilter = (ui.teamUserFilter === uid) ? '' : uid;
     ui.teamPage = 1;
-    save(); renderTeam();
+    save(); renderTeamOverview();
     return;
   }
   const prevBtn = e.target.closest('#teamPagePrev');
@@ -4747,47 +4446,16 @@ $('#view-team').addEventListener('change', e => {
     save(); renderTeamOverview();
     return;
   }
-  if(e.target.id === 'teamProofsUserSelect'){
-    ui.teamUserFilter = e.target.value || '';
-    save(); renderTeamProofs();
+  if(e.target.id === 'teamCatSelect'){
+    ui.teamCategoriaFilter = e.target.value || '';
+    ui.teamPage = 1;
+    save(); renderTeamOverview();
     return;
   }
   if(e.target.id === 'teamPageSize'){
     const v = parseInt(e.target.value, 10);
     if([5,10,20].includes(v)){ ui.teamPageSize = v; ui.teamPage = 1; save(); renderTeamOverview(); }
   }
-});
-
-$('#fCat').addEventListener('change', () => {
-  updateTrainingProofVisibility();
-});
-$('#trainingProofClose').addEventListener('click', closeTrainingProofPrompt);
-$('#trainingProofCancel').addEventListener('click', closeTrainingProofPrompt);
-$('#trainingProofModal').addEventListener('click', e => {
-  if(e.target.id === 'trainingProofModal') closeTrainingProofPrompt();
-});
-$('#trainingProofSave').addEventListener('click', () => {
-  const txt = $('#tpProofText').value.trim();
-  if(!txt){
-    const el = $('#tpError');
-    el.textContent = 'Descreva como realizou o treinamento para poder concluir.';
-    el.hidden = false;
-    el.style.animation = 'none';
-    void el.offsetWidth;
-    el.style.animation = '';
-    return;
-  }
-  const { date, id } = trainingProofCtx;
-  if(!date || !id){ closeTrainingProofPrompt(); return; }
-  const arr = data.daily[date] || [];
-  const t = arr.find(x => x.id === id);
-  if(!t){ closeTrainingProofPrompt(); return; }
-  t.trainingProof = txt.slice(0, 400);
-  t.done = true;
-  touchUser(t.ownerId);
-  save();
-  closeTrainingProofPrompt();
-  render();
 });
 
 $('#modalForm').addEventListener('submit', async e => {
@@ -4802,7 +4470,6 @@ $('#modalForm').addEventListener('submit', async e => {
   let newOwner = isLeader() ? ($('#fOwner').value || ui.currentUserId) : ui.currentUserId;
   if(!newOwner || newOwner === ALL_MEMBERS) newOwner = ui.currentUserId;
   const catVal = $('#fCat').value;
-  const trainingProof = $('#fTrainingProof').value.trim();
   const ignoreId = modalCtx.mode === 'edit' ? modalCtx.item.id : null;
   if(newStart && newEnd){
     const conflicts = detectTimeConflicts(newOwner, newDate, newStart, newEnd, ignoreId);
@@ -4816,19 +4483,16 @@ $('#modalForm').addEventListener('submit', async e => {
       if(!ok) return;
     }
   }
-  const isTraining = TRAINING_CATEGORIES.includes(catVal);
   const base = {
     title, start: newStart, end: newEnd, cat: catVal,
     carteira: $('#fCarteira').value || '',
     prio: $('#fPrio').value,
-    notes: $('#fNotes').value.trim(),
-    trainingProof: isTraining ? trainingProof.slice(0, 400) : ''
+    notes: $('#fNotes').value.trim()
   };
   if(modalCtx.mode === 'new'){
     if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
     data.daily[newDate].push({
       id: uid(), ownerId: newOwner, done: false,
-      proofVerified: false, proofVerifiedAt: '', proofVerifiedBy: '',
       ...base
     });
     touchUser(newOwner);
@@ -4841,16 +4505,12 @@ $('#modalForm').addEventListener('submit', async e => {
     const idx = oldArr.findIndex(t => t.id === modalCtx.item.id);
     const wasDone = idx >= 0 ? oldArr[idx].done : false;
     const oldOwner = idx >= 0 ? oldArr[idx].ownerId : newOwner;
-    const oldVerified = idx >= 0 ? oldArr[idx].proofVerified : false;
-    const oldVerifiedAt = idx >= 0 ? oldArr[idx].proofVerifiedAt : '';
-    const oldVerifiedBy = idx >= 0 ? oldArr[idx].proofVerifiedBy : '';
     if(idx >= 0) oldArr.splice(idx, 1);
     if(!oldArr.length) delete data.daily[oldDate];
     const finalOwner = isLeader() ? newOwner : oldOwner;
     if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
     data.daily[newDate].push({
       id: modalCtx.item.id, ownerId: finalOwner, done: wasDone,
-      proofVerified: oldVerified, proofVerifiedAt: oldVerifiedAt, proofVerifiedBy: oldVerifiedBy,
       ...base
     });
     touchUser(finalOwner);
@@ -5089,7 +4749,6 @@ document.addEventListener('keydown', e => {
   closeSettingsMenu();
   hideMemberTooltip();
   if(!$('#appDialog').hidden) return;
-  if(!$('#trainingProofModal').hidden){ closeTrainingProofPrompt(); return; }
   if(!$('#modal').hidden) closeModal();
   if(!$('#dayDetailModal').hidden) closeDayDetail();
   if(!$('#userModal').hidden) closeUserModal();
