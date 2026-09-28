@@ -178,6 +178,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .icon-chip-btn:hover{background:var(--surface-2);border-color:#3a3a3a;color:var(--text);}
 .icon-chip-btn.icon-only{padding:0;width:32px;justify-content:center;}
 .icon-chip-btn.icon-only .ico{font-size:15px;line-height:1;display:inline-block;}
+.save-btn{background:linear-gradient(135deg, rgba(16,185,129,.16), rgba(5,150,105,.08));border-color:rgba(16,185,129,.4);color:#6ee7b7;font-weight:700;}
+.save-btn:hover{background:linear-gradient(135deg, rgba(16,185,129,.26), rgba(5,150,105,.14));border-color:rgba(16,185,129,.6);color:#a7f3d0;}
+[data-theme="light"] .save-btn{color:#047857;}
+[data-theme="light"] .save-btn:hover{color:#065f46;}
+.save-btn.dirty{animation:savePulse 2s ease-in-out infinite;}
+@keyframes savePulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4);}50%{box-shadow:0 0 0 6px rgba(16,185,129,0);}}
 .settings-wrap{position:relative;}
 .settings-menu{position:absolute;top:calc(100% + 8px);right:0;background:linear-gradient(180deg,var(--overlay-2),transparent),var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:250px;box-shadow:var(--shadow-menu);z-index:120;animation:fade .16s ease;}
 .settings-title{font-size:10.5px;font-weight:800;color:var(--muted);padding:8px 10px 6px;text-transform:uppercase;letter-spacing:.7px;}
@@ -854,6 +860,9 @@ select option:checked{background:linear-gradient(0deg, var(--accent), var(--acce
       <button class="tab" data-tab="team" data-leader-only hidden>👥 Equipe</button>
     </nav>
     <div class="user-wrap">
+      <button class="icon-chip-btn save-btn" id="saveBtn" title="Salvar cronograma no servidor">
+        <span class="ico">💾</span><span>Salvar</span>
+      </button>
       <button class="user-chip" id="userChip" title="Editar meu perfil">
         <span class="avatar" id="userChipAvatar">?</span>
         <span id="userChipName">—</span>
@@ -1537,6 +1546,9 @@ let fbConnected = false;
 /* Auto-save periódico */
 let autoSaveTimer = null;
 
+/* Controle de alterações não salvas */
+let hasUnsavedChanges = false;
+
 let horaOpWarnedThisSession = false;
 let postRenderLock = false;
 
@@ -1639,6 +1651,12 @@ function setSyncStatus(status){
     offline: 'Sem conexão com a nuvem',
     error: 'Erro de sincronização'
   })[status] || 'Sincronização';
+}
+function updateSaveButtonState(){
+  const btn = document.getElementById('saveBtn');
+  if(!btn) return;
+  if(hasUnsavedChanges) btn.classList.add('dirty');
+  else btn.classList.remove('dirty');
 }
 async function waitForFirebaseReady(timeoutMs = 6000){
   if(window.firebaseReady) return;
@@ -1773,6 +1791,8 @@ function saveToFirestoreDebounced(){
         notifications: data.notifications
       });
       setSyncStatus('ok');
+      hasUnsavedChanges = false;
+      updateSaveButtonState();
     }catch(e){
       console.warn('[Firestore] save error:', e);
       setSyncStatus('error');
@@ -1783,10 +1803,10 @@ function saveToFirestoreDebounced(){
 }
 
 /* ============================================================
-   AUTO-SAVE PERIÓDICO (a cada 1 hora)
+   AUTO-SAVE PERIÓDICO (a cada 1 hora) + FORÇADO
    ============================================================ */
 async function forceSaveToServer(reason){
-  if(!firebaseBridge){ console.warn('[Auto-save] bridge indisponível'); return; }
+  if(!firebaseBridge){ console.warn('[Auto-save] bridge indisponível'); return false; }
   try{
     console.log('[Auto-save] Enviando dados para o servidor...' + (reason ? ` (${reason})` : ''));
     setSyncStatus('syncing');
@@ -1798,10 +1818,14 @@ async function forceSaveToServer(reason){
       notifications: data.notifications
     });
     setSyncStatus('ok');
+    hasUnsavedChanges = false;
+    updateSaveButtonState();
     console.log('[Auto-save] ✅ Dados salvos com sucesso às', new Date().toLocaleTimeString('pt-BR'));
+    return true;
   }catch(e){
     console.warn('[Auto-save] Erro ao salvar:', e);
     setSyncStatus('error');
+    return false;
   }finally{
     setTimeout(() => { suppressRemoteRender = false; }, 900);
   }
@@ -1809,23 +1833,63 @@ async function forceSaveToServer(reason){
 function startAutoSaveTimer(){
   if(autoSaveTimer) clearInterval(autoSaveTimer);
   autoSaveTimer = setInterval(() => {
-    /* Só salva se houver usuário logado */
     if(!ui.currentUserId) return;
     forceSaveToServer('auto-horário');
   }, AUTO_SAVE_INTERVAL_MS);
   console.log('[Auto-save] Timer iniciado — salvamento a cada 1 hora');
 }
-/* Ao fechar a aba, tenta salvar antes de sair */
-window.addEventListener('beforeunload', () => {
-  if(fbConnected && ui.currentUserId){
-    try{
-      firebaseBridge.save({
-        users: data.users, daily: data.daily,
-        deletedUserIds: data.deletedUserIds, notifications: data.notifications
-      });
-    }catch(e){}
+
+/* Aviso ao fechar a aba se houver alterações pendentes */
+window.addEventListener('beforeunload', (e) => {
+  if(!fbConnected || !ui.currentUserId) return;
+  if(hasUnsavedChanges){
+    e.preventDefault();
+    e.returnValue = 'Há alterações não salvas. Deseja realmente sair?';
+    return e.returnValue;
   }
+  /* Sem alterações pendentes: apenas envia backup silencioso */
+  try{
+    firebaseBridge.save({
+      users: data.users, daily: data.daily,
+      deletedUserIds: data.deletedUserIds, notifications: data.notifications
+    });
+  }catch(e){}
 });
+
+/* ============================================================
+   SALVAR MANUAL (botão 💾)
+   ============================================================ */
+async function saveScheduleWithConfirm(){
+  if(!ui.currentUserId){
+    await showAlert('É necessário estar logado para salvar.', 'Atenção', { icon:'⚠️', iconVariant:'warn' });
+    return;
+  }
+  const ok = await showConfirm(
+    `<div style="margin-bottom:12px;">Deseja salvar seu cronograma no <b>servidor (Firebase)</b> agora?</div>
+     <div style="padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;line-height:1.6;">
+       💾 Todos os dados salvos (tarefas, perfil, carteiras e notificações) serão enviados para a nuvem e estarão disponíveis em qualquer dispositivo.
+     </div>`,
+    '💾 Salvar cronograma',
+    { icon:'💾', iconVariant:'notify', confirmText:'Salvar agora' }
+  );
+  if(!ok) return;
+
+  const success = await forceSaveToServer('manual pelo usuário');
+  if(success){
+    await showAlert(
+      `<div>✅ Cronograma salvo no <b>Firebase</b> com sucesso!</div>
+       <div style="margin-top:10px;font-size:12px;color:var(--muted);">Horário: ${new Date().toLocaleString('pt-BR')}</div>`,
+      'Tudo certo!',
+      { icon:'✅', iconVariant:'success' }
+    );
+  } else {
+    await showAlert(
+      'Não foi possível salvar no servidor. Verifique sua conexão e tente novamente.',
+      'Erro ao salvar',
+      { icon:'⚠️', iconVariant:'danger' }
+    );
+  }
+}
 
 /* ============================================================
    DIÁLOGO CUSTOMIZADO
@@ -2167,6 +2231,9 @@ function save(){
       }
     }));
   }catch(err){ console.warn('Falha ao salvar:', err); }
+  /* Marca como alteração pendente e atualiza o botão Salvar */
+  hasUnsavedChanges = true;
+  updateSaveButtonState();
   saveToFirestoreDebounced();
 }
 function migrateLegacyData(){
@@ -2458,10 +2525,44 @@ function completeLogin(user){
   render();
 }
 async function logout(){
-  const ok = await showConfirm('Deseja encerrar a sessão atual?', 'Sair da conta', {
-    icon:'🚪', iconVariant:'warn', confirmText:'Sair', danger:true
-  });
-  if(!ok) return;
+  /* Se houver alterações não salvas, oferece salvar antes de sair */
+  if(hasUnsavedChanges){
+    const saveFirst = await showConfirm(
+      `<div>Há <b>alterações não salvas</b> no seu cronograma.</div>
+       <div style="margin-top:12px;padding:10px 12px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:12.5px;line-height:1.6;">
+         Deseja <b>salvar no Firebase antes de sair</b>? Isso garante que nada seja perdido.
+       </div>`,
+      '💾 Salvar antes de sair?',
+      { icon:'💾', iconVariant:'notify', confirmText:'Salvar e sair', cancelText:'Sair sem salvar' }
+    );
+    if(saveFirst){
+      const okSave = await forceSaveToServer('antes de logout');
+      if(!okSave){
+        const proceed = await showConfirm(
+          'Não foi possível salvar no servidor. Deseja sair mesmo assim (as alterações podem ser perdidas)?',
+          'Atenção',
+          { icon:'⚠️', iconVariant:'danger', confirmText:'Sair mesmo assim', danger:true }
+        );
+        if(!proceed) return;
+      } else {
+        await showAlert('✅ Cronograma salvo no servidor com sucesso!', 'Salvo', { icon:'✅', iconVariant:'success' });
+      }
+    } else {
+      /* Usuário escolheu sair sem salvar: confirma */
+      const reallyLeave = await showConfirm(
+        'Tem certeza que deseja sair <b>sem salvar</b>? As alterações recentes podem ser perdidas.',
+        'Sair sem salvar?',
+        { icon:'⚠️', iconVariant:'warn', confirmText:'Sair sem salvar', danger:true }
+      );
+      if(!reallyLeave) return;
+    }
+  } else {
+    const ok = await showConfirm('Deseja encerrar a sessão atual?', 'Sair da conta', {
+      icon:'🚪', iconVariant:'warn', confirmText:'Sair', danger:true
+    });
+    if(!ok) return;
+  }
+
   ui.currentUserId = null;
   ui.viewUserId = null;
   ui.tab = 'daily';
@@ -2472,6 +2573,8 @@ async function logout(){
   ui.categoriaFilter = '';
   ui.teamPage = 1;
   horaOpWarnedThisSession = false;
+  hasUnsavedChanges = false;
+  updateSaveButtonState();
   save();
   showLogin();
 }
@@ -3422,6 +3525,7 @@ function render(){
   else if(ui.tab === 'team') renderTeam();
   else renderDashboard();
   renderUserChip();
+  updateSaveButtonState();
   runPostRenderChecks();
 }
 
@@ -4025,10 +4129,13 @@ async function confirmImport(){
       });
     }
   });
+
   save();
   closeImportModal();
   render();
-  await showAlert(`✅ ${totalTasks} tarefa(s) importada(s) com sucesso!${skipped ? `<br><br>⚠ ${skipped} linha(s) foram ignoradas.` : ''}`, 'Importação concluída', { icon:'✅', iconVariant:'success' });
+  await forceSaveToServer('após importação');
+
+  await showAlert(`✅ ${totalTasks} tarefa(s) importada(s) e salvas no servidor com sucesso!${skipped ? `<br><br>⚠ ${skipped} linha(s) foram ignoradas.` : ''}`, 'Importação concluída', { icon:'✅', iconVariant:'success' });
 }
 
 let exportCtx = { mode: 'all' };
@@ -4084,7 +4191,7 @@ function sanitizeSheetName(name){
   if(n.length > 31) n = n.slice(0, 31);
   return n || 'Aba';
 }
-function doExport(){
+async function doExport(){
   const mode = exportCtx.mode;
   const wb = XLSX.utils.book_new();
   const cols = [
@@ -4137,6 +4244,7 @@ function doExport(){
     XLSX.writeFile(wb, `cronoplano-${slug}-${todayISO()}.xlsx`);
   }
   closeExportModal();
+  await forceSaveToServer('após exportação');
 }
 
 /* ============================================================
@@ -4194,6 +4302,8 @@ $('#loginForgot').addEventListener('click', async () => {
 $$('.tab').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
+
+$('#saveBtn').addEventListener('click', saveScheduleWithConfirm);
 
 $('#settingsBtn').addEventListener('click', e => {
   e.stopPropagation();
