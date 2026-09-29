@@ -7,10 +7,10 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import {
     getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDx3FgH2_rSTyQ561q4bjE8TZUJ_FGhJl8",
@@ -26,7 +26,7 @@
     try{
       const app = initializeApp(firebaseConfig);
       try{
-        const mod = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js");
+        const mod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js");
         const ok = await mod.isSupported().catch(() => false);
         if(ok) mod.getAnalytics(app);
       }catch(e){ console.warn('[Firebase] Analytics indisponível:', e.message || e); }
@@ -1530,6 +1530,11 @@ function ensureCarteirasInitialized(){
 }
 function applyRemoteData(remote){
   if(!remote) return;
+  
+  // DOCUMENTAÇÃO: Bloqueio de Proteção.
+  // Ignora as informações do servidor se o usuário estiver no meio de uma edição local.
+  if(hasUnsavedChanges) return;
+  
   const remoteUsers = remote.users || {};
   const remoteDaily = remote.daily || {};
   const remoteDeleted = remote.deletedUserIds || [];
@@ -1606,14 +1611,19 @@ function saveToFirestoreDebounced(){
   clearTimeout(saveDebounceTimer);
   setSyncStatus('syncing');
   saveDebounceTimer = setTimeout(async () => {
-    try{
-      suppressRemoteRender = true;
-      await firebaseBridge.save({
-        users: data.users, daily: data.daily,
-        deletedUserIds: data.deletedUserIds, notifications: data.notifications,
-        carteiras: data.carteiras
-      });
-      setSyncStatus('ok');
+try{
+    suppressRemoteRender = true;
+    
+    // DOCUMENTAÇÃO: Limpeza de Payload.
+    // Formata os dados removendo variáveis undefined ou falhas de estruturação interna.
+    const cleanPayload = JSON.parse(JSON.stringify({
+      users: data.users, daily: data.daily,
+      deletedUserIds: data.deletedUserIds, notifications: data.notifications,
+      carteiras: data.carteiras
+    }));
+    
+    await firebaseBridge.save(cleanPayload);
+    setSyncStatus('ok');
       hasUnsavedChanges = false;
       updateSaveButtonState();
     }catch(e){
