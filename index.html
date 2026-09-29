@@ -40,8 +40,8 @@
           const snap = await getDoc(dataDocRef);
           return snap.exists() ? snap.data() : null;
         },
-        async save(payload){
-          await setDoc(dataDocRef, { ...payload, updatedAt: serverTimestamp() });
+      async save(payload){
+          await setDoc(dataDocRef, { ...payload, updatedAt: serverTimestamp() }, { merge: true });
         },
         onSnapshot(cb, errCb){
           return onSnapshot(
@@ -1293,7 +1293,7 @@ select option{background-color:var(--surface);color:var(--text);padding:10px 14p
 const STORAGE_KEY = 'cronoplano.v28';
 const THEME_KEY = 'cronoplano.theme';
 const FRIDAY_REMINDER_KEY = 'cronoplano.fridayReminder';
-const AUTO_SAVE_INTERVAL_MS = 60 * 60 * 1000;
+const AUTO_SAVE_INTERVAL_MS = 5000;
 const LEGACY_KEYS = ['cronoplano.v27','cronoplano.v26','cronoplano.v25','cronoplano.v24','cronoplano.v23','cronoplano.v22','cronoplano.v21','cronoplano.v20','cronoplano.v19','cronoplano.v18','cronoplano.v17','cronoplano.v16','cronoplano.v15','cronoplano.v14','cronoplano.v13','cronoplano.v12','cronoplano.v11','cronoplano.v10','cronoplano.v9','cronoplano.v8','cronoplano.v7','cronoplano.v6','cronoplano.v5','cronoplano.v4','cronoplano.v3','cronoplano.v2','cronoplano.v1'];
 const VALID_TABS = ['daily','weekly','month','dashboard','team'];
 const ALL_MEMBERS = '__all__';
@@ -3539,10 +3539,10 @@ async function deleteTask(date, id){
   const ok = await showConfirm('Excluir esta atividade? Esta ação não pode ser desfeita.', 'Excluir atividade',
     { icon:'🗑', iconVariant:'danger', confirmText:'Excluir', danger:true });
   if(!ok) return;
-  const removed = arr.splice(idx, 1)[0];
-  if(removed) touchUser(removed.ownerId);
-  if(!arr.length) delete data.daily[date];
-  save(); render();
+const removed = arr.splice(idx, 1)[0];
+      if(removed) touchUser(removed.ownerId);
+      if(!arr.length) data.daily[date] = [];
+      save(); render();
 }
 async function deleteMember(userId){
   if(!isLeader()) return;
@@ -3562,7 +3562,7 @@ async function deleteMember(userId){
     const arr = data.daily[iso] || [];
     const filtered = arr.filter(t => t.ownerId !== userId);
     if(filtered.length) data.daily[iso] = filtered;
-    else delete data.daily[iso];
+    else data.daily[iso] = [];
   });
   if(!data.deletedUserIds.includes(userId)) data.deletedUserIds.push(userId);
   delete data.users[userId];
@@ -4373,9 +4373,9 @@ $('#modalForm').addEventListener('submit', async e => {
     const idx = oldArr.findIndex(t => t.id === modalCtx.item.id);
     const wasDone = idx >= 0 ? oldArr[idx].done : false;
     const oldOwner = idx >= 0 ? oldArr[idx].ownerId : newOwner;
-    if(idx >= 0) oldArr.splice(idx, 1);
-    if(!oldArr.length) delete data.daily[oldDate];
-    const finalOwner = isLeader() ? newOwner : oldOwner;
+        if(idx >= 0) oldArr.splice(idx, 1);
+        if(!oldArr.length) data.daily[oldDate] = [];
+        const finalOwner = isLeader() ? newOwner : oldOwner;
     if(!Array.isArray(data.daily[newDate])) data.daily[newDate] = [];
     data.daily[newDate].push({ id: modalCtx.item.id, ownerId: finalOwner, done: wasDone, ...base });
     touchUser(finalOwner);
