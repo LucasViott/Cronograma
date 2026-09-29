@@ -155,7 +155,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:16px;letter-spacing:-.3px;flex:0 0 auto;}
 .brand .logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-size:17px;color:#fff;box-shadow:0 6px 22px rgba(30,64,175,.4);}
 .brand small{display:block;font-size:10.5px;font-weight:500;color:var(--muted);letter-spacing:.3px;margin-top:1px;}
-.topbar-carteiras{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:4px 6px;max-width:100%;}
+/* Topbar carteiras: altura fixa e sem quebra, evita deslocar os demais elementos do cabeçalho */
+.topbar-carteiras{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;padding:4px 6px;max-width:100%;min-height:30px;overflow:hidden;flex:0 1 auto;}
 .carteira-chip{font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:3px 9px;border-radius:20px;background:color-mix(in srgb, var(--accent) 16%, transparent);color:#93c5fd;border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);text-transform:uppercase;white-space:nowrap;}
 [data-theme="light"] .carteira-chip{color:var(--accent-2);}
 .carteira-chip.none{background:var(--surface-2);color:var(--muted);border-color:var(--border);}
@@ -1847,7 +1848,6 @@ window.addEventListener('beforeunload', (e) => {
     e.returnValue = 'Há alterações não salvas. Deseja realmente sair?';
     return e.returnValue;
   }
-  /* Sem alterações pendentes: apenas envia backup silencioso */
   try{
     firebaseBridge.save({
       users: data.users, daily: data.daily,
@@ -2231,7 +2231,6 @@ function save(){
       }
     }));
   }catch(err){ console.warn('Falha ao salvar:', err); }
-  /* Marca como alteração pendente e atualiza o botão Salvar */
   hasUnsavedChanges = true;
   updateSaveButtonState();
   saveToFirestoreDebounced();
@@ -2525,7 +2524,6 @@ function completeLogin(user){
   render();
 }
 async function logout(){
-  /* Se houver alterações não salvas, oferece salvar antes de sair */
   if(hasUnsavedChanges){
     const saveFirst = await showConfirm(
       `<div>Há <b>alterações não salvas</b> no seu cronograma.</div>
@@ -2548,7 +2546,6 @@ async function logout(){
         await showAlert('✅ Cronograma salvo no servidor com sucesso!', 'Salvo', { icon:'✅', iconVariant:'success' });
       }
     } else {
-      /* Usuário escolheu sair sem salvar: confirma */
       const reallyLeave = await showConfirm(
         'Tem certeza que deseja sair <b>sem salvar</b>? As alterações recentes podem ser perdidas.',
         'Sair sem salvar?',
@@ -2645,6 +2642,10 @@ function refreshViewSelects(){
   buildCategoriaFilterOptions($('#categoriaFilterMonth'));
   buildCategoriaFilterOptions($('#categoriaFilterDash'));
 }
+/* Topbar: exibe apenas o essencial para não deslocar os elementos do cabeçalho.
+   - Ver todos: chip "Todos os membros"
+   - Líder olhando outro membro: apenas o nome do membro (sem listar as carteiras)
+   - Visualizando a própria agenda: as carteiras do próprio usuário */
 function refreshTopbarCarteiras(){
   const el = $('#topbarCarteiras');
   if(!el) return;
@@ -2654,12 +2655,16 @@ function refreshTopbarCarteiras(){
   }
   const viewed = viewedUser() || currentUser();
   if(!viewed){ el.innerHTML = ''; return; }
-  const carteiras = carteirasOf(viewed);
   const me = currentUser();
   const isOther = viewed.id !== (me ? me.id : null);
-  const prefix = isOther ? `<span class="carteira-chip none" style="text-transform:none;letter-spacing:0;">👁 ${esc(viewed.name)}</span>` : '';
-  if(!carteiras.length){ el.innerHTML = prefix; return; }
-  el.innerHTML = prefix + carteiras.map(c => `<span class="carteira-chip">${esc(c)}</span>`).join('');
+  if(isOther){
+    /* Não lista as carteiras do outro membro para manter o cabeçalho estável */
+    el.innerHTML = `<span class="carteira-chip none" style="text-transform:none;letter-spacing:0;">👁 ${esc(viewed.name)}</span>`;
+    return;
+  }
+  const carteiras = carteirasOf(viewed);
+  if(!carteiras.length){ el.innerHTML = ''; return; }
+  el.innerHTML = carteiras.map(c => `<span class="carteira-chip">${esc(c)}</span>`).join('');
 }
 
 /* ============================================================
@@ -2926,7 +2931,8 @@ function renderWeekly(){
       bodyHTML = ownerIds.map(oid => {
         const owner = userById(oid);
         const cnt = byOwner[oid].length;
-        return `<button type="button" class="wk-member-block" data-mo-member="${oid}" data-mo-member-date="${iso}" style="--mc:${owner.color}" title="${esc(owner.name)} · ${cnt} tarefa(s) — clique para abrir no Diário">
+        /* Sem atributo title — evita tooltip nativo com "clique para abrir no Diário" */
+        return `<button type="button" class="wk-member-block" data-mo-member="${oid}" data-mo-member-date="${iso}" style="--mc:${owner.color}">
           ${avatarHTML(owner)}
           <span class="mb-name">${esc(firstNameOf(owner.name))}</span>
           <span class="mb-count">${cnt}</span>
@@ -2938,7 +2944,7 @@ function renderWeekly(){
         const lateCls = taskStatus(t, iso) === 'late' ? 'late' : '';
         const doneCls = t.done ? 'done' : '';
         const hasCar = !!t.carteira;
-        return `<div class="wk-item-compact ${doneCls} ${lateCls}" data-goto-daily="${iso}" style="--c:${cat.color}" title="Ver detalhes no Diário">
+        return `<div class="wk-item-compact ${doneCls} ${lateCls}" data-goto-daily="${iso}" style="--c:${cat.color}">
           <span class="wk-cat">${esc(cat.label)}</span>
           ${hasCar ? `<span class="wk-car">🏷️ ${esc(t.carteira)}</span>` : `<span class="wk-nodata">sem carteira</span>`}
         </div>`;
@@ -2948,7 +2954,7 @@ function renderWeekly(){
     return `<div class="day-col ${isToday?'is-today':''} ${isSelected?'is-selected':''} ${isHoliday?'is-holiday':''}">
       <div class="day-head">
         <div>
-          <div class="name" data-goto="${iso}" title="Abrir no Diário">${label} · ${String(dt.getDate()).padStart(2,'0')}</div>
+          <div class="name" data-goto="${iso}">${label} · ${String(dt.getDate()).padStart(2,'0')}</div>
           <div class="day-count">${tasks.length} ${tasks.length===1?'item':'itens'}</div>
           ${isHoliday ? `<div class="holiday-tag">🎉 ${esc(holidayName)}</div>` : ''}
         </div>
@@ -3026,7 +3032,8 @@ function renderMonth(){
       tasksHTML = ownerIds.map(oid => {
         const owner = userById(oid);
         const cnt = byOwner[oid].length;
-        return `<button type="button" class="month-member-block" data-mo-member="${oid}" data-mo-member-date="${iso}" style="--mc:${owner.color}" title="${esc(owner.name)} · ${cnt} tarefa(s) — clique para abrir no Diário">
+        /* Sem title — o tooltip nativo "clique para abrir no Diário" foi removido */
+        return `<button type="button" class="month-member-block" data-mo-member="${oid}" data-mo-member-date="${iso}" style="--mc:${owner.color}">
           ${avatarHTML(owner)}
           <span class="mb-name">${esc(firstNameOf(owner.name))}</span>
           <span class="mb-count">${cnt}</span>
@@ -3041,16 +3048,14 @@ function renderMonth(){
         const doneCls = t.done ? 'done' : '';
         const lateCls = status === 'late' ? 'late' : '';
         const hasCar = !!t.carteira;
-        return `<div class="month-task-compact ${doneCls} ${lateCls}" data-goto-daily="${iso}" style="--c:${cat.color}" title="Ver detalhes no Diário">
+        return `<div class="month-task-compact ${doneCls} ${lateCls}" data-goto-daily="${iso}" style="--c:${cat.color}">
           <span class="mt-cat">${esc(cat.label)}</span>
           ${hasCar ? `<span class="mt-car">🏷️ ${esc(t.carteira)}</span>` : `<span class="mt-nodata">sem carteira</span>`}
         </div>`;
       }).join('') + (extraCount ? `<div class="month-more">+${extraCount} mais</div>` : '');
     }
 
-    const titleAttr = isHoliday ? `🎉 ${holidayName}` : (tasks.length ? `${tasks.length} atividade(s)` : '');
-
-    return `<div class="month-day ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${isHoliday?'holiday':''} ${isSunday?'sunday':''}" data-mo-day="${iso}" title="${esc(titleAttr)}">
+    return `<div class="month-day ${c.other?'other':''} ${isToday?'today':''} ${isSelected?'selected':''} ${isHoliday?'holiday':''} ${isSunday?'sunday':''}" data-mo-day="${iso}">
       <div class="month-day-head">
         <span class="month-day-num">${c.date.getDate()}</span>
         ${tasks.length ? `<span class="month-day-count">${tasks.length}</span>` : ''}
@@ -4129,12 +4134,10 @@ async function confirmImport(){
       });
     }
   });
-
   save();
   closeImportModal();
   render();
   await forceSaveToServer('após importação');
-
   await showAlert(`✅ ${totalTasks} tarefa(s) importada(s) e salvas no servidor com sucesso!${skipped ? `<br><br>⚠ ${skipped} linha(s) foram ignoradas.` : ''}`, 'Importação concluída', { icon:'✅', iconVariant:'success' });
 }
 
@@ -4932,7 +4935,6 @@ async function init(){
   initFirebaseBridge();
   await loadFromFirestore();
 
-  /* Inicia o timer de auto-save (1 hora) */
   startAutoSaveTimer();
 
   if(!ui.date) ui.date = todayISO();
