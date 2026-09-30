@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cronoplano - Gestão de Cronograma da Equipe</title>
+  <meta name="description" content="Sistema de organização e acompanhamento de rotina, cronograma diário, semanal e mensal, hora operacional e gestão da equipe de treinamento.">
+  <meta property="og:title" content="Cronoplano - Gestão de Cronograma da Equipe">
+  <meta property="og:description" content="Sistema de organização e acompanhamento de rotina, cronograma diário, semanal e mensal, hora operacional e gestão da equipe de treinamento.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen" hidden>
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="logo">◈</div>
+      <div>
+        <h1>Cronoplano</h1>
+        <p id="loginSubtitle">Acesse com seu nome e sobrenome</p>
+      </div>
+    </div>
+    <form id="loginForm" autocomplete="off">
+      <div id="loginStepName">
+        <label class="field"><span>Nome e sobrenome</span>
+          <input type="text" id="loginName" placeholder="Ex: Lucas Viotti" autocomplete="off" autofocus required>
+        </label>
+        <div class="login-error" id="loginError" hidden></div>
+        <button type="submit" class="btn primary login-btn">Continuar →</button>
+        <div class="login-hint">Use <b>exatamente</b> o nome e sobrenome cadastrados.</div>
+      </div>
+      <div id="loginStepPwd" hidden>
+        <div class="login-user-badge">
+          <div class="avatar" id="loginPwdAvatar">?</div>
+          <div class="info">
+            <div class="nm" id="loginPwdName">—</div>
+            <div class="rl" id="loginPwdRole">—</div>
+          </div>
+        </div>
+        <label class="field"><span>Senha</span>
+          <input type="password" id="loginPwd" placeholder="••••••••" autocomplete="off">
+        </label>
+        <div class="login-error" id="loginError2" hidden></div>
+        <button type="submit" class="btn primary login-btn">Entrar →</button>
+        <button type="button" class="login-link-btn forgot" id="loginForgot">Esqueci minha senha</button>
+        <button type="button" class="login-link-btn" id="loginBack2">← Voltar</button>
+      </div>
+      <div id="loginStepSetup" hidden>
+        <div class="login-user-badge">
+          <div class="avatar" id="loginSetupAvatar">?</div>
+          <div class="info">
+            <div class="nm" id="loginSetupName">—</div>
+            <div class="rl" id="loginSetupRole">—</div>
+          </div>
+        </div>
+        <div class="login-hint" style="margin-top:0;margin-bottom:16px;text-align:left;">
+          ✨ <b>Primeiro acesso!</b> Defina uma senha para proteger seu perfil.
+        </div>
+        <label class="field"><span>Nova senha</span>
+          <input type="password" id="loginPwdNew" placeholder="Mínimo 4 caracteres" autocomplete="new-password">
+        </label>
+        <label class="field"><span>Confirme a senha</span>
+          <input type="password" id="loginPwdNew2" placeholder="Repita a senha" autocomplete="new-password">
+        </label>
+        <div class="login-error" id="loginError3" hidden></div>
+        <button type="submit" class="btn primary login-btn">Definir senha e entrar →</button>
+        <button type="button" class="login-link-btn" id="loginBack3">← Voltar</button>
+      </div>
+    </form>
+    <div class="login-footer">
+      <span class="chip" id="loginUserCount">0 colaboradores</span>
+      <span class="chip">🔒 Acesso interno</span>
+    </div>
+  </div>
+</div>
+
+<header class="topbar" id="appTopbar" hidden>
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo">◈</div>
+      <div>Cronoplano<small>equipe &amp; rotina</small></div>
+      <span class="sync-indicator offline" id="syncIndicator" title="Sincronização"></span>
+    </div>
+    <div class="topbar-carteiras" id="topbarCarteiras"></div>
+    <nav class="tabs" id="tabsNav">
+      <button class="tab active" data-tab="daily">☀️ Diário</button>
+      <button class="tab" data-tab="weekly">🗓️ Semanal</button>
+      <button class="tab" data-tab="month">📆 Mês</button>
+      <button class="tab" data-tab="dashboard">📊 Painel</button>
+      <button class="tab" data-tab="team" data-leader-only hidden>👥 Equipe</button>
+    </nav>
+    <div class="user-wrap">
+      <button class="icon-chip-btn save-btn" id="saveBtn" title="Salvar cronograma no servidor">
+        <span class="ico">💾</span><span id="saveBtnLabel">Salvar</span>
+      </button>
+      <button class="user-chip" id="userChip" title="Editar meu perfil">
+        <span class="avatar" id="userChipAvatar">?</span>
+        <span id="userChipName">—</span>
+        <span class="role-badge member" id="userChipRole">membro</span>
+      </button>
+      <div class="settings-wrap">
+        <button class="icon-chip-btn icon-only" id="settingsBtn" title="Configurações" aria-haspopup="true" aria-expanded="false">
+          <span class="ico">⚙️</span>
+        </button>
+        <div class="settings-menu" id="settingsMenu" hidden>
+          <div class="settings-title">Configurações</div>
+          <button type="button" class="settings-item" id="setImport">
+            <span class="settings-ico">📥</span><span class="lbl">Importar cronograma</span>
+          </button>
+          <button type="button" class="settings-item" id="setExport" data-leader-only hidden>
+            <span class="settings-ico">📊</span><span class="lbl">Exportar cronogramas</span>
+          </button>
+          <button type="button" class="settings-item" id="setAddMember" data-leader-only hidden>
+            <span class="settings-ico">＋</span><span class="lbl">Adicionar membro</span>
+          </button>
+          <button type="button" class="settings-item" id="setManageCarteiras" data-leader-only hidden>
+            <span class="settings-ico">🏷️</span><span class="lbl">Gerenciar carteiras</span>
+          </button>
+          <div class="settings-divider"></div>
+          <button type="button" class="settings-item" id="setChangePwd">
+            <span class="settings-ico">🔑</span><span class="lbl">Alterar senha</span>
+          </button>
+          <button type="button" class="settings-item" id="setTheme">
+            <span class="settings-ico" id="setThemeIcon">☀️</span>
+            <span class="lbl" id="setThemeLabel">Modo claro</span>
+          </button>
+          <div class="settings-divider"></div>
+          <button type="button" class="settings-item danger" id="setLogout">
+            <span class="settings-ico">🚪</span><span class="lbl">Sair</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="appMain" hidden>
+
+  <section class="view" id="view-daily">
+    <div class="daily-layout">
+      <div class="daily-main">
+        <div class="section-head">
+          <div>
+            <h2 id="dailyTitle">Rotina Diária</h2>
+            <p id="dailySubtitle">Suas atividades do dia. Crie, marque como concluída e acompanhe.</p>
+          </div>
+        </div>
+        <div class="date-nav">
+          <div class="filter-wrap" title="Ver agenda de" data-leader-only hidden>
+            <span class="ico">👁</span>
+            <select class="filter-select" id="viewUserSelectDaily"></select>
+          </div>
+          <div class="filter-wrap" title="Filtrar por carteira">
+            <span class="ico">🏷️</span>
+            <select class="filter-select" id="carteiraFilterDaily"></select>
+          </div>
+          <div class="filter-wrap" title="Filtrar por categoria" data-leader-only hidden>
+            <span class="ico">📂</span>
+            <select class="filter-select" id="categoriaFilterDaily"></select>
+          </div>
+          <div class="spacer"></div>
+          <button class="nav-btn" id="prevDay">‹</button>
+          <input type="date" id="dailyDate">
+          <button class="nav-btn" id="nextDay">›</button>
+          <div class="label" id="dailyDateLabel"></div>
+          <button class="btn ghost" id="todayBtn">Hoje</button>
+        </div>
+        <div class="readonly-banner" id="dailyReadonly" hidden>
+          <span class="ico">👁</span>
+          <span id="dailyReadonlyText">—</span>
+          <span class="hint" id="dailyReadonlyHint"></span>
+        </div>
+        <form class="quick-add" id="dailyForm">
+          <input type="time" id="qTime" required>
+          <input type="time" id="qEnd">
+          <select id="qCat"></select>
+          <select id="qCarteira"></select>
+          <button class="btn primary" type="submit">+ Adicionar</button>
+          <textarea id="qTitle" placeholder="Descreva o que você vai fazer no dia..." maxlength="500" required></textarea>
+        </form>
+        <div class="progress-wrap" id="dailyProgress"></div>
+        <ul class="task-list" id="dailyList"></ul>
+      </div>
+      <aside class="daily-side">
+        <div class="panel cal-panel">
+          <div class="cal-head">
+            <div class="cal-title" id="calTitle">—</div>
+            <div class="cal-nav">
+              <button class="nav-btn" id="calPrev">‹</button>
+              <button class="nav-btn" id="calNext">›</button>
+            </div>
+          </div>
+          <div class="cal-weekdays">
+            <span>Seg</span><span>Ter</span><span>Qua</span>
+            <span>Qui</span><span>Sex</span><span>Sáb</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-hint">
+            <button class="chip" id="calToday" type="button" style="cursor:pointer;">Hoje</button>
+            <span class="chip" id="calMonthTotal">0 no mês</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="view" id="view-weekly">
+    <div class="section-head">
+      <div>
+        <h2 id="weeklyTitle">Visão Semanal</h2>
+        <p id="weeklySubtitle">Suas atividades agrupadas por dia da semana.</p>
+      </div>
+    </div>
+    <div class="date-nav">
+      <button class="nav-btn" id="wkPrev">‹</button>
+      <div class="label" id="wkLabel"></div>
+      <button class="nav-btn" id="wkNext">›</button>
+      <div class="spacer"></div>
+      <div class="filter-wrap" data-leader-only hidden>
+        <span class="ico">👁</span>
+        <select class="filter-select" id="viewUserSelectWeekly"></select>
+      </div>
+      <div class="filter-wrap">
+        <span class="ico">🏷️</span>
+        <select class="filter-select" id="carteiraFilterWeekly"></select>
+      </div>
+      <div class="filter-wrap" data-leader-only hidden>
+        <span class="ico">📂</span>
+        <select class="filter-select" id="categoriaFilterWeekly"></select>
+      </div>
+      <button class="btn ghost" id="wkToday">Esta semana</button>
+    </div>
+    <div class="readonly-banner" id="weeklyReadonly" hidden>
+      <span class="ico">👁</span>
+      <span id="weeklyReadonlyText">—</span>
+      <span class="hint" id="weeklyReadonlyHint"></span>
+    </div>
+    <div class="panel" style="padding:14px;">
+      <div class="week-scroll"><div class="week-grid" id="weekGrid"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-month">
+    <div class="section-head">
+      <div>
+        <h2 id="monthTitle">Visão Mensal</h2>
+        <p id="monthSubtitle">Todos os dias do mês com suas atividades.</p>
+      </div>
+    </div>
+    <div class="date-nav">
+      <button class="nav-btn" id="moPrev">‹</button>
+      <div class="label" id="moLabel"></div>
+      <button class="nav-btn" id="moNext">›</button>
+      <div class="spacer"></div>
+      <div class="filter-wrap" data-leader-only hidden>
+        <span class="ico">👁</span>
+        <select class="filter-select" id="viewUserSelectMonth"></select>
+      </div>
+      <div class="filter-wrap">
+        <span class="ico">🏷️</span>
+        <select class="filter-select" id="carteiraFilterMonth"></select>
+      </div>
+      <div class="filter-wrap" data-leader-only hidden>
+        <span class="ico">📂</span>
+        <select class="filter-select" id="categoriaFilterMonth"></select>
+      </div>
+      <button class="btn ghost" id="moToday">Este mês</button>
+    </div>
+    <div class="readonly-banner" id="monthReadonly" hidden>
+      <span class="ico">👁</span>
+      <span id="monthReadonlyText">—</span>
+      <span class="hint" id="monthReadonlyHint"></span>
+    </div>
+    <div class="panel month-panel">
+      <div class="month-weekdays">
+        <span>Seg</span><span>Ter</span><span>Qua</span>
+        <span>Qui</span><span>Sex</span><span>Sáb</span>
+        <span class="is-sunday">Dom</span>
+      </div>
+      <div class="month-grid" id="monthGrid"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-dashboard">
+    <div class="section-head">
+      <div>
+        <h2 id="dashTitle">Meu painel</h2>
+        <p id="dashSubtitle">Sua visão pessoal de produtividade.</p>
+      </div>
+    </div>
+    <div class="date-nav" style="margin-bottom:18px;">
+      <div class="filter-wrap">
+        <span class="ico">🏷️</span>
+        <select class="filter-select" id="carteiraFilterDash"></select>
+      </div>
+      <div class="filter-wrap" data-leader-only hidden>
+        <span class="ico">📂</span>
+        <select class="filter-select" id="categoriaFilterDash"></select>
+      </div>
+      <div class="filter-wrap" data-leader-only hidden>
+        <span class="ico">👁</span>
+        <select class="filter-select" id="viewUserSelectDash"></select>
+      </div>
+    </div>
+    <div id="dashContent"></div>
+  </section>
+
+  <section class="view" id="view-team">
+    <div class="section-head">
+      <div>
+        <h2>👥 Visão da Equipe</h2>
+        <p>Acompanhe pendências, conclusões e atrasos dos membros da equipe.</p>
+      </div>
+    </div>
+    <div id="teamOverviewWrap"></div>
+  </section>
+
+</main>
+
+<!-- MODAL: TAREFA -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Nova atividade</h3>
+      <button class="icon-btn" id="modalClose" type="button">✕</button>
+    </div>
+    <form id="modalForm">
+      <label class="field"><span>Título</span>
+        <input type="text" id="fTitle" placeholder="Ex: Reunião de equipe" maxlength="90" required>
+      </label>
+      <label class="field" id="ownerRow" hidden><span>Atribuir a</span>
+        <select id="fOwner"></select>
+      </label>
+      <label class="field"><span>Data</span>
+        <input type="date" id="fDate">
+      </label>
+      <div class="row">
+        <label class="field"><span>Início</span>
+          <input type="time" id="fStart">
+        </label>
+        <label class="field"><span>Fim</span>
+          <input type="time" id="fEnd">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field"><span>Categoria</span>
+          <select id="fCat"></select>
+        </label>
+        <label class="field"><span>Carteira</span>
+          <select id="fCarteira"></select>
+        </label>
+      </div>
+      <label class="field"><span>Prioridade</span>
+        <select id="fPrio">
+          <option value="alta">Alta</option>
+          <option value="media" selected>Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
+      </label>
+      <label class="field"><span>Observações</span>
+        <textarea id="fNotes" rows="2" maxlength="220" placeholder="Detalhes opcionais..."></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="btnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: DETALHES DO DIA -->
+<div class="modal-backdrop" id="dayDetailModal" hidden>
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-head">
+      <h3 id="dayDetailTitle">Detalhes do dia</h3>
+      <button class="icon-btn" id="dayDetailClose" type="button">✕</button>
+    </div>
+    <div id="dayDetailBody"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="dayDetailBtnClose">Fechar</button>
+      <button type="button" class="btn primary" id="dayDetailBtnAdd" hidden>+ Adicionar tarefa</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADICIONAR MEMBRO -->
+<div class="modal-backdrop" id="userModal" hidden>
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head">
+      <h3 id="userModalTitle">Adicionar membro à equipe</h3>
+      <button class="icon-btn" id="userModalClose" type="button">✕</button>
+    </div>
+    <form id="userForm">
+      <label class="field"><span>Nome completo</span>
+        <input type="text" id="uName" placeholder="Ex: Ana Silva" maxlength="40" required>
+      </label>
+      <label class="field"><span>Cargo na empresa</span>
+        <input type="text" id="uCargo" placeholder="Ex: Analista" maxlength="40">
+      </label>
+      <label class="field"><span>E-mail</span>
+        <input type="email" id="uEmail" placeholder="email@exemplo.com" maxlength="80">
+      </label>
+      <label class="field"><span>Tipo de acesso</span></label>
+      <div class="role-picker" style="margin-bottom:14px;">
+        <button type="button" class="role-opt active" data-role="member">
+          <div class="t">👤 Membro</div>
+          <div class="d">Vê apenas seu próprio cronograma.</div>
+        </button>
+        <button type="button" class="role-opt" data-role="leader">
+          <div class="t">⭐ Líder</div>
+          <div class="d">Vê o painel da equipe e todos os cronogramas.</div>
+        </button>
+      </div>
+      <label class="field"><span>Carteiras</span></label>
+      <div class="carteiras-picker" id="uCarteirasPicker"></div>
+      <div class="custom-carteira-wrap">
+        <input type="text" id="uCarteiraCustom" placeholder="Adicionar carteira (fica disponível para todos)">
+        <button type="button" class="btn ghost" id="uCarteiraAdd">＋</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="userBtnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: MEU PERFIL -->
+<div class="modal-backdrop" id="profileModal" hidden>
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head">
+      <h3 id="profileModalTitle">Meu perfil</h3>
+      <button class="icon-btn" id="profileModalClose" type="button">✕</button>
+    </div>
+    <form id="profileForm">
+      <div class="photo-uploader">
+        <div class="photo-preview" id="pPhotoPreview">?</div>
+        <div class="photo-info">
+          <div class="btns">
+            <button type="button" class="btn ghost" id="pPhotoBtn">📷 Escolher imagem</button>
+            <button type="button" class="btn ghost" id="pPhotoRemoveBtn">Remover</button>
+            <input type="file" id="pPhotoInput" accept="image/*" hidden>
+          </div>
+          <div class="photo-hint">JPG, PNG ou WebP · compactada automaticamente.</div>
+        </div>
+      </div>
+      <label class="field"><span>Nome</span>
+        <input type="text" id="pName" placeholder="Nome e sobrenome" maxlength="40" required>
+      </label>
+      <label class="field"><span>Cargo na empresa</span>
+        <input type="text" id="pCargo" placeholder="Ex: Analista" maxlength="40">
+      </label>
+      <label class="field"><span>E-mail</span>
+        <input type="email" id="pEmail" placeholder="email@exemplo.com" maxlength="80">
+      </label>
+      <label class="field"><span>Carteiras</span></label>
+      <div class="carteiras-picker" id="pCarteirasPicker"></div>
+      <div class="custom-carteira-wrap">
+        <input type="text" id="pCarteiraCustom" placeholder="Adicionar carteira (fica disponível para todos)">
+        <button type="button" class="btn ghost" id="pCarteiraAdd">＋</button>
+      </div>
+      <div class="io-hint" id="profileHoHint" style="margin-top:6px;margin-bottom:0;">
+        Toque nas carteiras acima para selecionar/desselecionar. Meta diária: <b>2h mínimas</b> somando <b>Hora Operacional</b> + <b>Acompanhamento</b>.
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="profileBtnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR MEMBRO -->
+<div class="modal-backdrop" id="editMemberModal" hidden>
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head">
+      <h3 id="editMemberTitle">Editar membro</h3>
+      <button class="icon-btn" id="editMemberClose" type="button">✕</button>
+    </div>
+    <form id="editMemberForm">
+      <div class="photo-uploader">
+        <div class="photo-preview" id="emPhotoPreview">?</div>
+        <div class="photo-info">
+          <div class="btns">
+            <button type="button" class="btn ghost" id="emPhotoBtn">📷 Escolher imagem</button>
+            <button type="button" class="btn ghost" id="emPhotoRemoveBtn">Remover</button>
+            <input type="file" id="emPhotoInput" accept="image/*" hidden>
+          </div>
+          <div class="photo-hint">JPG, PNG ou WebP · compactada automaticamente.</div>
+        </div>
+      </div>
+      <label class="field"><span>Nome</span>
+        <input type="text" id="emName" placeholder="Nome e sobrenome" maxlength="40" required>
+      </label>
+      <label class="field"><span>Cargo na empresa</span>
+        <input type="text" id="emCargo" placeholder="Ex: Analista" maxlength="40">
+      </label>
+      <label class="field"><span>E-mail</span>
+        <input type="email" id="emEmail" placeholder="email@exemplo.com" maxlength="80">
+      </label>
+      <label class="field"><span>Tipo de acesso</span></label>
+      <div class="role-picker" style="margin-bottom:14px;">
+        <button type="button" class="role-opt" data-em-role="member">
+          <div class="t">👤 Membro</div>
+          <div class="d">Vê apenas seu próprio cronograma.</div>
+        </button>
+        <button type="button" class="role-opt" data-em-role="leader">
+          <div class="t">⭐ Líder</div>
+          <div class="d">Vê o painel da equipe e todos os cronogramas.</div>
+        </button>
+      </div>
+      <label class="field"><span>Carteiras</span></label>
+      <div class="carteiras-picker" id="emCarteirasPicker"></div>
+      <div class="custom-carteira-wrap">
+        <input type="text" id="emCarteiraCustom" placeholder="Adicionar carteira (fica disponível para todos)">
+        <button type="button" class="btn ghost" id="emCarteiraAdd">＋</button>
+      </div>
+      <div class="section-divider">🔑 Redefinir senha</div>
+      <label class="field"><span>Nova senha</span>
+        <input type="password" id="emNewPwd" placeholder="Deixe em branco para não alterar" autocomplete="new-password">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="editMemberBtnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ALTERAR SENHA -->
+<div class="modal-backdrop" id="passwordModal" hidden>
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-head">
+      <h3>🔑 Alterar senha</h3>
+      <button class="icon-btn" id="passwordModalClose" type="button">✕</button>
+    </div>
+    <form id="passwordForm">
+      <label class="field"><span>Nova senha</span>
+        <input type="password" id="pwNew" placeholder="Mínimo 4 caracteres" autocomplete="new-password" required>
+      </label>
+      <label class="field"><span>Confirmar nova senha</span>
+        <input type="password" id="pwNew2" placeholder="Repita a nova senha" autocomplete="new-password" required>
+      </label>
+      <div class="login-error" id="pwError" hidden></div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="passwordBtnCancel">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar nova senha</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: IMPORTAR -->
+<div class="modal-backdrop" id="importModal" hidden>
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-head">
+      <h3>📥 Importar cronograma (Excel)</h3>
+      <button class="icon-btn" id="importModalClose" type="button">✕</button>
+    </div>
+    <div class="io-hint">
+      Colunas obrigatórias: <code>Data</code>, <code>Hora Início</code>, <code>Hora Fim</code>, <code>Descrição</code>, <code>Categoria</code> e <code>Carteira</code>.<br>
+      A coluna <b>Data</b> deve estar no formato <b>DD/MM/AAAA</b>.
+      <span id="importOwnerLine"> Tarefas importadas para <b id="importOwnerName">—</b>.</span>
+    </div>
+    <div class="import-actions">
+      <button type="button" class="btn ghost" id="importDownloadTemplate">⬇️ Baixar planilha-modelo</button>
+    </div>
+    <div id="importLeaderSection" hidden>
+      <div class="section-divider">Destinatários</div>
+      <label class="field"><span>Modo de importação</span></label>
+      <div class="role-picker" style="margin-bottom:14px;">
+        <button type="button" class="role-opt active" data-import-mode="single">
+          <div class="t">👤 Um membro</div>
+          <div class="d">Todas as tarefas vão para uma pessoa.</div>
+        </button>
+        <button type="button" class="role-opt" data-import-mode="multi">
+          <div class="t">👥 Vários membros</div>
+          <div class="d">Duplica as tarefas para as pessoas selecionadas.</div>
+        </button>
+      </div>
+      <div id="importSingleWrap">
+        <label class="field"><span>Membro</span>
+          <select id="importSingleSelect"></select>
+        </label>
+      </div>
+      <div id="importMultiWrap" hidden>
+        <label class="field"><span>Membros selecionados</span></label>
+        <div class="carteiras-picker" id="importMultiPicker" style="margin-bottom:6px;"></div>
+      </div>
+    </div>
+    <label class="field">
+      <span>Arquivo (.xlsx, .xls, .csv)</span>
+      <input type="file" id="importFile" accept=".xlsx,.xls,.csv">
+    </label>
+    <div id="importPreviewWrap" hidden>
+      <div class="import-stats" id="importStats"></div>
+      <div class="import-preview" id="importPreview"></div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="importBtnCancel">Cancelar</button>
+      <button type="button" class="btn primary" id="importConfirmBtn" disabled>Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EXPORTAR -->
+<div class="modal-backdrop" id="exportModal" hidden>
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <h3>📊 Exportar cronogramas</h3>
+      <button class="icon-btn" id="exportModalClose" type="button">✕</button>
+    </div>
+    <div class="io-hint" style="margin-bottom:16px;">
+      Gera uma planilha <b>.xlsx</b> com uma aba geral e uma aba por membro.
+    </div>
+    <div class="export-opt active" data-export="all">
+      <div class="ic">📊</div>
+      <div class="tx">
+        <div class="t">Geral + por membro</div>
+        <div class="d">Uma aba consolidada + uma aba por colaborador</div>
+      </div>
+    </div>
+    <div class="export-opt" data-export="selected">
+      <div class="ic">👤</div>
+      <div class="tx">
+        <div class="t">Somente um membro</div>
+        <div class="d">Escolha quem exportar</div>
+      </div>
+    </div>
+    <div id="exportUserWrap" hidden style="margin-top:10px;">
+      <label class="field"><span>Membro</span>
+        <select id="exportUserSelect"></select>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="exportBtnCancel">Cancelar</button>
+      <button type="button" class="btn primary" id="exportConfirmBtn">Baixar .xlsx</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GERENCIAR CARTEIRAS -->
+<div class="modal-backdrop" id="carteirasModal" hidden>
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-head">
+      <h3>🏷️ Gerenciar carteiras</h3>
+      <button class="icon-btn" id="carteirasModalClose" type="button">✕</button>
+    </div>
+    <div class="io-hint">
+      As carteiras cadastradas aqui ficam disponíveis para <b>toda a equipe</b>. Ao renomear ou excluir, todas as atividades e perfis que usam essa carteira serão atualizados automaticamente.
+    </div>
+    <div class="custom-carteira-wrap" style="margin-bottom:12px;">
+      <input type="text" id="newCarteiraName" placeholder="Nova carteira (ex: XYZ Bank)" maxlength="60">
+      <button type="button" class="btn primary" id="newCarteiraAdd">＋ Adicionar</button>
+    </div>
+    <ul class="carteiras-manage-list" id="carteirasManageList"></ul>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="carteirasModalBtnClose">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="member-tooltip" id="memberTooltip" hidden></div>
+
+<!-- MODAL: DIÁLOGO -->
+<div class="modal-backdrop" id="appDialog" hidden>
+  <div class="modal dialog-modal">
+    <div id="appDialogIcon" class="dialog-icon" hidden>ℹ️</div>
+    <div class="modal-head" style="margin-bottom:10px;">
+      <h3 id="appDialogTitle">Aviso</h3>
+      <button class="icon-btn" id="appDialogClose" type="button">✕</button>
+    </div>
+    <div class="dialog-body" id="appDialogMessage"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn ghost" id="appDialogCancel">Cancelar</button>
+      <button type="button" class="btn primary" id="appDialogOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
