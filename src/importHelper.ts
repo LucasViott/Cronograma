@@ -32,6 +32,15 @@ export function setOnImportSuccess(cb: () => void) {
   onImportSuccessCb = cb;
 }
 
+export function isoToBR(iso: string): string {
+  if (!iso) return '';
+  const parts = iso.split('-');
+  if (parts.length === 3) {
+    return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+  }
+  return iso;
+}
+
 function parseExcelDate(val: any): string | null {
   if (val === null || val === undefined || val === '') return null;
   if (val instanceof Date) {
@@ -43,10 +52,17 @@ function parseExcelDate(val: any): string | null {
     if (!isNaN(d.getTime())) return d.toLocaleDateString('sv-SE', { timeZone: 'UTC' });
   }
   const s = String(val).trim();
-  const mBR = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  const mBR = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
   if (mBR) {
-    let dd = parseInt(mBR[1], 10), mm = parseInt(mBR[2], 10), yy = parseInt(mBR[3], 10);
-    if (yy < 100) yy += 2000;
+    const dd = parseInt(mBR[1], 10), mm = parseInt(mBR[2], 10), yy = parseInt(mBR[3], 10);
+    if (mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31) {
+      return `${yy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+    }
+  }
+  const mBR2 = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2})$/);
+  if (mBR2) {
+    const dd = parseInt(mBR2[1], 10), mm = parseInt(mBR2[2], 10);
+    const yy = 2000 + parseInt(mBR2[3], 10);
     if (mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31) {
       return `${yy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
     }
@@ -201,7 +217,7 @@ export function handleImportFile(file: File) {
       const parsed: ParsedImportRow[] = [];
 
       rawRows.forEach((r, idx) => {
-        const dateRaw = pickCol(r, ['Data', 'Date', 'Dia', 'data']);
+        const dateRaw = pickCol(r, ['Data (DD/MM/AAAA)', 'Data', 'Date', 'Dia', 'data']);
         const startRaw = pickCol(r, ['Hora Início', 'Hora Inicio', 'Início', 'Inicio', 'Start']);
         const endRaw = pickCol(r, ['Hora Fim', 'Fim', 'End', 'Hora Final']);
         const titleRaw = pickCol(r, ['Descrição', 'Descricao', 'Título', 'Titulo', 'Title', 'Atividade', 'Ação', 'Acao']);
@@ -225,7 +241,7 @@ export function handleImportFile(file: File) {
         const errors: ParsedImportRow['errors'] = {};
 
         if (!iso) {
-          errors.data = 'Data inválida (formato esperado: DD/MM/AAAA)';
+          errors.data = 'Data inválida (formato obrigatório: DD/MM/AAAA)';
         }
         if (!title) {
           errors.descricao = 'Descrição da tarefa não preenchida';
@@ -299,9 +315,11 @@ function renderImportPreviewTable() {
       ? `<span style="color:#f87171;font-weight:700;">⚠ ${esc(errList.join(' | '))}</span>`
       : `<span style="color:#34d399;font-weight:700;">✓ Funcional</span>`;
 
+    const displayDate = r.iso ? isoToBR(r.iso) : (r.rawDate || '—');
+
     return `<tr class="${isErr ? 'row-error' : ''}">
       <td style="font-weight:700;color:var(--muted);">${r.rowNum}</td>
-      <td class="${e.data ? 'cell-error' : ''}" title="${esc(e.data || '')}">${esc(r.rawDate || r.iso || '—')}</td>
+      <td class="${e.data ? 'cell-error' : ''}" title="${esc(e.data || '')}">${esc(displayDate)}</td>
       <td>${esc(r.start || '—')}</td>
       <td>${esc(r.end || '—')}</td>
       <td class="${e.descricao ? 'cell-error' : ''}" title="${esc(e.descricao || '')}">${esc(r.title || '—')}</td>
@@ -315,7 +333,7 @@ function renderImportPreviewTable() {
     <thead>
       <tr>
         <th style="width:40px;">Linha</th>
-        <th>Data</th>
+        <th>Data (DD/MM/AAAA)</th>
         <th>Início</th>
         <th>Fim</th>
         <th>Descrição</th>
@@ -417,13 +435,13 @@ export function bindImportEvents() {
   $('#importDownloadTemplate')?.addEventListener('click', () => {
     const wb = XLSX.utils.book_new();
     const rows = [
-      ['Data', 'Hora Início', 'Hora Fim', 'Descrição', 'Categoria', 'Carteira'],
+      ['Data (DD/MM/AAAA)', 'Hora Início', 'Hora Fim', 'Descrição', 'Categoria', 'Carteira'],
       ['15/01/2026', '09:00', '10:30', 'Exemplo: reunião de alinhamento com equipe', 'Reunião', 'GM'],
       ['15/01/2026', '14:00', '15:00', 'Exemplo: acompanhamento operacional', 'Acompanhamento', 'Safra'],
       ['16/01/2026', '08:30', '09:15', 'Exemplo: capacitação e treinamento', 'Capacitação Inicial', 'BMW']
     ];
     const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 42 }, { wch: 24 }, { wch: 18 }];
+    ws['!cols'] = [{ wch: 18 }, { wch: 12 }, { wch: 12 }, { wch: 44 }, { wch: 24 }, { wch: 18 }];
     XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
     XLSX.writeFile(wb, 'cronoplano-modelo-importacao.xlsx');
   });

@@ -11,6 +11,12 @@ import {
 import { CATEGORIES, PRIO, PHOTO_SIZE, ALL_MEMBERS } from './constants';
 import { TaskItem, UserProfile } from './types';
 import * as XLSX from 'xlsx';
+import {
+  openImportModal as openImportModalHelper,
+  closeImportModal as closeImportModalHelper,
+  bindImportEvents,
+  setOnImportSuccess
+} from './importHelper';
 
 let onRenderRequest: (() => void) | null = null;
 export function setRenderRequester(cb: () => void) {
@@ -238,23 +244,26 @@ export function openEditMemberModal(userId: string) {
 
   $$('.role-opt[data-em-role]').forEach(b => b.classList.toggle('active', b.dataset.emRole === editMemberRole));
   renderCarteiraPicker($('#emCarteirasPicker'), editMemberCarteiras);
-
-  const prev = $('#emPhotoPreview');
-  if (prev) {
-    if (editMemberPhoto) {
-      prev.innerHTML = `<img src="${editMemberPhoto}" alt="Foto">`;
-      prev.style.background = '#000';
-    } else {
-      prev.innerHTML = u.name ? u.name[0].toUpperCase() : '?';
-      prev.style.background = u.color || '#666';
-    }
-  }
+  renderEditMemberPhotoPreview();
   $('#editMemberModal').hidden = false;
 }
 
 export function closeEditMemberModal() {
   $('#editMemberModal').hidden = true;
   editMemberId = null;
+}
+
+export function renderEditMemberPhotoPreview() {
+  const prev = $('#emPhotoPreview');
+  if (!prev) return;
+  const u = editMemberId ? data.users[editMemberId] : null;
+  if (editMemberPhoto) {
+    prev.innerHTML = `<img src="${editMemberPhoto}" alt="Foto" style="width:100%;height:100%;object-fit:cover;border-radius:18px;">`;
+    prev.style.background = '#000';
+  } else {
+    prev.innerHTML = u?.name ? u.name[0].toUpperCase() : '?';
+    prev.style.background = u?.color || '#666';
+  }
 }
 
 // 7. MODAL GERENCIAR CARTEIRAS
@@ -285,38 +294,12 @@ export function renderCarteirasManageList() {
 }
 
 // 8. MODAL IMPORTAR EXCEL
-let importRows: any[] = [];
-
 export function openImportModal() {
-  importRows = [];
-  const leaderSection = $('#importLeaderSection');
-  const ownerLine = $('#importOwnerLine');
-  const fileInput = $('#importFile') as HTMLInputElement;
-  if (fileInput) fileInput.value = '';
-
-  if (isLeader()) {
-    if (leaderSection) leaderSection.hidden = false;
-    if (ownerLine) ownerLine.hidden = true;
-    const sel = $('#importSingleSelect') as HTMLSelectElement;
-    if (sel) {
-      sel.innerHTML = usersList().map(u => `<option value="${u.id}">${esc(u.name)}</option>`).join('');
-    }
-  } else {
-    if (leaderSection) leaderSection.hidden = true;
-    if (ownerLine) ownerLine.hidden = false;
-    const me = currentUser();
-    const ownerName = $('#importOwnerName');
-    if (ownerName) ownerName.textContent = me?.name || '—';
-  }
-
-  $('#importPreviewWrap').hidden = true;
-  const confirmBtn = $('#importConfirmBtn') as HTMLButtonElement;
-  if (confirmBtn) confirmBtn.disabled = true;
-  $('#importModal').hidden = false;
+  openImportModalHelper();
 }
 
 export function closeImportModal() {
-  $('#importModal').hidden = true;
+  closeImportModalHelper();
 }
 
 // 9. MODAL EXPORTAR
@@ -340,7 +323,7 @@ export function closeExportModal() {
 
 export function exportToExcel() {
   const wb = XLSX.utils.book_new();
-  const rows: any[][] = [['Data', 'Colaborador', 'Carteira', 'Início', 'Fim', 'Descrição', 'Categoria', 'Status']];
+  const rows: any[][] = [['Data (DD/MM/AAAA)', 'Colaborador', 'Carteira', 'Início', 'Fim', 'Descrição', 'Categoria', 'Status']];
 
   Object.entries(data.daily).forEach(([iso, arr]) => {
     arr.forEach(t => {
@@ -349,8 +332,11 @@ export function exportToExcel() {
         const selectedUid = ($('#exportUserSelect') as HTMLSelectElement)?.value;
         if (t.ownerId !== selectedUid) return;
       }
+      const [y, m, d] = iso.split('-');
+      const dateBR = (y && m && d) ? `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}` : iso;
+
       rows.push([
-        iso,
+        dateBR,
         u.name,
         t.carteira || '',
         t.start || '',
@@ -363,8 +349,20 @@ export function exportToExcel() {
   });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [
+    { wch: 18 }, // Data (DD/MM/AAAA)
+    { wch: 24 }, // Colaborador
+    { wch: 16 }, // Carteira
+    { wch: 10 }, // Início
+    { wch: 10 }, // Fim
+    { wch: 45 }, // Descrição
+    { wch: 22 }, // Categoria
+    { wch: 14 }  // Status
+  ];
   XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
-  XLSX.writeFile(wb, `cronoplano-export-${todayISO()}.xlsx`);
+  const [yy, mm, dd] = todayISO().split('-');
+  const todayBR = `${dd}-${mm}-${yy}`;
+  XLSX.writeFile(wb, `cronoplano-export-${todayBR}.xlsx`);
   closeExportModal();
 }
 
@@ -606,6 +604,24 @@ export function bindModalListeners() {
     });
   });
 
+  // Photo handlers for editing member
+  $('#emPhotoBtn')?.addEventListener('click', () => ($('#emPhotoInput') as HTMLInputElement)?.click());
+  $('#emPhotoRemoveBtn')?.addEventListener('click', () => {
+    editMemberPhoto = '';
+    renderEditMemberPhotoPreview();
+  });
+  $('#emPhotoInput')?.addEventListener('change', async (e) => {
+    const f = (e.target as HTMLInputElement).files?.[0];
+    if (f) {
+      try {
+        editMemberPhoto = await resizeImageFile(f, PHOTO_SIZE);
+        renderEditMemberPhotoPreview();
+      } catch (err: any) {
+        showAlert(err.message || 'Erro ao processar imagem', 'Erro', { icon: '⚠️' });
+      }
+    }
+  });
+
   $('#emCarteirasPicker')?.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('[data-carteira]') as HTMLElement;
     if (!btn) return;
@@ -614,6 +630,20 @@ export function bindModalListeners() {
     const i = editMemberCarteiras.indexOf(c);
     if (i >= 0) editMemberCarteiras.splice(i, 1);
     else editMemberCarteiras.push(c);
+    renderCarteiraPicker($('#emCarteirasPicker'), editMemberCarteiras);
+  });
+
+  $('#emCarteiraAdd')?.addEventListener('click', () => {
+    const inp = $('#emCarteiraCustom') as HTMLInputElement;
+    const v = inp.value.trim();
+    if (!v) return;
+    ensureCarteirasInitialized();
+    if (!data.carteiras.includes(v)) {
+      data.carteiras.push(v);
+      data.carteiras.sort();
+    }
+    if (!editMemberCarteiras.includes(v)) editMemberCarteiras.push(v);
+    inp.value = '';
     renderCarteiraPicker($('#emCarteirasPicker'), editMemberCarteiras);
   });
 
@@ -628,6 +658,7 @@ export function bindModalListeners() {
     u.email = ($('#emEmail') as HTMLInputElement).value.trim();
     u.role = editMemberRole;
     u.carteiras = editMemberCarteiras.slice();
+    u.photo = editMemberPhoto;
     const newPwd = ($('#emNewPwd') as HTMLInputElement).value;
     if (newPwd && newPwd.length >= 4) {
       u.passwordHash = hashPassword(newPwd);
@@ -693,90 +724,9 @@ export function bindModalListeners() {
     showAlert('Senha alterada com sucesso!', 'Pronto', { icon: '✅' });
   });
 
-  // Import Modal
-  $('#importModalClose')?.addEventListener('click', closeImportModal);
-  $('#importBtnCancel')?.addEventListener('click', closeImportModal);
-  $('#importDownloadTemplate')?.addEventListener('click', () => {
-    const wb = XLSX.utils.book_new();
-    const rows = [
-      ['Data', 'Hora Início', 'Hora Fim', 'Descrição', 'Categoria', 'Carteira'],
-      ['15/01/2026', '09:00', '10:30', 'Exemplo: reunião de alinhamento', 'Reunião', 'GM'],
-      ['15/01/2026', '14:00', '15:00', 'Exemplo: acompanhamento operacional', 'Acompanhamento', 'Safra']
-    ];
-    const ws = XLSX.utils.aoa_to_sheet(rows);
-    XLSX.utils.book_append_sheet(wb, ws, 'Cronograma');
-    XLSX.writeFile(wb, 'cronoplano-modelo-importacao.xlsx');
-  });
-
-  $('#importFile')?.addEventListener('change', (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const buf = new Uint8Array(evt.target?.result as ArrayBuffer);
-        const wb = XLSX.read(buf, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const raw = XLSX.utils.sheet_to_json(ws, { defval: '' }) as any[];
-        importRows = raw;
-
-        const previewWrap = $('#importPreviewWrap');
-        if (previewWrap) previewWrap.hidden = false;
-
-        const stats = $('#importStats');
-        if (stats) stats.innerHTML = `<div class="st ok"><div class="v">${raw.length}</div><div class="k">Linhas lidas</div></div>`;
-
-        const confirmBtn = $('#importConfirmBtn') as HTMLButtonElement;
-        if (confirmBtn) confirmBtn.disabled = raw.length === 0;
-      } catch (err: any) {
-        showAlert('Erro ao ler planilha: ' + err.message, 'Erro', { icon: '⚠️' });
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  });
-
-  $('#importConfirmBtn')?.addEventListener('click', () => {
-    if (!importRows.length) return;
-    const targetUid = isLeader() ? (($('#importSingleSelect') as HTMLSelectElement)?.value || ui.currentUserId) : ui.currentUserId;
-    if (!targetUid) return;
-
-    let addedCount = 0;
-    importRows.forEach(r => {
-      const dateVal = String(r['Data'] || '').trim();
-      let iso = todayISO();
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateVal)) {
-        const [d, m, y] = dateVal.split('/');
-        iso = `${y}-${m}-${d}`;
-      } else if (/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
-        iso = dateVal;
-      }
-
-      const desc = String(r['Descrição'] || r['Descricao'] || r['Título'] || '').trim();
-      if (!desc) return;
-
-      if (!Array.isArray(data.daily[iso])) data.daily[iso] = [];
-      data.daily[iso].push({
-        id: uid(),
-        ownerId: targetUid,
-        title: desc,
-        start: String(r['Hora Início'] || r['Hora Inicio'] || ''),
-        end: String(r['Hora Fim'] || ''),
-        cat: 'capacitacao-inicial',
-        carteira: String(r['Carteira'] || ''),
-        prio: 'media',
-        notes: '',
-        done: false,
-        updatedAt: Date.now()
-      });
-      addedCount++;
-    });
-
-    touchUser(targetUid);
-    saveState(true);
-    closeImportModal();
-    triggerRender();
-    showAlert(`${addedCount} tarefa(s) importada(s) com sucesso!`, 'Concluído', { icon: '✅' });
-  });
+  // Bind Import Events from importHelper
+  bindImportEvents();
+  setOnImportSuccess(() => triggerRender());
 
   // Export Modal
   $('#exportModalClose')?.addEventListener('click', closeExportModal);
