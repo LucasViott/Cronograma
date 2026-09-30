@@ -1,6 +1,0 @@
-{
-  "name": "Cronoplano - Gestão de Cronograma da Equipe",
-  "description": "Sistema de organização e acompanhamento de rotina, cronograma diário, semanal e mensal, hora operacional e gestão da equipe de treinamento.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
