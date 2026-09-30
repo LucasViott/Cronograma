@@ -24,6 +24,7 @@ import {
   openDayDetail, openUserModal, openProfileModal, openEditMemberModal,
   openCarteirasModal, openImportModal, openExportModal
 } from './modals';
+import { bindTooltipEvents } from './tooltip';
 
 let loginCtx = { step: 'name', userId: null as string | null };
 
@@ -561,6 +562,9 @@ function bindEvents() {
 
   // Bind modals from modals.ts
   bindModalListeners();
+
+  // Bind hover tooltips for week and month member blocks
+  bindTooltipEvents();
 }
 
 async function init() {
