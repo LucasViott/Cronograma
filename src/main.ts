@@ -56,13 +56,22 @@ function updateSaveButton() {
 function render() {
   if (!ui.currentUserId || !data.users[ui.currentUserId]) return;
 
-  if (isLeader()) {
-    if (ui.viewUserId !== ALL_MEMBERS && !data.users[ui.viewUserId || '']) ui.viewUserId = ALL_MEMBERS;
+  const user = data.users[ui.currentUserId];
+  if (user.role === 'leader') {
+    if (!ui.viewUserId || (!data.users[ui.viewUserId] && ui.viewUserId !== ALL_MEMBERS)) {
+      ui.viewUserId = ALL_MEMBERS;
+    }
+    if (!ui.tab) ui.tab = 'month';
   } else {
-    ui.viewUserId = ui.currentUserId;
+    ui.viewUserId = user.id;
+    if (ui.tab === 'team' || !ui.tab) ui.tab = 'daily';
   }
 
-  $$('[data-leader-only]').forEach(el => { el.hidden = !isLeader(); });
+  // Ensure the appropriate view and tab have the active class
+  $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + ui.tab));
+
+  $$('[data-leader-only]').forEach(el => { el.hidden = user.role !== 'leader'; });
   refreshTopbarCarteiras();
 
   // Populate view user selects
@@ -169,12 +178,15 @@ function setLoginStep(step: string) {
 function completeLogin(user: any) {
   ui.currentUserId = user.id;
   ui.date = todayISO();
-  ui.viewUserId = user.role === 'leader' ? ALL_MEMBERS : user.id;
-  ui.tab = user.role === 'leader' ? 'month' : 'daily';
+  if (user.role === 'leader') {
+    ui.viewUserId = ALL_MEMBERS;
+    ui.tab = 'month';
+  } else {
+    ui.viewUserId = user.id;
+    ui.tab = 'daily';
+  }
   saveState(true);
   hideLogin();
-  $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === ui.tab));
-  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + ui.tab));
   render();
 }
 
@@ -584,6 +596,14 @@ async function init() {
   }, 10000);
 
   if (ui.currentUserId && data.users[ui.currentUserId]) {
+    const user = data.users[ui.currentUserId];
+    if (user.role === 'leader') {
+      if (!ui.viewUserId || ui.viewUserId === user.id) ui.viewUserId = ALL_MEMBERS;
+      if (!ui.tab || ui.tab === 'team') ui.tab = 'month';
+    } else {
+      ui.viewUserId = user.id;
+      if (!ui.tab || ui.tab === 'team') ui.tab = 'daily';
+    }
     hideLogin();
     render();
   } else {
