@@ -14,11 +14,12 @@ import { DEFAULT_CARTEIRAS } from './constants';
 const firebaseConfig = {
   apiKey: "AIzaSyDx3FgH2_rSTyQ561q4bjE8TZUJ_FGhJl8",
   authDomain: "cronoplano.firebaseapp.com",
+  databaseURL: "https://cronoplano-default-rtdb.firebaseio.com",
   projectId: "cronoplano",
   storageBucket: "cronoplano.firebasestorage.app",
   messagingSenderId: "162271814959",
-  appId: "1:162271814959:web:eaea9db17a2c216fb0adda",
-  measurementId: "G-34H054MQEH"
+  appId: "1:162271814959:web:d2505e4f6c3aabdbb0adda",
+  measurementId: "G-5SQEVC9LEV"
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
