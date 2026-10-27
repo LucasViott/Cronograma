@@ -1,4 +1,5 @@
 import './index.css';
+import './plannedTasks.css';
 import {
   data, ui, saveState, forceSaveNow, loadLocal, seedPredefinedUsers,
   migrateLegacyData, setOnSaveStateChange, setRenderCallback,
@@ -27,7 +28,7 @@ import {
 import { bindTooltipEvents } from './tooltip';
 import {
   initPlannedTasks, updatePlannedTasksBadge, checkAndTriggerDeadlineAlerts,
-  populateFormOptions, togglePlannedTasksPanel
+  populateFormOptions, togglePlannedTasksPanel, syncTopbarHeight
 } from './plannedTasks';
 
 let loginCtx = { step: 'name', userId: null as string | null };
@@ -127,6 +128,12 @@ function render() {
   updateSaveButton();
   updatePlannedTasksBadge();
   populateFormOptions();
+  syncTopbarHeight();
+
+  const tab = $('#plannedTasksTab');
+  if (tab) tab.hidden = !ui.currentUserId;
+  const topbarAlertsBtn = $('#topbarAlertsBtn');
+  if (topbarAlertsBtn) topbarAlertsBtn.hidden = !ui.currentUserId;
 }
 
 function switchTab(tab: string) {
@@ -144,6 +151,8 @@ function showLogin() {
   $('#appMain').hidden = true;
   const tab = $('#plannedTasksTab');
   if (tab) tab.hidden = true;
+  const topbarAlertsBtn = $('#topbarAlertsBtn');
+  if (topbarAlertsBtn) topbarAlertsBtn.hidden = true;
   togglePlannedTasksPanel(false);
   const countEl = $('#loginUserCount');
   if (countEl) countEl.textContent = `${usersList().length} colaboradores`;
@@ -154,10 +163,14 @@ function hideLogin() {
   $('#loginScreen').hidden = true;
   $('#appTopbar').hidden = false;
   $('#appMain').hidden = false;
+  syncTopbarHeight();
   const tab = $('#plannedTasksTab');
   if (tab) tab.hidden = false;
+  const topbarAlertsBtn = $('#topbarAlertsBtn');
+  if (topbarAlertsBtn) topbarAlertsBtn.hidden = false;
   updatePlannedTasksBadge();
   setTimeout(() => {
+    syncTopbarHeight();
     checkAndTriggerDeadlineAlerts();
   }, 600);
 }

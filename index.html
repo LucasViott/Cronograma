@@ -92,6 +92,10 @@
       <button class="tab" data-tab="team" data-leader-only hidden>👥 Equipe</button>
     </nav>
     <div class="user-wrap">
+      <button class="icon-chip-btn topbar-alerts-btn" id="topbarAlertsBtn" title="Alertas de prazos e ações atrasadas no cronograma">
+        <span class="ico">🔔</span><span>Alertas</span>
+        <span class="topbar-badge" id="topbarAlertsBadge" hidden>0</span>
+      </button>
       <button class="icon-chip-btn save-btn" id="saveBtn" title="Salvar cronograma no servidor">
         <span class="ico">💾</span><span id="saveBtnLabel">Salvar</span>
       </button>
@@ -704,84 +708,14 @@
       </div>
     </div>
     <div class="planned-head-actions">
-      <button type="button" class="icon-chip-btn alert-chip-btn" id="plannedAlertsBtn" title="Ver alertas de prazos (2, 1 e hoje)">
-        <span class="ico">🔔</span>
-        <span class="lbl">Alertas</span>
-        <span id="plannedAlertsBtnBadge" class="badge-num" hidden>0</span>
+      <button type="button" class="btn primary small" id="plannedOpenAddModalBtn" title="Adicionar nova tarefa planejada">
+        ＋ Nova Tarefa
       </button>
-      <button type="button" class="icon-btn close-panel-btn" id="plannedCloseBtn" title="Fechar menu">✕</button>
+      <button type="icon-btn" class="icon-btn close-panel-btn" id="plannedCloseBtn" title="Fechar menu">✕</button>
     </div>
   </div>
 
   <div class="planned-panel-body">
-    <!-- Formulário de adição / edição -->
-    <div class="planned-form-card">
-      <div class="planned-form-head">
-        <span id="plannedFormTitle">＋ Nova Tarefa Planejada</span>
-        <button type="button" class="btn ghost small" id="plannedCancelEditBtn" hidden>Cancelar edição</button>
-      </div>
-      <form id="plannedTaskForm">
-        <input type="hidden" id="plannedEditId">
-        <label class="field">
-          <span>Título da tarefa *</span>
-          <input type="text" id="plannedTitle" placeholder="Ex: Entregar relatório de capacitação" required maxlength="250">
-        </label>
-
-        <div class="row">
-          <label class="field">
-            <span>Data de Início *</span>
-            <input type="date" id="plannedStartDate" required>
-          </label>
-          <label class="field">
-            <span>Prazo Final (Fim) *</span>
-            <input type="date" id="plannedEndDate" required>
-          </label>
-        </div>
-
-        <div class="planned-quick-dates">
-          <span class="lbl">Prazo rápido:</span>
-          <div class="quick-date-chips">
-            <button type="button" class="quick-date-chip" data-days="0">Hoje</button>
-            <button type="button" class="quick-date-chip" data-days="1">Amanhã (+1d)</button>
-            <button type="button" class="quick-date-chip" data-days="2">+2 dias</button>
-            <button type="button" class="quick-date-chip" data-days="7">+7 dias</button>
-            <button type="button" class="quick-date-chip" data-days="15">+15 dias</button>
-            <button type="button" class="quick-date-chip" data-days="30">+30 dias</button>
-          </div>
-        </div>
-
-        <div class="row">
-          <label class="field">
-            <span>Responsável</span>
-            <select id="plannedOwner"></select>
-          </label>
-          <label class="field">
-            <span>Carteira</span>
-            <select id="plannedCarteira"></select>
-          </label>
-        </div>
-
-        <div class="row">
-          <label class="field">
-            <span>Prioridade</span>
-            <select id="plannedPriority">
-              <option value="alta">🔴 Alta</option>
-              <option value="media" selected>🟡 Média</option>
-              <option value="baixa">🟢 Baixa</option>
-            </select>
-          </label>
-          <label class="field">
-            <span>Observações</span>
-            <input type="text" id="plannedNotes" placeholder="Detalhes ou metas..." maxlength="300">
-          </label>
-        </div>
-
-        <button type="submit" class="btn primary" style="width:100%;margin-top:4px;" id="plannedSubmitBtn">
-          ＋ Adicionar Tarefa
-        </button>
-      </form>
-    </div>
-
     <!-- Barra de busca e filtros -->
     <div class="planned-filter-bar">
       <div class="planned-tabs">
@@ -791,24 +725,94 @@
         <button type="button" class="p-tab" data-filter="done">Concluídas (<span id="countDone">0</span>)</button>
       </div>
       <div class="planned-search-wrap">
-        <input type="text" id="plannedSearch" placeholder="🔍 Buscar por título, membro ou carteira...">
+        <input type="text" id="plannedSearch" placeholder="🔍 Buscar por título ou carteira...">
       </div>
     </div>
 
-    <!-- Lista de tarefas -->
+    <!-- Lista de tarefas com status -->
     <div class="planned-tasks-list" id="plannedTasksList"></div>
   </div>
 </aside>
 
-<!-- MODAL DE ALERTA DE PRAZOS (2, 1 e dia da finalização) -->
+<!-- MODAL: NOVA / EDITAR TAREFA PLANEJADA (POP-UP) -->
+<div class="modal-backdrop" id="plannedTaskModal" hidden>
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">📋</span>
+        <h3 id="plannedModalTitle" style="margin:0;">＋ Nova Tarefa Planejada</h3>
+      </div>
+      <button class="icon-btn" id="plannedModalClose" type="button">✕</button>
+    </div>
+
+    <form id="plannedTaskModalForm">
+      <input type="hidden" id="plannedEditId">
+
+      <label class="field">
+        <span>Título da tarefa *</span>
+        <input type="text" id="plannedTitle" placeholder="Ex: Entregar relatório de capacitação" required maxlength="250" autofocus>
+      </label>
+
+      <div class="row">
+        <label class="field">
+          <span>Data de Início *</span>
+          <input type="date" id="plannedStartDate" required>
+        </label>
+        <label class="field">
+          <span>Prazo Final (Fim) *</span>
+          <input type="date" id="plannedEndDate" required>
+        </label>
+      </div>
+
+      <div class="planned-quick-dates">
+        <span class="lbl">Definir prazo rápido:</span>
+        <div class="quick-date-chips">
+          <button type="button" class="quick-date-chip" data-days="0">Hoje</button>
+          <button type="button" class="quick-date-chip" data-days="1">Amanhã (+1d)</button>
+          <button type="button" class="quick-date-chip" data-days="2">+2 dias</button>
+          <button type="button" class="quick-date-chip" data-days="7">+7 dias</button>
+          <button type="button" class="quick-date-chip" data-days="15">+15 dias</button>
+          <button type="button" class="quick-date-chip" data-days="30">+30 dias</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="field">
+          <span>Carteira</span>
+          <select id="plannedCarteira"></select>
+        </label>
+        <label class="field">
+          <span>Prioridade</span>
+          <select id="plannedPriority">
+            <option value="alta">🔴 Alta</option>
+            <option value="media" selected>🟡 Média</option>
+            <option value="baixa">🟢 Baixa</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Observações</span>
+        <textarea id="plannedNotes" placeholder="Detalhes ou metas opcionais..." maxlength="400" rows="3"></textarea>
+      </label>
+
+      <div class="modal-actions" style="margin-top:16px;">
+        <button type="button" class="btn ghost" id="plannedModalCancel">Cancelar</button>
+        <button type="submit" class="btn primary" id="plannedModalSubmit">Salvar Tarefa</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DE ALERTA DE PRAZOS E AÇÕES ATRASADAS NO CRONOGRAMA -->
 <div class="modal-backdrop" id="plannedTasksAlertModal" hidden>
-  <div class="modal alert-modal" style="max-width:560px;">
+  <div class="modal alert-modal">
     <div class="modal-head">
       <div class="alert-modal-header-wrap">
         <div class="alert-bell-icon">🔔</div>
         <div>
-          <h3 style="margin:0;font-size:16px;">Alertas de Prazo: Tarefas Planejadas</h3>
-          <p style="margin:2px 0 0;font-size:12px;color:var(--muted);">Tarefas com finalização prevista para 2 dias, 1 dia ou hoje!</p>
+          <h3 style="margin:0;font-size:16.5px;">Central de Alertas</h3>
+          <p style="margin:2px 0 0;font-size:12px;color:var(--muted);">Prazos próximos de tarefas planejadas e ações atrasadas do cronograma</p>
         </div>
       </div>
       <button class="icon-btn" id="plannedAlertModalClose" type="button">✕</button>
@@ -817,7 +821,7 @@
     <div class="alert-modal-content" id="plannedAlertModalContent"></div>
 
     <div class="modal-actions" style="margin-top:16px;">
-      <button type="button" class="btn ghost" id="plannedAlertModalDismiss">Entendido</button>
+      <button type="button" class="btn ghost" id="plannedAlertModalDismiss">Fechar</button>
       <button type="button" class="btn primary" id="plannedAlertModalOpenPanel">📋 Abrir Tarefas Planejadas</button>
     </div>
   </div>

@@ -1,12 +1,12 @@
-import { PlannedTask } from './types';
+import { PlannedTask, TaskItem } from './types';
 import { data, ui, saveState, currentUser, usersList, userById, isLeader, getAllCarteiras } from './state';
-import { $, $$, esc, uid, todayISO, showConfirm, applyAvatar } from './utils';
+import { $, $$, esc, uid, todayISO, showConfirm, catOf } from './utils';
+import './plannedTasks.css';
 
 let activeFilter: 'all' | 'pending' | 'alerts' | 'done' = 'all';
 let searchQuery = '';
 let isPanelOpen = false;
 let editingTaskId: string | null = null;
-let lastAlertCheckDate = '';
 
 /**
  * Calculates calendar day difference between endDate and today.
@@ -60,15 +60,52 @@ export function calculateTimelineProgress(startDateStr: string, endDateStr: stri
 
 /**
  * Returns planned tasks that need pop-up alerts:
- * Active (not done) and diff is 0, 1, or 2 days!
+ * Active (not done) and diff is 0, 1, or 2 days, or overdue (< 0)
  */
 export function getAlertTasks(): PlannedTask[] {
   const tasks = data.plannedTasks || [];
   return tasks.filter(t => {
     if (t.done) return false;
     const diff = getDaysDiff(t.endDate);
-    return diff === 0 || diff === 1 || diff === 2;
+    return diff <= 2;
   }).sort((a, b) => getDaysDiff(a.endDate) - getDaysDiff(b.endDate));
+}
+
+/**
+ * Returns routine/daily tasks from the cronograma that are late/overdue:
+ * dateIso < todayISO() and !t.done
+ */
+export function getLateCronogramaTasks(): { task: TaskItem; date: string }[] {
+  const result: { task: TaskItem; date: string }[] = [];
+  const curId = ui.currentUserId;
+  const isLead = isLeader();
+  const today = todayISO();
+
+  for (const [dateIso, taskList] of Object.entries(data.daily || {})) {
+    if (dateIso >= today) continue;
+    for (const t of taskList) {
+      if (!t.done) {
+        if (isLead || t.ownerId === curId) {
+          result.push({ task: t, date: dateIso });
+        }
+      }
+    }
+  }
+
+  return result.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/**
+ * Synchronizes the --topbar-height CSS variable with the exact DOM height of #appTopbar
+ */
+export function syncTopbarHeight() {
+  const topbar = $('#appTopbar');
+  if (topbar && !topbar.hidden) {
+    const h = topbar.offsetHeight;
+    if (h > 0) {
+      document.documentElement.style.setProperty('--topbar-height', `${h}px`);
+    }
+  }
 }
 
 /**
@@ -80,37 +117,38 @@ export function togglePlannedTasksPanel(open?: boolean) {
   const tab = $('#plannedTasksTab');
   if (!panel || !tab) return;
 
+  syncTopbarHeight();
   isPanelOpen = typeof open === 'boolean' ? open : !isPanelOpen;
 
   if (isPanelOpen) {
+    if (backdrop) {
+      backdrop.hidden = false;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          backdrop.classList.add('open');
+        });
+      });
+    }
     panel.classList.add('open');
-    if (backdrop) backdrop.hidden = false;
     tab.classList.add('active');
-    populateFormOptions();
+    populateCarteiraOptions();
     renderPlannedTasksList();
   } else {
     panel.classList.remove('open');
-    if (backdrop) backdrop.hidden = true;
+    if (backdrop) {
+      backdrop.classList.remove('open');
+      setTimeout(() => {
+        if (!isPanelOpen) backdrop.hidden = true;
+      }, 350);
+    }
     tab.classList.remove('active');
-    resetForm();
   }
 }
 
 /**
- * Populates owner and carteira selects in the form
+ * Populates carteira select in the modal form
  */
-export function populateFormOptions() {
-  const ownerSel = $('#plannedOwner') as HTMLSelectElement;
-  if (ownerSel) {
-    const cur = currentUser();
-    const curVal = ownerSel.value;
-    const users = usersList();
-    ownerSel.innerHTML = users.map(u => {
-      const isSelected = curVal ? curVal === u.id : (cur ? cur.id === u.id : false);
-      return `<option value="${u.id}" ${isSelected ? 'selected' : ''}>${esc(u.name)}</option>`;
-    }).join('');
-  }
-
+export function populateCarteiraOptions() {
   const carteiraSel = $('#plannedCarteira') as HTMLSelectElement;
   if (carteiraSel) {
     const curVal = carteiraSel.value;
@@ -120,108 +158,90 @@ export function populateFormOptions() {
   }
 }
 
+export const populateFormOptions = populateCarteiraOptions;
+
 /**
- * Resets the add/edit form to its initial state
+ * Opens the pop-up modal to add a new planned task or edit an existing one
  */
-function resetForm() {
-  editingTaskId = null;
-  const form = $('#plannedTaskForm') as HTMLFormElement;
-  if (form) form.reset();
+export function openPlannedTaskModal(taskId?: string) {
+  const modal = $('#plannedTaskModal');
+  const form = $('#plannedTaskModalForm') as HTMLFormElement;
+  if (!modal || !form) return;
 
-  const editId = $('#plannedEditId') as HTMLInputElement;
-  if (editId) editId.value = '';
+  populateCarteiraOptions();
+  editingTaskId = taskId || null;
 
-  const formTitle = $('#plannedFormTitle');
-  if (formTitle) formTitle.textContent = '＋ Nova Tarefa Planejada';
-
-  const submitBtn = $('#plannedSubmitBtn');
-  if (submitBtn) submitBtn.textContent = '＋ Adicionar Tarefa';
-
-  const cancelBtn = $('#plannedCancelEditBtn');
-  if (cancelBtn) cancelBtn.hidden = true;
-
-  // Set default dates
-  const today = todayISO();
+  const modalTitle = $('#plannedModalTitle');
+  const editIdInput = $('#plannedEditId') as HTMLInputElement;
+  const titleInput = $('#plannedTitle') as HTMLInputElement;
   const startInput = $('#plannedStartDate') as HTMLInputElement;
   const endInput = $('#plannedEndDate') as HTMLInputElement;
-  if (startInput) startInput.value = today;
-  if (endInput) {
-    // Default 7 days from today
-    const d = new Date();
-    d.setDate(d.getDate() + 7);
-    endInput.value = d.toLocaleDateString('sv-SE');
+  const carteiraSel = $('#plannedCarteira') as HTMLSelectElement;
+  const prioSel = $('#plannedPriority') as HTMLSelectElement;
+  const notesInput = $('#plannedNotes') as HTMLTextAreaElement;
+  const submitBtn = $('#plannedModalSubmit');
+
+  if (taskId) {
+    const task = (data.plannedTasks || []).find(t => t.id === taskId);
+    if (!task) return;
+
+    if (modalTitle) modalTitle.textContent = '✏️ Editar Tarefa Planejada';
+    if (submitBtn) submitBtn.textContent = 'Salvar Alterações';
+    if (editIdInput) editIdInput.value = task.id;
+    if (titleInput) titleInput.value = task.title;
+    if (startInput) startInput.value = task.startDate || todayISO();
+    if (endInput) endInput.value = task.endDate || todayISO();
+    if (carteiraSel) carteiraSel.value = task.carteira || '';
+    if (prioSel) prioSel.value = task.prio || 'media';
+    if (notesInput) notesInput.value = task.notes || '';
+  } else {
+    form.reset();
+    if (modalTitle) modalTitle.textContent = '＋ Nova Tarefa Planejada';
+    if (submitBtn) submitBtn.textContent = 'Adicionar Tarefa';
+    if (editIdInput) editIdInput.value = '';
+
+    const today = todayISO();
+    if (startInput) startInput.value = today;
+    if (endInput) {
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      endInput.value = d.toLocaleDateString('sv-SE');
+    }
   }
 
-  populateFormOptions();
+  modal.hidden = false;
+  setTimeout(() => titleInput?.focus(), 60);
 }
 
 /**
- * Loads an existing task into the form for editing
+ * Closes the planned task creation/edit modal
  */
-function startEditTask(taskId: string) {
-  const task = (data.plannedTasks || []).find(t => t.id === taskId);
-  if (!task) return;
-
-  editingTaskId = taskId;
-  const editId = $('#plannedEditId') as HTMLInputElement;
-  if (editId) editId.value = task.id;
-
-  const titleInput = $('#plannedTitle') as HTMLInputElement;
-  if (titleInput) titleInput.value = task.title;
-
-  const startInput = $('#plannedStartDate') as HTMLInputElement;
-  if (startInput) startInput.value = task.startDate || todayISO();
-
-  const endInput = $('#plannedEndDate') as HTMLInputElement;
-  if (endInput) endInput.value = task.endDate || todayISO();
-
-  const ownerSel = $('#plannedOwner') as HTMLSelectElement;
-  if (ownerSel && task.ownerId) ownerSel.value = task.ownerId;
-
-  const carteiraSel = $('#plannedCarteira') as HTMLSelectElement;
-  if (carteiraSel) carteiraSel.value = task.carteira || '';
-
-  const prioSel = $('#plannedPriority') as HTMLSelectElement;
-  if (prioSel) prioSel.value = task.prio || 'media';
-
-  const notesInput = $('#plannedNotes') as HTMLInputElement;
-  if (notesInput) notesInput.value = task.notes || '';
-
-  const formTitle = $('#plannedFormTitle');
-  if (formTitle) formTitle.textContent = '✏️ Editar Tarefa Planejada';
-
-  const submitBtn = $('#plannedSubmitBtn');
-  if (submitBtn) submitBtn.textContent = '💾 Salvar Alterações';
-
-  const cancelBtn = $('#plannedCancelEditBtn');
-  if (cancelBtn) cancelBtn.hidden = false;
-
-  // Scroll form into view inside panel body
-  const body = $('.planned-panel-body');
-  if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
+export function closePlannedTaskModal() {
+  const modal = $('#plannedTaskModal');
+  if (modal) modal.hidden = true;
+  editingTaskId = null;
 }
 
 /**
- * Adds or updates a planned task from form submission
+ * Handles submission of the planned task modal form
  */
-function handleFormSubmit(e: SubmitEvent) {
+function handleModalFormSubmit(e: SubmitEvent) {
   e.preventDefault();
 
   const titleInput = $('#plannedTitle') as HTMLInputElement;
   const startInput = $('#plannedStartDate') as HTMLInputElement;
   const endInput = $('#plannedEndDate') as HTMLInputElement;
-  const ownerSel = $('#plannedOwner') as HTMLSelectElement;
   const carteiraSel = $('#plannedCarteira') as HTMLSelectElement;
   const prioSel = $('#plannedPriority') as HTMLSelectElement;
-  const notesInput = $('#plannedNotes') as HTMLInputElement;
+  const notesInput = $('#plannedNotes') as HTMLTextAreaElement;
 
   const title = titleInput.value.trim();
   const startDate = startInput.value;
   const endDate = endInput.value;
-  const ownerId = ownerSel.value || ui.currentUserId || '';
-  const carteira = carteiraSel.value;
-  const prio = (prioSel.value as any) || 'media';
-  const notes = notesInput.value.trim();
+  const ownerId = ui.currentUserId || currentUser()?.id || '';
+  const carteira = carteiraSel?.value || '';
+  const prio = (prioSel?.value as any) || 'media';
+  const notes = notesInput?.value.trim() || '';
 
   if (!title || !startDate || !endDate) return;
 
@@ -237,7 +257,6 @@ function handleFormSubmit(e: SubmitEvent) {
         title,
         startDate,
         endDate,
-        ownerId,
         carteira,
         prio,
         notes,
@@ -260,7 +279,6 @@ function handleFormSubmit(e: SubmitEvent) {
     };
     data.plannedTasks.unshift(newTask);
 
-    // If task deadline is 0, 1, or 2 days, show friendly notice
     const diff = getDaysDiff(endDate);
     if (diff === 0 || diff === 1 || diff === 2) {
       setTimeout(() => {
@@ -270,7 +288,7 @@ function handleFormSubmit(e: SubmitEvent) {
   }
 
   saveState(true);
-  resetForm();
+  closePlannedTaskModal();
   renderPlannedTasksList();
   updatePlannedTasksBadge();
 }
@@ -311,42 +329,52 @@ export async function deleteTask(taskId: string) {
   data.plannedTasks = (data.plannedTasks || []).filter(t => t.id !== taskId);
   saveState(true);
 
-  if (editingTaskId === taskId) {
-    resetForm();
-  }
-
   renderPlannedTasksList();
   updatePlannedTasksBadge();
 }
 
 /**
- * Updates badge counters on the tab and inside the panel
+ * Updates badge counters on the tab, topbar alerts button, and side panel
  */
 export function updatePlannedTasksBadge() {
   const tasks = data.plannedTasks || [];
   const alertTasks = getAlertTasks();
+  const lateCronograma = getLateCronogramaTasks();
+  const totalAlerts = alertTasks.length + lateCronograma.length;
 
+  // Topbar alerts button badge
+  const topbarBadge = $('#topbarAlertsBadge');
+  const topbarBtn = $('#topbarAlertsBtn');
+  if (topbarBadge) {
+    if (totalAlerts > 0) {
+      topbarBadge.textContent = String(totalAlerts);
+      topbarBadge.hidden = false;
+      if (topbarBtn) {
+        topbarBtn.classList.add('has-alerts');
+        topbarBtn.title = `${totalAlerts} alerta(s): ${alertTasks.length} tarefa(s) planejada(s), ${lateCronograma.length} ação(ões) atrasada(s)`;
+      }
+    } else {
+      topbarBadge.hidden = true;
+      if (topbarBtn) {
+        topbarBtn.classList.remove('has-alerts');
+        topbarBtn.title = 'Nenhum alerta pendente';
+      }
+    }
+  }
+
+  // Lateral tab badge
   const tabBadge = $('#plannedTasksTabBadge');
   if (tabBadge) {
     if (alertTasks.length > 0) {
       tabBadge.textContent = String(alertTasks.length);
       tabBadge.hidden = false;
-      tabBadge.title = `${alertTasks.length} tarefa(s) com prazo em 2, 1 ou hoje!`;
+      tabBadge.title = `${alertTasks.length} tarefa(s) planejada(s) com prazo em 2, 1 ou hoje!`;
     } else {
       tabBadge.hidden = true;
     }
   }
 
-  const panelBadge = $('#plannedAlertsBtnBadge');
-  if (panelBadge) {
-    if (alertTasks.length > 0) {
-      panelBadge.textContent = String(alertTasks.length);
-      panelBadge.hidden = false;
-    } else {
-      panelBadge.hidden = true;
-    }
-  }
-
+  // Side panel filter counts
   const countAll = $('#countAll');
   if (countAll) countAll.textContent = String(tasks.length);
 
@@ -361,7 +389,7 @@ export function updatePlannedTasksBadge() {
 }
 
 /**
- * Renders the list of planned tasks inside the side panel
+ * Renders the list of planned tasks inside the side panel (Status view only)
  */
 export function renderPlannedTasksList() {
   const listEl = $('#plannedTasksList');
@@ -380,7 +408,7 @@ export function renderPlannedTasksList() {
     tasks = tasks.filter(t => {
       if (t.done) return false;
       const diff = getDaysDiff(t.endDate);
-      return diff === 0 || diff === 1 || diff === 2;
+      return diff <= 2;
     });
   }
 
@@ -396,8 +424,7 @@ export function renderPlannedTasksList() {
     });
   }
 
-  // Sorting:
-  // Non-done first sorted by days remaining (urgent first), then done tasks
+  // Sorting: Active first (by urgency diff), then completed
   tasks.sort((a, b) => {
     if (a.done !== b.done) return a.done ? 1 : -1;
     const diffA = getDaysDiff(a.endDate);
@@ -410,7 +437,7 @@ export function renderPlannedTasksList() {
       <div class="planned-empty">
         <div class="empty-ico">🎯</div>
         <h4>Nenhuma tarefa planejada encontrada</h4>
-        <p>${activeFilter === 'alerts' ? 'Não há tarefas com prazo para hoje, amanhã ou em 2 dias.' : 'Use o formulário acima para adicionar metas e atividades com prazo.'}</p>
+        <p>${activeFilter === 'alerts' ? 'Não há tarefas com prazo para hoje, amanhã ou em 2 dias.' : 'Clique no botão <b>＋ Nova Tarefa</b> acima para cadastrar um planejamento com prazo.'}</p>
       </div>
     `;
     return;
@@ -510,7 +537,7 @@ export function renderPlannedTasksList() {
   listEl.querySelectorAll('.edit-task-btn').forEach(el => {
     el.addEventListener('click', (e) => {
       const id = (e.currentTarget as HTMLElement).dataset.id;
-      if (id) startEditTask(id);
+      if (id) openPlannedTaskModal(id);
     });
   });
 
@@ -529,13 +556,13 @@ export function renderPlannedTasksList() {
 export function checkAndTriggerDeadlineAlerts(force = false) {
   const today = todayISO();
   const alertTasks = getAlertTasks();
+  const lateCronograma = getLateCronogramaTasks();
 
-  if (alertTasks.length === 0) return;
+  if (alertTasks.length === 0 && lateCronograma.length === 0) return;
 
   const storageKey = `cronoplano_planned_alerts_${today}_${ui.currentUserId || 'guest'}`;
 
   if (!force) {
-    // Only auto-show once per day/session unless forced
     try {
       if (sessionStorage.getItem(storageKey) === 'dismissed') {
         return;
@@ -547,7 +574,7 @@ export function checkAndTriggerDeadlineAlerts(force = false) {
 }
 
 /**
- * Displays the Pop-up Modal for tasks with deadline in 2, 1, or 0 days
+ * Displays the Pop-up Modal for planned tasks and late cronograma tasks
  */
 export function showPlannedTasksAlertModal(force = false) {
   const modal = $('#plannedTasksAlertModal');
@@ -555,14 +582,16 @@ export function showPlannedTasksAlertModal(force = false) {
   if (!modal || !content) return;
 
   const alertTasks = getAlertTasks();
-  if (alertTasks.length === 0) {
+  const lateCronograma = getLateCronogramaTasks();
+
+  if (alertTasks.length === 0 && lateCronograma.length === 0) {
     if (force) {
       content.innerHTML = `
         <div class="alert-empty-state">
-          <div style="font-size:36px;margin-bottom:8px;">✨</div>
-          <div style="font-weight:700;font-size:15px;">Tudo sob controle!</div>
-          <div style="color:var(--muted);font-size:13px;margin-top:4px;">
-            Nenhuma tarefa planejada com finalização prevista para hoje, amanhã ou em 2 dias.
+          <div style="font-size:38px;margin-bottom:10px;">✨</div>
+          <div style="font-weight:700;font-size:16px;">Tudo em dia!</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:6px;line-height:1.4;">
+            Nenhuma tarefa planejada próxima da finalização (2, 1 ou hoje) e nenhuma atividade atrasada no cronograma.
           </div>
         </div>
       `;
@@ -571,39 +600,112 @@ export function showPlannedTasksAlertModal(force = false) {
     return;
   }
 
-  // Group by: Hoje (0d), Amanhã (1d), Em 2 dias (2d)
-  const todayTasks = alertTasks.filter(t => getDaysDiff(t.endDate) === 0);
-  const tomorrowTasks = alertTasks.filter(t => getDaysDiff(t.endDate) === 1);
-  const twoDaysTasks = alertTasks.filter(t => getDaysDiff(t.endDate) === 2);
-  const overdueTasks = alertTasks.filter(t => getDaysDiff(t.endDate) < 0);
+  let html = '';
 
-  const renderSection = (title: string, icon: string, badgeClass: string, taskList: PlannedTask[], note: string) => {
-    if (taskList.length === 0) return '';
-    return `
-      <div class="alert-group">
-        <div class="alert-group-header ${badgeClass}">
-          <span class="group-icon">${icon}</span>
-          <span class="group-title">${title}</span>
-          <span class="group-note">${note}</span>
-          <span class="group-count">${taskList.length}</span>
+  // 1. SEÇÃO: TAREFAS PLANEJADAS
+  if (alertTasks.length > 0) {
+    const todayTasks = alertTasks.filter(t => getDaysDiff(t.endDate) === 0);
+    const tomorrowTasks = alertTasks.filter(t => getDaysDiff(t.endDate) === 1);
+    const twoDaysTasks = alertTasks.filter(t => getDaysDiff(t.endDate) === 2);
+    const overdueTasks = alertTasks.filter(t => getDaysDiff(t.endDate) < 0);
+
+    const renderPlannedGroup = (title: string, icon: string, badgeClass: string, taskList: PlannedTask[], note: string) => {
+      if (taskList.length === 0) return '';
+      return `
+        <div class="alert-group">
+          <div class="alert-group-header ${badgeClass}">
+            <span class="group-icon">${icon}</span>
+            <span class="group-title">${title}</span>
+            <span class="group-note">${note}</span>
+            <span class="group-count">${taskList.length}</span>
+          </div>
+          <div class="alert-group-items">
+            ${taskList.map(t => {
+              const owner = userById(t.ownerId);
+              return `
+                <div class="alert-task-card planned-alert-card" data-id="${t.id}">
+                  <div class="alert-task-info">
+                    <div class="alert-task-top">
+                      <span class="alert-task-name">${esc(t.title)}</span>
+                      <span class="alert-deadline-badge">
+                        🎯 <b>Prazo Final: ${formatDateBR(t.endDate)}</b>
+                      </span>
+                    </div>
+
+                    <div class="alert-task-sub">
+                      <span>🗓️ Início: <b>${formatDateBR(t.startDate)}</b></span>
+                      <span>•</span>
+                      <span>Data Final do Prazo: <b class="deadline-highlight">${formatDateBR(t.endDate)}</b></span>
+                      ${t.carteira ? `<span>• 🏷️ ${esc(t.carteira)}</span>` : ''}
+                      <span>• 👤 ${esc(owner.name)}</span>
+                    </div>
+
+                    ${t.notes ? `
+                      <div class="alert-task-notes">
+                        <span class="notes-lbl">📝 <b>Observações:</b></span>
+                        <span class="notes-val">${esc(t.notes)}</span>
+                      </div>
+                    ` : ''}
+                  </div>
+                  <div class="alert-task-actions">
+                    <button type="button" class="btn small success-btn alert-complete-btn" data-id="${t.id}" title="Marcar tarefa como concluída">
+                      ✓ Concluir
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
         </div>
-        <div class="alert-group-items">
-          ${taskList.map(t => {
+      `;
+    };
+
+    html += `
+      <div class="alert-section-title">
+        <span>📋 Prazos Próximos (${alertTasks.length})</span>
+      </div>
+      ${renderPlannedGroup('Dia da Finalização (HOJE)', '🚨', 'bg-today', todayTasks, 'Atenção máxima: vence hoje!')}
+      ${renderPlannedGroup('Falta 1 Dia (Amanhã)', '⏰', 'bg-tomorrow', tomorrowTasks, 'Vence amanhã')}
+      ${renderPlannedGroup('Faltam 2 Dias', '⚠️', 'bg-two-days', twoDaysTasks, 'Prazo em 2 dias')}
+      ${renderPlannedGroup('Prazos Ultrapassados', '❗', 'bg-overdue', overdueTasks, 'Prazo final já ultrapassado')}
+    `;
+  }
+
+  // 2. SEÇÃO: TAREFAS ATRASADAS (AÇÕES DO CRONOGRAMA)
+  if (lateCronograma.length > 0) {
+    html += `
+      <div class="alert-section-title" style="margin-top:${alertTasks.length > 0 ? '18px' : '0'};">
+        <span>⚠️ Tarefas Atrasadas (${lateCronograma.length})</span>
+      </div>
+      <div class="alert-group">
+        <div class="alert-group-header bg-overdue">
+          <span class="group-icon">⏱️</span>
+          <span class="group-title">Ações do Cronograma com Status Atrasada</span>
+          <span class="group-note">Role para ver todas (${lateCronograma.length})</span>
+          <span class="group-count">${lateCronograma.length}</span>
+        </div>
+        <div class="alert-group-items cronograma-scroll-list">
+          ${lateCronograma.map(item => {
+            const t = item.task;
             const owner = userById(t.ownerId);
+            const cat = catOf(t.cat);
             return `
-              <div class="alert-task-card" data-id="${t.id}">
+              <div class="alert-task-card" data-task-id="${t.id}" data-task-date="${item.date}">
                 <div class="alert-task-info">
                   <div class="alert-task-title">${esc(t.title)}</div>
                   <div class="alert-task-sub">
-                    <span>🗓️ Início: <b>${formatDateBR(t.startDate)}</b></span>
-                    <span>•</span>
-                    <span>Prazo: <b>${formatDateBR(t.endDate)}</b></span>
-                    ${t.carteira ? `<span>• 🏷️ ${esc(t.carteira)}</span>` : ''}
-                    <span>• 👤 ${esc(owner.name)}</span>
+                    <span class="date-badge">📅 <b>${formatDateBR(item.date)}</b></span>
+                    <span>🕒 ${esc(t.start || '--:--')}${t.end ? ' às ' + esc(t.end) : ''}</span>
+                    <span class="cat-chip-mini" style="background:${cat.color}22;color:${cat.color}">● ${esc(cat.label)}</span>
+                    ${t.carteira ? `<span>🏷️ ${esc(t.carteira)}</span>` : ''}
+                    <span>👤 ${esc(owner.name)}</span>
                   </div>
                 </div>
                 <div class="alert-task-actions">
-                  <button type="button" class="btn small success-btn alert-complete-btn" data-id="${t.id}">
+                  <button type="button" class="btn small ghost alert-goto-date-btn" data-date="${item.date}" title="Ver no cronograma">
+                    👁️ Ver
+                  </button>
+                  <button type="button" class="btn small success-btn alert-complete-cronograma-btn" data-task-id="${t.id}" data-task-date="${item.date}">
                     ✓ Concluir
                   </button>
                 </div>
@@ -613,23 +715,54 @@ export function showPlannedTasksAlertModal(force = false) {
         </div>
       </div>
     `;
-  };
+  }
 
-  content.innerHTML = `
-    ${renderSection('Dia da Finalização (HOJE)', '🚨', 'bg-today', todayTasks, 'Atenção máxima: o prazo termina hoje!')}
-    ${renderSection('Falta 1 Dia (Amanhã)', '⏰', 'bg-tomorrow', tomorrowTasks, 'Finalização prevista para amanhã')}
-    ${renderSection('Faltam 2 Dias', '⚠️', 'bg-two-days', twoDaysTasks, 'Prepare-se: prazo final em 2 dias')}
-    ${renderSection('Tarefas Atrasadas', '❗', 'bg-overdue', overdueTasks, 'Prazo final já ultrapassado')}
-  `;
+  content.innerHTML = html;
 
-  // Bind quick complete buttons
+  // Bind complete planned task buttons
   content.querySelectorAll('.alert-complete-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const id = (e.currentTarget as HTMLElement).dataset.id;
       if (id) {
         toggleTaskDone(id);
-        // Refresh alert content
         showPlannedTasksAlertModal(true);
+      }
+    });
+  });
+
+  // Bind complete cronograma task buttons
+  content.querySelectorAll('.alert-complete-cronograma-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const el = e.currentTarget as HTMLElement;
+      const tid = el.dataset.taskId;
+      const date = el.dataset.taskDate;
+      if (tid && date && data.daily[date]) {
+        const t = data.daily[date].find(x => x.id === tid);
+        if (t) {
+          t.done = true;
+          t.updatedAt = Date.now();
+          saveState(true);
+          updatePlannedTasksBadge();
+          showPlannedTasksAlertModal(true);
+        }
+      }
+    });
+  });
+
+  // Bind go to date in daily cronograma
+  content.querySelectorAll('.alert-goto-date-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const date = (e.currentTarget as HTMLElement).dataset.date;
+      if (date) {
+        ui.date = date;
+        ui.tab = 'daily';
+        dismissPlannedTasksAlertModal();
+        $$('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'daily'));
+        $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-daily'));
+        saveState(false);
+        const dailyInput = $('#dailyDate') as HTMLInputElement;
+        if (dailyInput) dailyInput.value = date;
+        window.dispatchEvent(new CustomEvent('cronoplano:render-daily'));
       }
     });
   });
@@ -655,35 +788,44 @@ export function dismissPlannedTasksAlertModal() {
  * Sets up all DOM event listeners for the planned tasks feature
  */
 export function initPlannedTasks() {
-  // Toggle right tab
+  // Toggle right lateral tab
   $('#plannedTasksTab')?.addEventListener('click', () => {
     togglePlannedTasksPanel();
   });
 
-  // Close panel
+  // Close lateral panel
   $('#plannedCloseBtn')?.addEventListener('click', () => {
     togglePlannedTasksPanel(false);
   });
 
-  // Backdrop click closes panel
+  // Backdrop click closes lateral panel
   $('#plannedTasksBackdrop')?.addEventListener('click', () => {
     togglePlannedTasksPanel(false);
   });
 
-  // Alert bell button in header
-  $('#plannedAlertsBtn')?.addEventListener('click', () => {
+  // Button in panel header: "＋ Nova Tarefa" opens modal
+  $('#plannedOpenAddModalBtn')?.addEventListener('click', () => {
+    openPlannedTaskModal();
+  });
+
+  // Button in topbar: "🔔 Alertas" opens alert modal
+  $('#topbarAlertsBtn')?.addEventListener('click', () => {
     showPlannedTasksAlertModal(true);
   });
 
-  // Form submit
-  $('#plannedTaskForm')?.addEventListener('submit', handleFormSubmit);
+  // Planned Task modal form submission
+  $('#plannedTaskModalForm')?.addEventListener('submit', handleModalFormSubmit);
 
-  // Cancel edit button
-  $('#plannedCancelEditBtn')?.addEventListener('click', () => {
-    resetForm();
+  // Planned Task modal close / cancel buttons
+  $('#plannedModalClose')?.addEventListener('click', () => {
+    closePlannedTaskModal();
   });
 
-  // Quick date chips
+  $('#plannedModalCancel')?.addEventListener('click', () => {
+    closePlannedTaskModal();
+  });
+
+  // Quick date chips inside modal
   $$('.quick-date-chip').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const days = parseInt((e.currentTarget as HTMLElement).dataset.days || '0', 10);
@@ -698,7 +840,7 @@ export function initPlannedTasks() {
     });
   });
 
-  // Filter tabs
+  // Filter tabs in lateral panel
   $$('.planned-tabs .p-tab').forEach(tabBtn => {
     tabBtn.addEventListener('click', (e) => {
       $$('.planned-tabs .p-tab').forEach(b => b.classList.remove('active'));
@@ -709,7 +851,7 @@ export function initPlannedTasks() {
     });
   });
 
-  // Search input
+  // Search input in lateral panel
   $('#plannedSearch')?.addEventListener('input', (e) => {
     searchQuery = (e.target as HTMLInputElement).value;
     renderPlannedTasksList();
@@ -729,7 +871,12 @@ export function initPlannedTasks() {
     togglePlannedTasksPanel(true);
   });
 
-  // Set initial form dates
-  resetForm();
+  // Initial updates and sync
   updatePlannedTasksBadge();
+  syncTopbarHeight();
+  window.addEventListener('resize', syncTopbarHeight);
+  const topbar = $('#appTopbar');
+  if (topbar && typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => syncTopbarHeight()).observe(topbar);
+  }
 }
