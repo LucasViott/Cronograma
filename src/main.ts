@@ -25,6 +25,10 @@ import {
   openCarteirasModal, openImportModal, openExportModal
 } from './modals';
 import { bindTooltipEvents } from './tooltip';
+import {
+  initPlannedTasks, updatePlannedTasksBadge, checkAndTriggerDeadlineAlerts,
+  populateFormOptions, togglePlannedTasksPanel
+} from './plannedTasks';
 
 let loginCtx = { step: 'name', userId: null as string | null };
 
@@ -121,6 +125,8 @@ function render() {
   }
 
   updateSaveButton();
+  updatePlannedTasksBadge();
+  populateFormOptions();
 }
 
 function switchTab(tab: string) {
@@ -136,6 +142,9 @@ function showLogin() {
   $('#loginScreen').hidden = false;
   $('#appTopbar').hidden = true;
   $('#appMain').hidden = true;
+  const tab = $('#plannedTasksTab');
+  if (tab) tab.hidden = true;
+  togglePlannedTasksPanel(false);
   const countEl = $('#loginUserCount');
   if (countEl) countEl.textContent = `${usersList().length} colaboradores`;
   setLoginStep('name');
@@ -145,6 +154,12 @@ function hideLogin() {
   $('#loginScreen').hidden = true;
   $('#appTopbar').hidden = false;
   $('#appMain').hidden = false;
+  const tab = $('#plannedTasksTab');
+  if (tab) tab.hidden = false;
+  updatePlannedTasksBadge();
+  setTimeout(() => {
+    checkAndTriggerDeadlineAlerts();
+  }, 600);
 }
 
 function setLoginStep(step: string) {
@@ -579,6 +594,7 @@ async function init() {
   onSyncStatusChange(status => setSyncIndicator(status));
 
   bindEvents();
+  initPlannedTasks();
 
   // Background Firebase connection and initial merge
   try {

@@ -9,7 +9,8 @@ export const data: AppData = {
   deletedUserIds: [],
   deletedTaskIds: {},
   notifications: [],
-  carteiras: [...DEFAULT_CARTEIRAS]
+  carteiras: [...DEFAULT_CARTEIRAS],
+  plannedTasks: []
 };
 
 export const ui: UIState = {
@@ -196,6 +197,7 @@ export function saveLocal() {
       deletedTaskIds: data.deletedTaskIds,
       notifications: data.notifications,
       carteiras: data.carteiras,
+      plannedTasks: data.plannedTasks || [],
       ui: {
         tab: ui.tab,
         date: ui.date,
@@ -227,6 +229,11 @@ export function loadLocal() {
       if (parsed.deletedTaskIds) data.deletedTaskIds = parsed.deletedTaskIds;
       if (parsed.notifications) data.notifications = parsed.notifications;
       if (parsed.carteiras) data.carteiras = parsed.carteiras;
+      if (parsed.plannedTasks && Array.isArray(parsed.plannedTasks)) {
+        data.plannedTasks = parsed.plannedTasks;
+      } else if (!data.plannedTasks) {
+        data.plannedTasks = [];
+      }
       if (parsed.ui) {
         ui.tab = parsed.ui.tab || ui.tab;
         ui.date = parsed.ui.date || ui.date;
@@ -254,6 +261,9 @@ export function applyMergedRemote(merged: AppData) {
   data.deletedTaskIds = merged.deletedTaskIds;
   data.notifications = merged.notifications;
   data.carteiras = merged.carteiras;
+  if (merged.plannedTasks) {
+    data.plannedTasks = merged.plannedTasks;
+  }
   saveLocal();
 
   if (ui.currentUserId && !data.users[ui.currentUserId]) {

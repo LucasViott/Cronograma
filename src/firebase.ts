@@ -157,13 +157,29 @@ export function mergeAppData(local: AppData, remote: Partial<AppData>): AppData 
     .sort((a, b) => (b.at || '').localeCompare(a.at || ''))
     .slice(0, 50);
 
+  // Merge planned tasks
+  const plannedMap = new Map<string, any>();
+  for (const pt of (remote.plannedTasks || [])) {
+    if (pt && pt.id && !deletedTasks[pt.id]) plannedMap.set(pt.id, pt);
+  }
+  for (const pt of (local.plannedTasks || [])) {
+    if (pt && pt.id && !deletedTasks[pt.id]) {
+      const existing = plannedMap.get(pt.id);
+      if (!existing || (pt.updatedAt || 0) >= (existing.updatedAt || 0)) {
+        plannedMap.set(pt.id, pt);
+      }
+    }
+  }
+  const plannedTasks = Array.from(plannedMap.values());
+
   return {
     users: mergedUsers,
     daily: mergedDaily,
     deletedUserIds: Array.from(deletedUsers),
     deletedTaskIds: deletedTasks,
     notifications,
-    carteiras
+    carteiras,
+    plannedTasks
   };
 }
 

@@ -37,6 +37,20 @@ export interface NotificationItem {
   seen: boolean;
 }
 
+export interface PlannedTask {
+  id: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  ownerId: string;
+  carteira?: string;
+  prio?: 'alta' | 'media' | 'baixa';
+  notes?: string;
+  done: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface AppData {
   users: Record<string, UserProfile>;
   daily: Record<string, TaskItem[]>;
@@ -44,6 +58,7 @@ export interface AppData {
   deletedTaskIds: Record<string, number>;
   notifications: NotificationItem[];
   carteiras: string[];
+  plannedTasks?: PlannedTask[];
   updatedAt?: any;
 }
 
