@@ -34,12 +34,16 @@ export function hashPassword(pwd: string): string {
   return (h >>> 0).toString(16);
 }
 
-export function todayISO(): string {
-  return new Date().toLocaleDateString('sv-SE');
+export function isoOf(dt: Date): string {
+  if (!dt || isNaN(dt.getTime())) dt = new Date();
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, '0');
+  const d = String(dt.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
-export function isoOf(dt: Date): string {
-  return dt.toLocaleDateString('sv-SE');
+export function todayISO(): string {
+  return isoOf(new Date());
 }
 
 export function fmtDateFull(iso: string): string {
@@ -196,28 +200,43 @@ export function showDialog(opts: {
     const cancelBtn = $('#appDialogCancel');
     const closeBtn = $('#appDialogClose');
 
-    titleEl.textContent = opts.title || 'Aviso';
-    msgEl.innerHTML = opts.message || '';
-    okBtn.textContent = opts.confirmText || 'OK';
-    cancelBtn.textContent = opts.cancelText || 'Cancelar';
-    cancelBtn.hidden = !opts.showCancel;
+    if (!backdrop || !okBtn) {
+      // Fallback in case dialog markup was not rendered
+      if (opts.showCancel) {
+        resolve(window.confirm(opts.message?.replace(/<[^>]+>/g, '') || opts.title || ''));
+      } else {
+        window.alert(opts.message?.replace(/<[^>]+>/g, '') || opts.title || '');
+        resolve(true);
+      }
+      return;
+    }
 
-    if (opts.icon) {
-      iconEl.hidden = false;
-      iconEl.textContent = opts.icon;
-      iconEl.className = 'dialog-icon ' + (opts.iconVariant || '');
-    } else {
-      iconEl.hidden = true;
+    if (titleEl) titleEl.textContent = opts.title || 'Aviso';
+    if (msgEl) msgEl.innerHTML = opts.message || '';
+    if (okBtn) okBtn.textContent = opts.confirmText || 'OK';
+    if (cancelBtn) {
+      cancelBtn.textContent = opts.cancelText || 'Cancelar';
+      cancelBtn.hidden = !opts.showCancel;
+    }
+
+    if (iconEl) {
+      if (opts.icon) {
+        iconEl.hidden = false;
+        iconEl.textContent = opts.icon;
+        iconEl.className = 'dialog-icon ' + (opts.iconVariant || '');
+      } else {
+        iconEl.hidden = true;
+      }
     }
 
     okBtn.className = 'btn ' + (opts.danger ? 'primary danger-btn' : 'primary');
     backdrop.hidden = false;
 
     const cleanup = () => {
-      okBtn.removeEventListener('click', onOk);
-      cancelBtn.removeEventListener('click', onCancel);
-      closeBtn.removeEventListener('click', onCancel);
-      backdrop.removeEventListener('click', onBackdrop);
+      okBtn?.removeEventListener('click', onOk);
+      cancelBtn?.removeEventListener('click', onCancel);
+      closeBtn?.removeEventListener('click', onCancel);
+      backdrop?.removeEventListener('click', onBackdrop);
       document.removeEventListener('keydown', onKey);
       backdrop.hidden = true;
     };
@@ -228,8 +247,8 @@ export function showDialog(opts: {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { cleanup(); resolve(false); } };
 
     okBtn.addEventListener('click', onOk);
-    cancelBtn.addEventListener('click', onCancel);
-    closeBtn.addEventListener('click', onCancel);
+    cancelBtn?.addEventListener('click', onCancel);
+    closeBtn?.addEventListener('click', onCancel);
     backdrop.addEventListener('click', onBackdrop);
     document.addEventListener('keydown', onKey);
     setTimeout(() => okBtn.focus(), 60);

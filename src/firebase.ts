@@ -21,19 +21,46 @@ const firebaseConfig = {
   measurementId: "G-34H054MQEH"
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
-const dataDocRef = doc(db, 'cronoplano', 'data');
-
-let snapshotUnsub: Unsubscribe | null = null;
-let saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-let latestRemoteSnapshot: AppData | null = null;
-let isSaving = false;
-let pendingSaveQueued = false;
-
 export type SyncStatus = 'ok' | 'syncing' | 'offline' | 'error';
 let currentSyncStatus: SyncStatus = 'offline';
 let syncStatusListener: ((status: SyncStatus) => void) | null = null;
+
+let app: any = null;
+let db: any = null;
+let dataDocRef: any = null;
+
+try {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+  db = getFirestore(app);
+  dataDocRef = doc(db, 'cronoplano', 'data');
+} catch (e) {
+  console.warn('[Firebase] Falha na inicialização do Firebase SDK:', e);
+}
+
+/**
+ * Recursively removes all `undefined` values from an object or array.
+ * Firestore strictly forbids `undefined` in documents and throws an unhandled error if present.
+ */
+export function cleanFirestoreData<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(item => cleanFirestoreData(item)).filter(item => item !== undefined) as any;
+  }
+  if (typeof obj === 'object') {
+    // If it's a Firestore Sentinel (e.g. serverTimestamp), preserve it intact
+    if (obj.constructor && obj.constructor.name !== 'Object') {
+      return obj;
+    }
+    const cleaned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = cleanFirestoreData(value);
+      }
+    }
+    return cleaned;
+  }
+  return obj;
+}
 
 export function onSyncStatusChange(cb: (status: SyncStatus) => void) {
   syncStatusListener = cb;
@@ -188,10 +215,14 @@ export function subscribeToRemoteChanges(
   getLocalData: () => AppData
 ) {
   if (snapshotUnsub) snapshotUnsub();
+  if (!dataDocRef) {
+    updateSyncStatus('offline');
+    return () => {};
+  }
 
   snapshotUnsub = onSnapshot(
     dataDocRef,
-    (snap) => {
+    (snap: any) => {
       if (snap.exists()) {
         const remote = snap.data() as AppData;
         latestRemoteSnapshot = remote;
@@ -203,7 +234,7 @@ export function subscribeToRemoteChanges(
         updateSyncStatus('ok');
       }
     },
-    (err) => {
+    (err: any) => {
       console.warn('[Firestore] snapshot listener:', err);
       updateSyncStatus('error');
     }
@@ -217,7 +248,17 @@ export function subscribeToRemoteChanges(
   };
 }
 
+let snapshotUnsub: Unsubscribe | null = null;
+let saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+let latestRemoteSnapshot: AppData | null = null;
+let isSaving = false;
+let pendingSaveQueued = false;
+
 export async function fetchInitialRemote(local: AppData): Promise<AppData> {
+  if (!dataDocRef) {
+    updateSyncStatus('offline');
+    return local;
+  }
   try {
     updateSyncStatus('syncing');
     const snap = await getDoc(dataDocRef);
@@ -228,8 +269,9 @@ export async function fetchInitialRemote(local: AppData): Promise<AppData> {
       updateSyncStatus('ok');
       return merged;
     } else {
-      // First time initialization in firestore
-      await setDoc(dataDocRef, { ...local, updatedAt: serverTimestamp() }, { merge: true });
+      // First time initialization in firestore with sanitized data
+      const sanitized = cleanFirestoreData({ ...local });
+      await setDoc(dataDocRef, { ...sanitized, updatedAt: serverTimestamp() }, { merge: true });
       updateSyncStatus('ok');
       return local;
     }
@@ -244,6 +286,11 @@ export async function saveToFirestoreSafe(
   localData: AppData,
   onMergedSuccess?: (merged: AppData) => void
 ): Promise<boolean> {
+  if (!dataDocRef) {
+    updateSyncStatus('offline');
+    return false;
+  }
+
   if (isSaving) {
     pendingSaveQueued = true;
     return true;
@@ -268,9 +315,14 @@ export async function saveToFirestoreSafe(
     // 2. Perform safe merge
     const merged = remoteToMerge ? mergeAppData(localData, remoteToMerge) : localData;
 
-    // 3. Save merged state
+    // 3. Clean any undefined values before writing to Firestore
+    const sanitized = cleanFirestoreData({
+      ...merged
+    });
+
+    // 4. Save merged state
     await setDoc(dataDocRef, {
-      ...merged,
+      ...sanitized,
       updatedAt: serverTimestamp()
     }, { merge: true });
 

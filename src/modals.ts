@@ -518,7 +518,10 @@ export function bindModalListeners() {
     e.preventDefault();
     const name = ($('#uName') as HTMLInputElement).value.trim();
     if (!name) return;
-    const id = normalizeName(name).replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || ('u-' + uid());
+    let id = normalizeName(name).replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || ('u-' + uid());
+    if (data.users[id]) {
+      id = `${id}-${uid()}`;
+    }
     data.users[id] = {
       id,
       name,
@@ -698,6 +701,23 @@ export function bindModalListeners() {
     if (!ok) return;
 
     data.carteiras = data.carteiras.filter(x => x !== c);
+    Object.values(data.users || {}).forEach(u => {
+      if (Array.isArray(u.carteiras)) {
+        u.carteiras = u.carteiras.filter(x => x !== c);
+      }
+    });
+    Object.values(data.daily || {}).forEach(arr => {
+      if (Array.isArray(arr)) {
+        arr.forEach(t => {
+          if (t.carteira === c) t.carteira = '';
+        });
+      }
+    });
+    if (Array.isArray(data.plannedTasks)) {
+      data.plannedTasks.forEach(pt => {
+        if (pt.carteira === c) pt.carteira = '';
+      });
+    }
     saveState(true);
     renderCarteirasManageList();
     triggerRender();

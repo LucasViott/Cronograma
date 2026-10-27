@@ -146,9 +146,12 @@ function switchTab(tab: string) {
 }
 
 function showLogin() {
-  $('#loginScreen').hidden = false;
-  $('#appTopbar').hidden = true;
-  $('#appMain').hidden = true;
+  const loginScreen = $('#loginScreen');
+  if (loginScreen) loginScreen.hidden = false;
+  const appTopbar = $('#appTopbar');
+  if (appTopbar) appTopbar.hidden = true;
+  const appMain = $('#appMain');
+  if (appMain) appMain.hidden = true;
   const tab = $('#plannedTasksTab');
   if (tab) tab.hidden = true;
   const topbarAlertsBtn = $('#topbarAlertsBtn');
@@ -160,9 +163,12 @@ function showLogin() {
 }
 
 function hideLogin() {
-  $('#loginScreen').hidden = true;
-  $('#appTopbar').hidden = false;
-  $('#appMain').hidden = false;
+  const loginScreen = $('#loginScreen');
+  if (loginScreen) loginScreen.hidden = true;
+  const appTopbar = $('#appTopbar');
+  if (appTopbar) appTopbar.hidden = false;
+  const appMain = $('#appMain');
+  if (appMain) appMain.hidden = false;
   syncTopbarHeight();
   const tab = $('#plannedTasksTab');
   if (tab) tab.hidden = false;
@@ -177,29 +183,38 @@ function hideLogin() {
 
 function setLoginStep(step: string) {
   loginCtx.step = step;
-  $('#loginStepName').hidden = step !== 'name';
-  $('#loginStepPwd').hidden = step !== 'password';
-  $('#loginStepSetup').hidden = step !== 'setup';
+  const stepName = $('#loginStepName');
+  if (stepName) stepName.hidden = step !== 'name';
+  const stepPwd = $('#loginStepPwd');
+  if (stepPwd) stepPwd.hidden = step !== 'password';
+  const stepSetup = $('#loginStepSetup');
+  if (stepSetup) stepSetup.hidden = step !== 'setup';
+
   ['#loginError', '#loginError2', '#loginError3'].forEach(id => {
     const el = $(id);
     if (el) el.hidden = true;
   });
 
   const u = loginCtx.userId ? data.users[loginCtx.userId] : null;
+  const sub = $('#loginSubtitle');
   if (step === 'password' && u) {
-    $('#loginSubtitle').textContent = 'Digite sua senha';
+    if (sub) sub.textContent = 'Digite sua senha';
     applyAvatar($('#loginPwdAvatar'), u);
-    $('#loginPwdName').textContent = u.name;
-    $('#loginPwdRole').textContent = u.cargo || (u.role === 'leader' ? 'Líder' : 'Membro');
+    const pwdName = $('#loginPwdName');
+    if (pwdName) pwdName.textContent = u.name;
+    const pwdRole = $('#loginPwdRole');
+    if (pwdRole) pwdRole.textContent = u.cargo || (u.role === 'leader' ? 'Líder' : 'Membro');
     setTimeout(() => ($('#loginPwd') as HTMLInputElement)?.focus(), 60);
   } else if (step === 'setup' && u) {
-    $('#loginSubtitle').textContent = 'Primeiro acesso';
+    if (sub) sub.textContent = 'Primeiro acesso';
     applyAvatar($('#loginSetupAvatar'), u);
-    $('#loginSetupName').textContent = u.name;
-    $('#loginSetupRole').textContent = u.cargo || (u.role === 'leader' ? 'Líder' : 'Membro');
+    const setupName = $('#loginSetupName');
+    if (setupName) setupName.textContent = u.name;
+    const setupRole = $('#loginSetupRole');
+    if (setupRole) setupRole.textContent = u.cargo || (u.role === 'leader' ? 'Líder' : 'Membro');
     setTimeout(() => ($('#loginPwdNew') as HTMLInputElement)?.focus(), 60);
   } else {
-    $('#loginSubtitle').textContent = 'Acesse com seu nome e sobrenome';
+    if (sub) sub.textContent = 'Acesse com seu nome e sobrenome';
     setTimeout(() => ($('#loginName') as HTMLInputElement)?.focus(), 60);
   }
 }
@@ -593,6 +608,11 @@ function bindEvents() {
 
   // Bind hover tooltips for week and month member blocks
   bindTooltipEvents();
+
+  // Listen for navigation requests (e.g. from alert modal "Ver no cronograma")
+  window.addEventListener('cronoplano:render-daily', () => {
+    render();
+  });
 }
 
 async function init() {
@@ -644,4 +664,8 @@ async function init() {
   }
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => init());
+} else {
+  init();
+}

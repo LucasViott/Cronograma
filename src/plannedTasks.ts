@@ -18,11 +18,13 @@ let editingTaskId: string | null = null;
  */
 export function getDaysDiff(endDateStr: string): number {
   if (!endDateStr) return 999;
+  const parts = String(endDateStr).trim().split('-').map(Number);
+  if (parts.length < 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) return 999;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const [y, m, d] = endDateStr.split('-').map(Number);
-  const target = new Date(y, m - 1, d);
+  const target = new Date(parts[0], parts[1] - 1, parts[2]);
   target.setHours(0, 0, 0, 0);
+  if (isNaN(target.getTime())) return 999;
   const diffTime = target.getTime() - today.getTime();
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 }
@@ -32,9 +34,9 @@ export function getDaysDiff(endDateStr: string): number {
  */
 export function formatDateBR(dateStr: string): string {
   if (!dateStr) return '';
-  const parts = dateStr.split('-');
-  if (parts.length === 3) {
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  const parts = String(dateStr).trim().split('-');
+  if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+    return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
   }
   return dateStr;
 }
@@ -44,11 +46,14 @@ export function formatDateBR(dateStr: string): string {
  */
 export function calculateTimelineProgress(startDateStr: string, endDateStr: string): number {
   if (!startDateStr || !endDateStr) return 0;
+  const sParts = String(startDateStr).trim().split('-').map(Number);
+  const eParts = String(endDateStr).trim().split('-').map(Number);
+  if (sParts.length < 3 || eParts.length < 3 || isNaN(sParts[0]) || isNaN(sParts[1]) || isNaN(sParts[2]) || isNaN(eParts[0]) || isNaN(eParts[1]) || isNaN(eParts[2])) {
+    return 0;
+  }
   const today = new Date().setHours(0, 0, 0, 0);
-  const [sy, sm, sd] = startDateStr.split('-').map(Number);
-  const [ey, em, ed] = endDateStr.split('-').map(Number);
-  const start = new Date(sy, sm - 1, sd).setHours(0, 0, 0, 0);
-  const end = new Date(ey, em - 1, ed).setHours(0, 0, 0, 0);
+  const start = new Date(sParts[0], sParts[1] - 1, sParts[2]).setHours(0, 0, 0, 0);
+  const end = new Date(eParts[0], eParts[1] - 1, eParts[2]).setHours(0, 0, 0, 0);
 
   if (end <= start) return today >= end ? 100 : 0;
   if (today <= start) return 0;

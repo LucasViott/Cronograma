@@ -255,15 +255,19 @@ export function loadLocal() {
 }
 
 export function applyMergedRemote(merged: AppData) {
-  data.users = merged.users;
-  data.daily = merged.daily;
-  data.deletedUserIds = merged.deletedUserIds;
-  data.deletedTaskIds = merged.deletedTaskIds;
-  data.notifications = merged.notifications;
-  data.carteiras = merged.carteiras;
-  if (merged.plannedTasks) {
-    data.plannedTasks = merged.plannedTasks;
-  }
+  if (!merged) return;
+  data.users = merged.users || {};
+  data.daily = merged.daily || {};
+  data.deletedUserIds = merged.deletedUserIds || [];
+  data.deletedTaskIds = merged.deletedTaskIds || {};
+  data.notifications = merged.notifications || [];
+  data.carteiras = Array.isArray(merged.carteiras) && merged.carteiras.length ? merged.carteiras : [...DEFAULT_CARTEIRAS];
+  data.plannedTasks = Array.isArray(merged.plannedTasks) ? merged.plannedTasks : [];
+
+  // Guarantee predefined users and defaults are always restored even if remote document had empty users
+  seedPredefinedUsers();
+  ensureCarteirasInitialized();
+  migrateLegacyData();
   saveLocal();
 
   if (ui.currentUserId && !data.users[ui.currentUserId]) {
