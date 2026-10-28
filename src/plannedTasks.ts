@@ -1,5 +1,5 @@
 import { PlannedTask, TaskItem } from './types';
-import { data, ui, saveState, currentUser, usersList, userById, isLeader, getAllCarteiras } from './state';
+import { data, ui, saveState, currentUser, userById, isLeader, getAllCarteiras } from './state';
 import { $, $$, esc, uid, todayISO, showConfirm, catOf } from './utils';
 import './plannedTasks.css';
 
@@ -7,6 +7,33 @@ let activeFilter: 'all' | 'pending' | 'alerts' | 'done' = 'all';
 let searchQuery = '';
 let isPanelOpen = false;
 let editingTaskId: string | null = null;
+
+/**
+ * Retorna as tarefas planejadas visíveis de acordo com o perfil:
+ * - Líder: vê todas as tarefas planejadas de todos os membros da equipe.
+ * - Membro: vê apenas as suas próprias tarefas planejadas.
+ */
+export function getVisiblePlannedTasks(): PlannedTask[] {
+  const all = data.plannedTasks || [];
+  const curId = ui.currentUserId;
+  if (!curId) return [];
+  if (isLeader()) {
+    return all.slice();
+  }
+  return all.filter(t => t.ownerId === curId);
+}
+
+/**
+ * Sincroniza a interface do painel de tarefas planejadas conforme o cargo:
+ * - Oculta o botão de adicionar tarefa planejada para o Líder.
+ * - Mostra o botão de adicionar apenas para Membros.
+ */
+export function syncPlannedRoleUI() {
+  const addBtn = $('#plannedOpenAddModalBtn');
+  if (addBtn) {
+    addBtn.hidden = isLeader();
+  }
+}
 
 /**
  * Calculates calendar day difference between endDate and today.
@@ -68,14 +95,11 @@ export function calculateTimelineProgress(startDateStr: string, endDateStr: stri
  * Active (not done) and diff is 0, 1, or 2 days, or overdue (< 0)
  */
 export function getAlertTasks(): PlannedTask[] {
-  const tasks = data.plannedTasks || [];
-  const curId = ui.currentUserId;
-  const isLead = isLeader();
+  const tasks = getVisiblePlannedTasks();
   return tasks.filter(t => {
     if (t.done) return false;
-    if (!isLead && t.ownerId !== curId) return false;
     const diff = getDaysDiff(t.endDate);
-    return diff === 0 || diff === 1 || diff === 2;
+    return diff <= 2;
   }).sort((a, b) => getDaysDiff(a.endDate) - getDaysDiff(b.endDate));
 }
 
@@ -107,6 +131,7 @@ export function getLateCronogramaTasks(): { task: TaskItem; date: string }[] {
  * Synchronizes the --topbar-height CSS variable with the exact DOM height of #appTopbar
  */
 export function syncTopbarHeight() {
+  syncPlannedRoleUI();
   const topbar = $('#appTopbar');
   if (topbar && !topbar.hidden) {
     const h = topbar.offsetHeight;
@@ -126,6 +151,7 @@ export function togglePlannedTasksPanel(open?: boolean) {
   if (!panel || !tab) return;
 
   syncTopbarHeight();
+  syncPlannedRoleUI();
   isPanelOpen = typeof open === 'boolean' ? open : !isPanelOpen;
 
   if (isPanelOpen) {
@@ -157,6 +183,7 @@ export function togglePlannedTasksPanel(open?: boolean) {
  * Populates carteira select in the modal form
  */
 export function populateCarteiraOptions() {
+  syncPlannedRoleUI();
   const carteiraSel = $('#plannedCarteira') as HTMLSelectElement;
   if (carteiraSel) {
     const curVal = carteiraSel.value;
@@ -172,6 +199,9 @@ export const populateFormOptions = populateCarteiraOptions;
  * Opens the pop-up modal to add a new planned task or edit an existing one
  */
 export function openPlannedTaskModal(taskId?: string) {
+  // Bloqueia líderes de adicionarem novas tarefas planejadas
+  if (!taskId && isLeader()) return;
+
   const modal = $('#plannedTaskModal');
   const form = $('#plannedTaskModalForm') as HTMLFormElement;
   if (!modal || !form) return;
@@ -235,6 +265,12 @@ export function closePlannedTaskModal() {
  */
 function handleModalFormSubmit(e: SubmitEvent) {
   e.preventDefault();
+
+  // Trava de segurança: líder não pode criar novas tarefas planejadas
+  if (!editingTaskId && isLeader()) {
+    closePlannedTaskModal();
+    return;
+  }
 
   const titleInput = $('#plannedTitle') as HTMLInputElement;
   const startInput = $('#plannedStartDate') as HTMLInputElement;
@@ -345,7 +381,8 @@ export async function deleteTask(taskId: string) {
  * Updates badge counters on the tab, topbar alerts button, and side panel
  */
 export function updatePlannedTasksBadge() {
-  const tasks = data.plannedTasks || [];
+  syncPlannedRoleUI();
+  const tasks = getVisiblePlannedTasks();
   const alertTasks = getAlertTasks();
   const lateCronograma = getLateCronogramaTasks();
   const totalAlerts = alertTasks.length + lateCronograma.length;
@@ -397,20 +434,16 @@ export function updatePlannedTasksBadge() {
 }
 
 /**
- * Renders the list of planned tasks inside the side panel (Status view only)
+ * Renders the list of planned tasks inside the side panel
  */
 export function renderPlannedTasksList() {
   const listEl = $('#plannedTasksList');
   if (!listEl) return;
 
+  syncPlannedRoleUI();
   updatePlannedTasksBadge();
 
-  let tasks = (data.plannedTasks || []).slice();
-  if (!isLeader()) {
-  tasks = tasks.filter(t => t.ownerId === ui.currentUserId);
-} else if (ui.viewUserId && ui.viewUserId !== '__all__') {
-  tasks = tasks.filter(t => t.ownerId === ui.viewUserId);
-}
+  let tasks = getVisiblePlannedTasks();
 
   // Filter tab
   if (activeFilter === 'pending') {
@@ -446,11 +479,17 @@ export function renderPlannedTasksList() {
   });
 
   if (tasks.length === 0) {
+    const emptyMsg = activeFilter === 'alerts'
+      ? 'Não há tarefas com prazo para hoje, amanhã ou em 2 dias.'
+      : isLeader()
+        ? 'Nenhum membro da equipe cadastrou tarefas planejadas até o momento.'
+        : 'Clique no botão <b>＋ Nova Tarefa</b> acima para cadastrar um planejamento com prazo.';
+
     listEl.innerHTML = `
       <div class="planned-empty">
         <div class="empty-ico">🎯</div>
         <h4>Nenhuma tarefa planejada encontrada</h4>
-        <p>${activeFilter === 'alerts' ? 'Não há tarefas com prazo para hoje, amanhã ou em 2 dias.' : 'Clique no botão <b>＋ Nova Tarefa</b> acima para cadastrar um planejamento com prazo.'}</p>
+        <p>${emptyMsg}</p>
       </div>
     `;
     return;
@@ -571,7 +610,7 @@ export function checkAndTriggerDeadlineAlerts(force = false) {
   const alertTasks = getAlertTasks();
   const lateCronograma = getLateCronogramaTasks();
 
-  if (alertTasks.length === 0) return;
+  if (alertTasks.length === 0 && lateCronograma.length === 0) return;
 
   const storageKey = `cronoplano_planned_alerts_${today}_${ui.currentUserId || 'guest'}`;
 
@@ -816,8 +855,9 @@ export function initPlannedTasks() {
     togglePlannedTasksPanel(false);
   });
 
-  // Button in panel header: "＋ Nova Tarefa" opens modal
+  // Button in panel header: "＋ Nova Tarefa" opens modal (apenas para membros)
   $('#plannedOpenAddModalBtn')?.addEventListener('click', () => {
+    if (isLeader()) return;
     openPlannedTaskModal();
   });
 
@@ -885,6 +925,7 @@ export function initPlannedTasks() {
   });
 
   // Initial updates and sync
+  syncPlannedRoleUI();
   updatePlannedTasksBadge();
   syncTopbarHeight();
   window.addEventListener('resize', syncTopbarHeight);

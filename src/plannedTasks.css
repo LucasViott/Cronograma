@@ -3,23 +3,68 @@
    ========================================================== */
 
 :root {
-  --topbar-height: 57px;
-  --footer-height: 36px;
+  --topbar-height: 58px;
 }
 
-/* Garante que o cabeçalho fique acima do painel e da aba lateral */
+/* Garante que o cabeçalho fique acima do painel e mantenha 1 única linha sem crescer na visão do líder */
 .topbar {
+  position: sticky !important;
+  top: 0 !important;
   z-index: 100 !important;
+}
+
+@media (min-width: 1021px) {
+  .topbar-inner {
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+  }
+  .topbar-carteiras {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+  .tabs {
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  .tab {
+    padding: 7px 12px !important;
+    font-size: 12.5px !important;
+  }
+  .user-wrap {
+    flex-wrap: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* Coluna lateral da visão diária (Abordagem A: vai do fim do cabeçalho até o fim da tela no scroll) */
+@media (min-width: 1021px) {
+  .daily-side {
+    position: sticky !important;
+    top: var(--topbar-height, 58px) !important;
+    min-height: calc(100vh - var(--topbar-height, 58px)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding-top: 12px !important;
+    padding-bottom: 18px !important;
+    align-self: start !important;
+  }
+  .daily-side .cal-panel {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
 }
 
 /* Espaço na margem direita do conteúdo principal para a aba lateral fixa não cobrir botões */
 main {
-  padding-right: 60px !important;
+  padding-right: 64px !important;
 }
 
 @media (max-width: 640px) {
   main {
-    padding-right: 22px !important;
+    padding-right: 54px !important;
   }
 }
 
@@ -65,16 +110,17 @@ main {
   animation: plannedAlertPulse 1.8s ease-in-out infinite;
 }
 
-/* Aba estreita na lateral direita (do fim do cabeçalho até o fim da tela) */
+/* Aba estreita na lateral direita (do início da área útil abaixo do cabeçalho até o fim da tela) */
 .planned-tasks-tab {
   position: fixed !important;
-  top: var(--topbar-height, 57px) !important;
-  bottom: var(--footer-height, 36px) !important;
+  top: var(--topbar-height, 58px) !important;
+  bottom: 0 !important;
   right: 0 !important;
   width: 44px !important;
-  height: calc(100vh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
-  max-height: calc(100dvh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
-  z-index: 70 !important;
+  height: calc(100vh - var(--topbar-height, 58px)) !important;
+  min-height: calc(100vh - var(--topbar-height, 58px)) !important;
+  max-height: none !important;
+  z-index: 90 !important;
   background: var(--surface);
   border-left: 1.5px solid var(--border);
   box-shadow: -4px 0 22px rgba(0, 0, 0, 0.32);
@@ -85,7 +131,7 @@ main {
   padding: 18px 0 22px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+  transition: background-color 0.22s ease, border-color 0.22s ease;
 }
 
 .planned-tasks-tab[hidden] {
@@ -189,13 +235,15 @@ main {
 /* Backdrop com fade suave para fechar ao clicar fora */
 .planned-tasks-backdrop {
   position: fixed !important;
-  inset: 0 !important;
-  top: var(--topbar-height, 57px) !important;
-  height: calc(100vh - var(--topbar-height, 57px)) !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: var(--topbar-height, 58px) !important;
+  bottom: 0 !important;
+  height: calc(100vh - var(--topbar-height, 58px)) !important;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  z-index: 72 !important;
+  z-index: 92 !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
@@ -207,29 +255,28 @@ main {
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Painel lateral drawer fixado na lateral direita da tela */
+/* Painel lateral drawer fixado na lateral direita (do fim do cabeçalho até o fim da tela) */
 .planned-tasks-panel {
   position: fixed !important;
-  top: var(--topbar-height, 57px) !important;
-  bottom: var(--footer-height, 36px) !important;
+  top: var(--topbar-height, 58px) !important;
+  bottom: 0 !important;
   right: 0 !important;
   width: 460px !important;
   max-width: calc(100vw - 44px) !important;
-  height: calc(100vh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
-  max-height: calc(100dvh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
+  height: calc(100vh - var(--topbar-height, 58px)) !important;
+  min-height: calc(100vh - var(--topbar-height, 58px)) !important;
+  max-height: none !important;
   background: var(--surface);
   border-left: 1px solid var(--border);
   box-shadow: -14px 0 45px rgba(0, 0, 0, 0.55);
-  z-index: 75 !important;
+  z-index: 95 !important;
   display: flex !important;
   flex-direction: column;
   overflow: hidden;
-  /* Estado fechado: fora da tela à direita */
   transform: translate3d(100%, 0, 0);
   visibility: hidden;
   pointer-events: none;
   will-change: transform;
-  /* Transição de fechamento */
   transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
               visibility 0.32s,
               box-shadow 0.32s ease;
@@ -241,7 +288,6 @@ main {
   box-shadow: -10px 0 35px rgba(0, 0, 0, 0.12);
 }
 
-/* Estado aberto: desliza suavemente na lateral da tela */
 .planned-tasks-panel.open {
   transform: translate3d(0, 0, 0) !important;
   visibility: visible !important;
@@ -855,7 +901,6 @@ main {
    MODAL DE ALERTA DE PRAZOS (2, 1 e DIA DA FINALIZAÇÃO)
    ========================================================== */
 
-/* Modal mais comprido e espaçoso com rolagem interna independente */
 .modal.alert-modal {
   width: 95% !important;
   max-width: 820px !important;
@@ -902,7 +947,6 @@ main {
   50% { transform: rotate(0); }
 }
 
-/* Área de rolagem vertical da Central de Alertas */
 .alert-modal-content {
   flex: 1 1 auto !important;
   min-height: 0 !important;
@@ -1017,7 +1061,6 @@ main {
   flex-direction: column;
 }
 
-/* Card individual de alerta com espaçamento e sem sobreposição */
 .alert-task-card {
   padding: 13px 16px !important;
   display: flex !important;
@@ -1100,7 +1143,6 @@ main {
   white-space: nowrap;
 }
 
-/* Rolagem dedicada para a lista de tarefas atrasadas no cronograma */
 .cronograma-scroll-list {
   max-height: 320px !important;
   overflow-y: auto !important;
@@ -1122,7 +1164,6 @@ main {
   background: var(--accent);
 }
 
-/* Detalhes de nome, prazo final e observações no card de alerta */
 .alert-task-top {
   display: flex;
   align-items: flex-start;
