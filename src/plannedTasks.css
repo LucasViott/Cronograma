@@ -4,6 +4,7 @@
 
 :root {
   --topbar-height: 57px;
+  --footer-height: 36px;
 }
 
 /* Garante que o cabeçalho fique acima do painel e da aba lateral */
@@ -68,11 +69,11 @@ main {
 .planned-tasks-tab {
   position: fixed !important;
   top: var(--topbar-height, 57px) !important;
-  bottom: 0 !important;
+  bottom: var(--footer-height, 36px) !important;
   right: 0 !important;
   width: 44px !important;
-  height: calc(100vh - var(--topbar-height, 57px)) !important;
-  max-height: calc(100dvh - var(--topbar-height, 57px)) !important;
+  height: calc(100vh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
+  max-height: calc(100dvh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
   z-index: 70 !important;
   background: var(--surface);
   border-left: 1.5px solid var(--border);
@@ -210,12 +211,12 @@ main {
 .planned-tasks-panel {
   position: fixed !important;
   top: var(--topbar-height, 57px) !important;
-  bottom: 0 !important;
+  bottom: var(--footer-height, 36px) !important;
   right: 0 !important;
   width: 460px !important;
   max-width: calc(100vw - 44px) !important;
-  height: calc(100vh - var(--topbar-height, 57px)) !important;
-  max-height: calc(100dvh - var(--topbar-height, 57px)) !important;
+  height: calc(100vh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
+  max-height: calc(100dvh - var(--topbar-height, 57px) - var(--footer-height, 36px)) !important;
   background: var(--surface);
   border-left: 1px solid var(--border);
   box-shadow: -14px 0 45px rgba(0, 0, 0, 0.55);

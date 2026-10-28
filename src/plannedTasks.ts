@@ -69,10 +69,13 @@ export function calculateTimelineProgress(startDateStr: string, endDateStr: stri
  */
 export function getAlertTasks(): PlannedTask[] {
   const tasks = data.plannedTasks || [];
+  const curId = ui.currentUserId;
+  const isLead = isLeader();
   return tasks.filter(t => {
     if (t.done) return false;
+    if (!isLead && t.ownerId !== curId) return false;
     const diff = getDaysDiff(t.endDate);
-    return diff <= 2;
+    return diff === 0 || diff === 1 || diff === 2;
   }).sort((a, b) => getDaysDiff(a.endDate) - getDaysDiff(b.endDate));
 }
 
@@ -403,6 +406,11 @@ export function renderPlannedTasksList() {
   updatePlannedTasksBadge();
 
   let tasks = (data.plannedTasks || []).slice();
+  if (!isLeader()) {
+  tasks = tasks.filter(t => t.ownerId === ui.currentUserId);
+} else if (ui.viewUserId && ui.viewUserId !== '__all__') {
+  tasks = tasks.filter(t => t.ownerId === ui.viewUserId);
+}
 
   // Filter tab
   if (activeFilter === 'pending') {
@@ -563,7 +571,7 @@ export function checkAndTriggerDeadlineAlerts(force = false) {
   const alertTasks = getAlertTasks();
   const lateCronograma = getLateCronogramaTasks();
 
-  if (alertTasks.length === 0 && lateCronograma.length === 0) return;
+  if (alertTasks.length === 0) return;
 
   const storageKey = `cronoplano_planned_alerts_${today}_${ui.currentUserId || 'guest'}`;
 
